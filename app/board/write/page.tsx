@@ -59,7 +59,7 @@ export default function WritePage() {
 
       if (error) {
         console.error('Image upload failed:', error);
-        alert('이미지 업로드 실패 (Storage Bucket이 존재하는지 확인해주세요). 텍스트만 저장합니다.');
+        alert(`이미지 업로드 실패: ${error.message}`);
         // Proceed without image or return? Let's proceed for robustness in demo
       } else {
          const { data: publicUrlData } = supabase.storage.from('posts').getPublicUrl(filename);
