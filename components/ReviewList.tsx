@@ -1,0 +1,44 @@
+import { getReviews } from '@/actions/review';
+
+interface Review {
+  id: string;
+  content: string;
+  createdAt: Date;
+  author: {
+    name: string | null;
+  };
+}
+
+export default async function ReviewList({ postId }: { postId: string }) {
+  const reviews = await getReviews(postId);
+
+  if (reviews.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-xl">
+        <p>아직 작성된 후기가 없습니다.</p>
+        <p className="text-sm mt-2">첫 후기의 주인공이 되어보세요!</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <h3 className="font-bold text-lg text-gray-900">활동 후기 ({reviews.length})</h3>
+      <ul className="space-y-4">
+        {reviews.map((review: Review) => (
+          <li key={review.id} className="bg-gray-50 p-4 rounded-xl">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-medium text-gray-900">{review.author.name}</span>
+              <span className="text-xs text-gray-400">
+                {new Date(review.createdAt).toLocaleDateString()}
+              </span>
+            </div>
+            <p className="text-gray-700 whitespace-pre-wrap text-sm leading-relaxed">
+              {review.content}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}

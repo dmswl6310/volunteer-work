@@ -1,117 +1,95 @@
-'use client';
+import prisma from '@/lib/prisma';
+import { approveUser, approveApplication, rejectApplication } from '@/actions/admin';
 
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
+export const dynamic = 'force-dynamic';
 
-type UserProfile = {
-  id: string;
-  email: string;
-  name: string;
-  contact: string;
-  is_approved: boolean;
-  created_at: string;
-};
+export default async function AdminPage() {
+  // 1. Fetch pending users
+  const pendingUsers = await prisma.user.findMany({
+    where: { isApproved: false },
+    orderBy: { createdAt: 'desc' },
+  });
 
-export default function AdminPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState<UserProfile[]>([]);
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    checkAdmin();
-    fetchPendingUsers();
-  }, []);
-
-  const checkAdmin = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      router.push('/auth/login');
-      return;
-    }
-
-    const { data } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (data?.role !== 'admin') {
-      alert('관리자 권한이 필요합니다.');
-      router.push('/');
-      return;
-    }
-    setIsAdmin(true);
-  };
-
-  const fetchPendingUsers = async () => {
-    // Fetch users who are NOT approved
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('is_approved', false)
-      .order('created_at', { ascending: false });
-
-    if (error) console.error('Error fetching users:', error);
-    else setUsers(data || []);
-    setLoading(false);
-  };
-
-  const approveUser = async (userId: string) => {
-    // Ideally use an RPC or Server Action for security, but direct update works if RLS policies allow 'update own' or 'admin update'.
-    // NOTE: My RLS policy only allows "Users can update own profile". Admin cannot update others by default unless I add a policy for admins.
-    // I need to add an RLS policy for admins in Supabase SQL editor later. 
-    // For now, I will assume the policy exists or I will attempt to update.
-    
-    // UPDATE: We need to ensure the DB setup allows this.
-    const { error } = await supabase
-      .from('users')
-      .update({ is_approved: true })
-      .eq('id', userId);
-
-    if (error) {
-      alert('승인 실패: ' + error.message);
-    } else {
-      alert('승인되었습니다.');
-      setUsers(users.filter(u => u.id !== userId));
-    }
-  };
-
-  if (!isAdmin && loading) return <div className="p-8 text-center">Loading...</div>;
-  if (!isAdmin) return null; // Redirecting
+  // 2. Fetch pending applications
+  const pendingApplications = await prisma.application.findMany({
+    where: { status: 'pending' },
+    include: {
+      user: true,
+      post: true,
+    },
+    orderBy: { createdAt: 'desc' },
+  });
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">관리자 대시보드 - 회원 가입 승인</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">관리자 대시보드</h1>
 
-      {loading ? (
-        <p>Loading pending users...</p>
-      ) : users.length === 0 ? (
-        <p className="text-gray-500">승인 대기 중인 회원이 없습니다.</p>
-      ) : (
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
-          <ul className="divide-y divide-gray-200">
-            {users.map((user) => (
-              <li key={user.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
-                <div>
-                  <p className="text-sm font-medium text-indigo-600 truncate">{user.name} ({user.email})</p>
-                  <p className="text-sm text-gray-500">연락처: {user.contact}</p>
-                  <p className="text-xs text-gray-400">가입일: {new Date(user.created_at).toLocaleDateString()}</p>
-                </div>
-                <div>
-                  <button
-                    onClick={() => approveUser(user.id)}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                  >
-                    승인
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {/* User Approval Section */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold mb-4">가입 승인 대기 회원 ({pendingUsers.length})</h2>
+        {pendingUsers.length === 0 ? (
+          <p className="text-gray-500">대기 중인 회원이 없습니다.</p>
+        ) : (
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <ul className="divide-y divide-gray-200">
+              {pendingUsers.map((user) => (
+                <li key={user.id} className="p-4 flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{user.name || '이름 없음'}</p>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                    <p className="text-xs text-gray-400">{new Date(user.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <form action={approveUser.bind(null, user.id)}>
+                    <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-medium">
+                      승인
+                    </button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </section>
+
+      {/* Application Approval Section */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">봉사활동 신청 대기 ({pendingApplications.length})</h2>
+        {pendingApplications.length === 0 ? (
+          <p className="text-gray-500">대기 중인 신청이 없습니다.</p>
+        ) : (
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <ul className="divide-y divide-gray-200">
+              {pendingApplications.map((app) => (
+                <li key={app.id} className="p-6">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex-1">
+                      <h3 className="font-bold text-lg mb-1">{app.post.title}</h3>
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <p>신청자: <span className="font-medium text-black">{app.user.name}</span> ({app.user.email})</p>
+                        <p>연락처: {app.user.contact || '없음'}</p>
+                        <p>신청일: {new Date(app.createdAt).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <form action={approveApplication.bind(null, app.id)}>
+                        <button className="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 font-bold shadow-sm transition-colors">
+                          승인
+                        </button>
+                      </form>
+                      <form action={rejectApplication.bind(null, app.id)}>
+                        <button className="bg-red-100 text-red-600 px-5 py-2.5 rounded-lg hover:bg-red-200 font-bold transition-colors">
+                          거절
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
