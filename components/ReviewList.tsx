@@ -1,11 +1,12 @@
 import { getReviews } from '@/actions/review';
 
-interface Review {
+interface ReviewWithAuthor {
   id: string;
   content: string;
   createdAt: Date;
   author: {
     name: string | null;
+    email: string;
   };
 }
 
@@ -25,7 +26,7 @@ export default async function ReviewList({ postId }: { postId: string }) {
     <div className="space-y-4">
       <h3 className="font-bold text-lg text-gray-900">활동 후기 ({reviews.length})</h3>
       <ul className="space-y-4">
-        {reviews.map((review: Review) => (
+        {reviews.map((review: ReviewWithAuthor) => (
           <li key={review.id} className="bg-gray-50 p-4 rounded-xl">
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium text-gray-900">{review.author.name}</span>

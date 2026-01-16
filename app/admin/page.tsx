@@ -1,6 +1,27 @@
 import prisma from '@/lib/prisma';
 import { approveUser, approveApplication, rejectApplication } from '@/actions/admin';
 
+interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  contact: string | null;
+  createdAt: Date;
+}
+
+interface ApplicationWithRelations {
+  id: string;
+  createdAt: Date;
+  user: {
+    name: string | null;
+    email: string;
+    contact: string | null;
+  };
+  post: {
+    title: string;
+  };
+}
+
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
@@ -11,7 +32,7 @@ export default async function AdminPage() {
   });
 
   // 2. Fetch pending applications
-  const pendingApplications = await prisma.application.findMany({
+  const pendingApplications: ApplicationWithRelations[] = await prisma.application.findMany({
     where: { status: 'pending' },
     include: {
       user: true,
@@ -32,20 +53,22 @@ export default async function AdminPage() {
         ) : (
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <ul className="divide-y divide-gray-200">
-              {pendingUsers.map((user) => (
-                <li key={user.id} className="p-4 flex items-center justify-between">
+              {pendingUsers.map((user: unknown) => {
+                const u = user as User;
+                return (
+                <li key={u.id} className="p-4 flex items-center justify-between">
                   <div>
-                    <p className="font-medium">{user.name || '이름 없음'}</p>
-                    <p className="text-sm text-gray-500">{user.email}</p>
-                    <p className="text-xs text-gray-400">{new Date(user.createdAt).toLocaleDateString()}</p>
+                    <p className="font-medium">{u.name || '이름 없음'}</p>
+                    <p className="text-sm text-gray-500">{u.email}</p>
+                    <p className="text-xs text-gray-400">{new Date(u.createdAt).toLocaleDateString()}</p>
                   </div>
-                  <form action={approveUser.bind(null, user.id)}>
+                  <form action={approveUser.bind(null, u.id)}>
                     <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-medium">
                       승인
                     </button>
                   </form>
                 </li>
-              ))}
+              );})}
             </ul>
           </div>
         )}
@@ -59,7 +82,7 @@ export default async function AdminPage() {
         ) : (
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <ul className="divide-y divide-gray-200">
-              {pendingApplications.map((app) => (
+              {pendingApplications.map((app: ApplicationWithRelations) => (
                 <li key={app.id} className="p-6">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex-1">
