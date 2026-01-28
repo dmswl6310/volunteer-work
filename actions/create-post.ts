@@ -1,22 +1,18 @@
 'use server';
 
 import prisma from '@/lib/prisma';
-import { supabase } from '@/lib/supabase'; // NOTE: Server-side Supabase client might need auth context
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-
-// Simplification: We will pass authorId from the client for now, 
-// BUT in production, we should extract it from the session to prevent spoofing.
-// Since we are mocking/protoyping, we can check basic auth or just trust the client implementation with RLS backup if using Supabase directly.
-// However, using Prisma, we bypass RLS. So we MUST verify auth here.
 
 export async function createPost(formData: FormData) {
   const title = formData.get('title') as string;
   const content = formData.get('content') as string;
   const category = formData.get('category') as string;
   const maxParticipants = parseInt(formData.get('maxParticipants') as string);
-  const userId = formData.get('userId') as string; // Client provides this after Login check
+  const userId = formData.get('userId') as string;
   const imageUrl = formData.get('imageUrl') as string;
+  const isUrgent = formData.get('isUrgent') === 'true';
+  const dueDateStr = formData.get('dueDate') as string;
 
   if (!userId) {
     throw new Error('Unauthorized');
@@ -27,16 +23,20 @@ export async function createPost(formData: FormData) {
     throw new Error('필수 항목을 입력해주세요.');
   }
 
+  const dueDate = dueDateStr ? new Date(dueDateStr) : null;
+
   try {
      await prisma.post.create({
       data: {
         title,
-        content, // content can be HTML or markdown
+        content,
         category,
         maxParticipants,
         authorId: userId,
         imageUrl,
         isRecruiting: true,
+        isUrgent,
+        dueDate
       },
     });
   } catch (error) {

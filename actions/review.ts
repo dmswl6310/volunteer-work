@@ -67,3 +67,23 @@ export async function getReviews(postId: string) {
     orderBy: { createdAt: 'desc' },
   });
 }
+
+export async function getAllReviews() {
+  try {
+    return await prisma.review.findMany({
+      include: {
+        author: {
+           select: { name: true }
+        },
+        post: {
+           select: { title: true, id: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+  } catch (error) {
+    console.error('Error fetching all reviews:', error);
+    return [];
+  }
+}

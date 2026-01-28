@@ -6,10 +6,16 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post }: PostCardProps) {
+  // Safe default for dueDate
+  const today = new Date();
+  const dueDate = post.dueDate ? new Date(post.dueDate) : null;
+  const isExpired = dueDate ? dueDate < today : false;
+  
   return (
     <Link href={`/board/${post.id}`} className="block group">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
-        <div className="relative aspect-[4/3] bg-gray-200">
+      <div className="bg-white p-4 border-b border-gray-100 flex gap-4 hover:bg-gray-50 transition-colors">
+        {/* Image - Left Side */}
+        <div className="relative w-24 h-24 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
           {post.imageUrl ? (
             <img
               src={post.imageUrl}
@@ -18,42 +24,46 @@ export default function PostCard({ post }: PostCardProps) {
             />
           ) : (
              <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
-                <span className="text-xs">No Image</span>
+                <span className="text-xs">No Img</span>
              </div>
           )}
           {post.isUrgent && (
-            <span className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
+            <span className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg">
               긴급
             </span>
           )}
         </div>
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-1">
-             <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
-               {post.category || '기타'}
-             </span>
-             <span className="text-xs text-gray-400">
-               조회 {post.views}
-             </span>
+
+        {/* Content - Right Side */}
+        <div className="flex-1 flex flex-col justify-between py-0.5">
+          <div>
+              <div className="flex justify-between items-start mb-1">
+                 <h3 className="text-base font-bold text-gray-900 line-clamp-2 leading-tight group-hover:text-indigo-600 transition-colors">
+                    {post.title}
+                 </h3>
+              </div>
+              <div className="flex items-center space-x-2 text-xs text-gray-500 mb-1">
+                 <span className="font-medium text-gray-700">{post.category || '기타'}</span>
+                 <span>·</span>
+                 <span>{post.author.name || '익명'}</span>
+              </div>
           </div>
-          <h3 className="text-base font-bold text-gray-900 mb-1 line-clamp-2 group-hover:text-indigo-600 transition-colors">
-            {post.title}
-          </h3>
-          <p className="text-xs text-gray-500 mb-3">
-             {post.author.name || '익명'}
-          </p>
           
-          <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-100">
-            <div className="flex items-center space-x-1">
-               <span>모집</span>
-               <span className="font-semibold text-gray-900">
-                 {post.currentParticipants}/{post.maxParticipants}
-               </span>
-            </div>
-             <div className="flex items-center space-x-1">
-               {/* Icon for Scrap/Bookmark could go here */}
-               <span>스크랩 {post.scraps}</span>
-            </div>
+          <div className="flex items-center justify-between mt-2">
+               <div className="flex items-center space-x-2 text-xs">
+                    <span className={`font-bold ${post.isRecruiting && !isExpired ? 'text-green-600' : 'text-gray-500'}`}>
+                        {post.isRecruiting && !isExpired ? '모집중' : '마감'}
+                    </span>
+                    <span className="text-gray-400">
+                        {post.currentParticipants}/{post.maxParticipants}명
+                    </span>
+               </div>
+               
+               {dueDate && (
+                   <span className={`text-xs font-medium ${isExpired ? 'text-gray-400' : 'text-red-500'}`}>
+                       {isExpired ? '마감됨' : `D-${Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))}`}
+                   </span>
+               )}
           </div>
         </div>
       </div>

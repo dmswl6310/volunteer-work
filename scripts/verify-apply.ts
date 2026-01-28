@@ -12,9 +12,13 @@ async function main() {
     update: {},
     create: {
       email: 'test@example.com',
+      username: 'testuser',
       name: 'Test User',
       role: 'user',
       isApproved: true,
+      contact: '010-1234-5678',
+      address: 'Test City',
+      job: 'Tester',
     },
   });
   console.log('User created/found:', user.id);

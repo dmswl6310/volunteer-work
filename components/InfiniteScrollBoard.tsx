@@ -9,9 +9,10 @@ interface InfiniteScrollBoardProps {
   initialPosts: PostWithAuthor[];
   initialNextId: number | null;
   sort?: 'latest' | 'popular';
+  category?: string;
 }
 
-export default function InfiniteScrollBoard({ initialPosts, initialNextId, sort = 'latest' }: InfiniteScrollBoardProps) {
+export default function InfiniteScrollBoard({ initialPosts, initialNextId, sort = 'latest', category }: InfiniteScrollBoardProps) {
   const [posts, setPosts] = useState<PostWithAuthor[]>(initialPosts);
   const [nextId, setNextId] = useState<number | null>(initialNextId);
   const { ref, inView } = useInView();
@@ -20,12 +21,12 @@ export default function InfiniteScrollBoard({ initialPosts, initialNextId, sort 
   useEffect(() => {
     setPosts(initialPosts);
     setNextId(initialNextId);
-  }, [sort, initialPosts, initialNextId]);
+  }, [sort, category, initialPosts, initialNextId]);
 
   const loadMorePosts = async () => {
     if (nextId === null) return;
 
-    const newPosts = await getPosts({ page: nextId, sort });
+    const newPosts = await getPosts({ page: nextId, sort, category });
     setPosts((prev) => [...prev, ...newPosts.posts]);
     setNextId(newPosts.nextId);
   };
@@ -38,7 +39,7 @@ export default function InfiniteScrollBoard({ initialPosts, initialNextId, sort 
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {posts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}

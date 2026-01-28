@@ -15,9 +15,13 @@ async function main() {
     user = await prisma.user.create({
       data: {
         email: 'admin@example.com',
+        username: 'admin',
         name: '관리자',
         role: 'admin',
         isApproved: true,
+        contact: '010-0000-0000',
+        address: '서울시',
+        job: '관리자',
       },
     });
     console.log('Created dummy user:', user.id);

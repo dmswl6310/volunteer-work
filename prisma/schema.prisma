@@ -11,8 +11,11 @@ datasource db {
 model User {
   id          String   @id @default(uuid())
   email       String   @unique
-  name        String?
-  contact     String?
+  username    String   @unique
+  name        String
+  contact     String
+  address     String
+  job         String
   role        String   @default("user") // "admin" | "user"
   isApproved  Boolean  @default(false) @map("is_approved")
   points      Int      @default(0)
@@ -37,6 +40,7 @@ model Post {
   maxParticipants Int @default(10) @map("max_participants")
   currentParticipants Int @default(0) @map("current_participants")
   isUrgent    Boolean @default(false) @map("is_urgent")
+  dueDate     DateTime? @map("due_date")
   views       Int @default(0)
   scraps      Int @default(0)
   isRecruiting Boolean @default(true) @map("is_recruiting")

@@ -105,6 +105,20 @@ export default function WritePage() {
            <input name="title" required placeholder="봉사활동 제목을 입력하세요" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" />
         </div>
 
+        {/* Urgent & Due Date */}
+        <div className="flex gap-4">
+             <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">마감 기한</label>
+                <input type="date" name="dueDate" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" />
+             </div>
+             <div className="flex items-center pt-6">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" name="isUrgent" value="true" className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300" />
+                    <span className="font-bold text-red-500">긴급 모집</span>
+                </label>
+             </div>
+        </div>
+
         {/* Category */}
         <div>
            <label className="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
