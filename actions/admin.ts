@@ -59,6 +59,20 @@ export async function rejectApplication(applicationId: string) {
     revalidatePath('/admin');
   } catch (error) {
     console.error('Error rejecting application:', error);
-    throw new Error('신청 거절 중 오류가 발생했습니다.');
   }
 }
+
+
+export async function getAdminDashboardData() {
+  try {
+    const pendingUsers = await prisma.user.findMany({
+      where: { isApproved: false },
+      orderBy: { createdAt: 'desc' },
+    });
+    return pendingUsers;
+  } catch (error) {
+    console.error('Error fetching admin data:', error);
+    return [];
+  }
+}
+

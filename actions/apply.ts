@@ -3,7 +3,38 @@
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
-export async function applyForPost(postId: string, userId: string) {
+export async function applyForPost(postId: string, userId: string, email?: string) {
+  // 0. Auto-Heal User Check
+  const userExists = await prisma.user.findUnique({ where: { id: userId } });
+  if (!userExists) {
+    console.warn(`User ${userId} not found in DB during application. Auto-creating...`);
+    if (!email) {
+      throw new Error('User record missing and no email provided for auto-registration.');
+    }
+    const emailPrefix = email.split('@')[0];
+    let newUsername = emailPrefix;
+    let counter = 1;
+    while (await prisma.user.findUnique({ where: { username: newUsername } })) {
+      newUsername = `${emailPrefix}${counter}`;
+      counter++;
+    }
+
+    await prisma.user.create({
+      data: {
+        id: userId, // CRITICAL: Use Auth Key
+        email: email,
+        username: newUsername,
+        name: 'User',
+        contact: '010-0000-0000',
+        address: 'Unknown',
+        job: 'Unknown',
+        role: 'user',
+        isApproved: true,
+      },
+    });
+    console.log(`User ${userId} auto-created.`);
+  }
+
   // 1. Check if post exists and is recruiting
   const post = await prisma.post.findUnique({
     where: { id: postId },
@@ -15,7 +46,7 @@ export async function applyForPost(postId: string, userId: string) {
 
   // Check due date if exists
   if (post.dueDate && new Date(post.dueDate) < new Date()) {
-      throw new Error('마감 기한이 지났습니다.');
+    throw new Error('마감 기한이 지났습니다.');
   }
 
   // 2. Check capacity (Rough check, strictly check on approval)
@@ -39,13 +70,13 @@ export async function applyForPost(postId: string, userId: string) {
 
   // 4. Create Application
   try {
-      await prisma.application.create({
-        data: {
-          postId,
-          userId,
-          status: 'pending',
-        },
-      });
+    await prisma.application.create({
+      data: {
+        postId,
+        userId,
+        status: 'pending',
+      },
+    });
   } catch (error) {
     console.error(error);
     throw new Error('신청 중 오류가 발생했습니다.');
@@ -55,66 +86,66 @@ export async function applyForPost(postId: string, userId: string) {
 }
 
 export async function updateApplicationStatus(applicationId: string, newStatus: 'approved' | 'rejected') {
-    const app = await prisma.application.findUnique({
-        where: { id: applicationId },
-        include: { post: true }
-    });
+  const app = await prisma.application.findUnique({
+    where: { id: applicationId },
+    include: { post: true }
+  });
 
-    if (!app) throw new Error('신청 내역을 찾을 수 없습니다.');
-    if (app.status === newStatus) return; // No change
+  if (!app) throw new Error('신청 내역을 찾을 수 없습니다.');
+  if (app.status === newStatus) return; // No change
 
-    try {
-        await prisma.$transaction(async (tx) => {
-            // If approving, increment count
-            if (newStatus === 'approved' && app.status !== 'approved') {
-                if (app.post.currentParticipants >= app.post.maxParticipants) {
-                    throw new Error('모집 인원이 초과되어 승인할 수 없습니다.');
-                }
-                await tx.post.update({
-                    where: { id: app.postId },
-                    data: { currentParticipants: { increment: 1 } }
-                });
-            }
-            // If was approved and now rejecting (unlikely flow but possible), decrement?
-            // User flow: Pending -> Approve/Reject.
-            // If Confirmed -> Reject?
-            
-            await tx.application.update({
-                where: { id: applicationId },
-                data: { status: newStatus }
-            });
+  try {
+    await prisma.$transaction(async (tx) => {
+      // If approving, increment count
+      if (newStatus === 'approved' && app.status !== 'approved') {
+        if (app.post.currentParticipants >= app.post.maxParticipants) {
+          throw new Error('모집 인원이 초과되어 승인할 수 없습니다.');
+        }
+        await tx.post.update({
+          where: { id: app.postId },
+          data: { currentParticipants: { increment: 1 } }
         });
-    } catch (error: any) {
-        throw new Error(error.message || '상태 변경 중 오류가 발생했습니다.');
-    }
+      }
+      // If was approved and now rejecting (unlikely flow but possible), decrement?
+      // User flow: Pending -> Approve/Reject.
+      // If Confirmed -> Reject?
 
-    revalidatePath('/mypage');
+      await tx.application.update({
+        where: { id: applicationId },
+        data: { status: newStatus }
+      });
+    });
+  } catch (error: any) {
+    throw new Error(error.message || '상태 변경 중 오류가 발생했습니다.');
+  }
+
+  revalidatePath('/mypage');
 }
 
 export async function cancelApplication(applicationId: string) {
-    const app = await prisma.application.findUnique({
-        where: { id: applicationId },
-        include: { post: true }
-    });
-    
-    if (!app) throw new Error('신청 내역을 찾을 수 없습니다.');
+  const app = await prisma.application.findUnique({
+    where: { id: applicationId },
+    include: { post: true }
+  });
 
-    try {
-        await prisma.$transaction(async (tx) => {
-            if (app.status === 'approved' || app.status === 'confirmed') {
-                await tx.post.update({
-                    where: { id: app.postId },
-                    data: { currentParticipants: { decrement: 1 } }
-                });
-            }
-            await tx.application.delete({
-                where: { id: applicationId }
-            });
+  if (!app) throw new Error('신청 내역을 찾을 수 없습니다.');
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      if (app.status === 'approved' || app.status === 'confirmed') {
+        await tx.post.update({
+          where: { id: app.postId },
+          data: { currentParticipants: { decrement: 1 } }
         });
-    } catch (error) {
-        console.error(error);
-        throw new Error('취소 처리 중 오류가 발생했습니다.');
-    }
-    revalidatePath('/mypage');
-    revalidatePath(`/board/${app.postId}`);
+      }
+      await tx.application.delete({
+        where: { id: applicationId }
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error('취소 처리 중 오류가 발생했습니다.');
+  }
+  revalidatePath('/mypage');
+  revalidatePath(`/board/${app.postId}`);
 }

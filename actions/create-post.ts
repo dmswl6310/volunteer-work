@@ -24,9 +24,50 @@ export async function createPost(formData: FormData) {
   }
 
   const dueDate = dueDateStr ? new Date(dueDateStr) : null;
+  const email = formData.get('email') as string;
+  const name = formData.get('name') as string;
 
   try {
-     await prisma.post.create({
+    // 1. Check if user exists in DB
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    // 2. If user does not exist, AUTO-HEAL (Create the user)
+    if (!userExists) {
+      console.warn(`User ${userId} not found in DB. Auto-creating...`);
+
+      if (!email) {
+        throw new Error('User email not provided for auto-registration.');
+      }
+
+      const emailPrefix = email.split('@')[0];
+      let newUsername = emailPrefix;
+
+      // Ensure username uniqueness
+      let counter = 1;
+      while (await prisma.user.findUnique({ where: { username: newUsername } })) {
+        newUsername = `${emailPrefix}${counter}`;
+        counter++;
+      }
+
+      await prisma.user.create({
+        data: {
+          id: userId,
+          email: email,
+          username: newUsername,
+          name: name || 'User', // Use provided name
+          contact: '010-0000-0000', // Default contact
+          address: 'Unknown', // Default address
+          job: 'Unknown', // Default job
+          role: 'user',
+          isApproved: true, // Auto-approve for now or false depending on logic
+        },
+      });
+      console.log(`User ${userId} auto-created.`);
+    }
+
+    await prisma.post.create({
       data: {
         title,
         content,

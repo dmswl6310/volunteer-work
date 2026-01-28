@@ -8,15 +8,15 @@ export async function getPost(id: string) {
       where: { id },
       include: {
         author: {
-           select: {
-             id: true,
-             name: true,
-             email: true,
-             contact: true, // Needed for admin/organizer? Maybe hide for general users? Let's show for now or handle visibility.
-           }
+          select: {
+            name: true,
+            email: true,
+            contact: true,
+            username: true, // Needed for display logic
+          }
         },
         _count: {
-            select: { reviews: true } 
+          select: { reviews: true }
         }
       },
     });

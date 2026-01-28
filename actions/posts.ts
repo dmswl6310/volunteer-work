@@ -22,7 +22,7 @@ export async function getPosts({
 
   const where: Prisma.PostWhereInput = {
     isRecruiting: true, // Only show active posts by default
-    ...(category && { category }),
+    ...(category && { category: { contains: category } }),
   };
 
   let orderBy: Prisma.PostOrderByWithRelationInput = { createdAt: 'desc' };

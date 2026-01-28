@@ -30,9 +30,9 @@ export default function SignupPage() {
 
     // Basic validation
     if (!formData.username || !formData.address || !formData.job) {
-         setError('모든 필드를 입력해주세요.');
-         setLoading(false);
-         return;
+      setError('모든 필드를 입력해주세요.');
+      setLoading(false);
+      return;
     }
 
     try {
@@ -40,6 +40,12 @@ export default function SignupPage() {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
+        options: {
+          data: {
+            name: formData.name,
+            username: formData.username,
+          }
+        }
       });
 
       if (authError) throw authError;
@@ -61,20 +67,25 @@ export default function SignupPage() {
           });
 
         if (dbError) {
-            console.error('DB Error:', dbError);
-            if (dbError.code === '23505') { // Unique violation
-                if (dbError.message.includes('username')) throw new Error('이미 사용 중인 아이디입니다.');
-                if (dbError.message.includes('email')) throw new Error('이미 가입된 이메일입니다.');
-            }
-            throw new Error('계정 정보 저장 중 오류가 발생했습니다.');
+          console.error('DB Error:', JSON.stringify(dbError, null, 2));
+          if (dbError.code === '23505') { // Unique violation
+            if (dbError.message.includes('username')) throw new Error('이미 사용 중인 아이디입니다.');
+            if (dbError.message.includes('email')) throw new Error('이미 가입된 이메일입니다.');
+          }
+          throw new Error('계정 정보 저장 중 오류가 발생했습니다.');
         }
 
         alert('회원가입 요청이 완료되었습니다. 관리자 승인 후 로그인 가능합니다.');
         router.push('/'); // Redirect to Login (which is now root)
       }
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || '회원가입 실패');
+      if (err.message?.includes('User already registered') || err.message?.includes('already registered')) {
+        // Suppress console error for this expected case and show friendly message
+        setError('이미 가입된 이메일입니다. <a href="/" class="underline font-bold">로그인하기</a>');
+      } else {
+        console.error(err);
+        setError(err.message || '회원가입 실패');
+      }
     } finally {
       setLoading(false);
     }
@@ -90,96 +101,96 @@ export default function SignupPage() {
           </p>
         </div>
         <form className="mt-8 space-y-4" onSubmit={handleSignup}>
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">아이디 (계정)</label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={formData.username}
-                onChange={handleChange}
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">비밀번호</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">아이디 (계정)</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              value={formData.username}
+              onChange={handleChange}
+            />
+          </div>
 
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">이름</label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={formData.name}
-                onChange={handleChange}
-              />
-            </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">비밀번호</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              value={formData.password}
+              onChange={handleChange}
+            />
+          </div>
 
-            <div>
-              <label htmlFor="contact" className="block text-sm font-medium text-gray-700">연락처</label>
-              <input
-                id="contact"
-                name="contact"
-                type="text"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={formData.contact}
-                onChange={handleChange}
-              />
-            </div>
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">이름</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              value={formData.name}
+              onChange={handleChange}
+            />
+          </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">SNS (E-mail)</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
+          <div>
+            <label htmlFor="contact" className="block text-sm font-medium text-gray-700">연락처</label>
+            <input
+              id="contact"
+              name="contact"
+              type="text"
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              value={formData.contact}
+              onChange={handleChange}
+            />
+          </div>
 
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700">주소</label>
-              <input
-                id="address"
-                name="address"
-                type="text"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={formData.address}
-                onChange={handleChange}
-              />
-            </div>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">SNS (E-mail)</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              value={formData.email}
+              onChange={handleChange}
+            />
+          </div>
 
-            <div>
-              <label htmlFor="job" className="block text-sm font-medium text-gray-700">직업</label>
-              <input
-                id="job"
-                name="job"
-                type="text"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={formData.job}
-                onChange={handleChange}
-              />
-            </div>
+          <div>
+            <label htmlFor="address" className="block text-sm font-medium text-gray-700">주소</label>
+            <input
+              id="address"
+              name="address"
+              type="text"
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              value={formData.address}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="job" className="block text-sm font-medium text-gray-700">직업</label>
+            <input
+              id="job"
+              name="job"
+              type="text"
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              value={formData.job}
+              onChange={handleChange}
+            />
+          </div>
 
           {error && (
             <div className="text-red-500 text-sm text-center">
@@ -196,11 +207,11 @@ export default function SignupPage() {
               {loading ? '가입 처리 중...' : '가입완료'}
             </button>
           </div>
-          
-           <div className="text-center text-sm">
-             <Link href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
-               이미 계정이 있으신가요? 로그인
-             </Link>
+
+          <div className="text-center text-sm">
+            <Link href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
+              이미 계정이 있으신가요? 로그인
+            </Link>
           </div>
         </form>
       </div>

@@ -60,7 +60,8 @@ export async function getReviews(postId: string) {
       author: {
         select: {
           name: true,
-          email: true, // Maybe just name for privacy? keeping email for now as unique ID reference in UI if needed
+          email: true,
+          username: true,
         },
       },
     },
@@ -73,10 +74,10 @@ export async function getAllReviews() {
     return await prisma.review.findMany({
       include: {
         author: {
-           select: { name: true }
+          select: { name: true }
         },
         post: {
-           select: { title: true, id: true }
+          select: { title: true, id: true }
         }
       },
       orderBy: { createdAt: 'desc' },
