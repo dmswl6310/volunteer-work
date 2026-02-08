@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { checkUserApproval } from '@/actions/user';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,24 +28,21 @@ export default function LoginPage() {
 
       if (data.user) {
         // Check approval status
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('is_approved, role')
-          .eq('id', data.user.id)
-          .single();
+        // Check approval status via Server Action
+        const checkResult = await checkUserApproval(data.user.id);
 
-        if (userError) {
-             // If user record missing, might need handling.
-             throw new Error('사용자 정보를 불러올 수 없습니다.');
+        if (!checkResult.success) {
+          await supabase.auth.signOut();
+          throw new Error(checkResult.error || '사용자 정보를 확인할 수 없습니다.');
         }
 
-        if (!userData.is_approved) {
-             await supabase.auth.signOut();
-             throw new Error('관리자 승인 대기 중입니다. 승인 후 이용 가능합니다.');
+        if (!checkResult.isApproved) {
+          await supabase.auth.signOut();
+          throw new Error('관리자 승인 대기 중입니다. 승인 후 이용 가능합니다.');
         }
 
         // Success
-        router.push('/');
+        router.push('/board');
       }
     } catch (err: any) {
       console.error(err);
@@ -108,11 +106,11 @@ export default function LoginPage() {
               {loading ? '로그인 중...' : '로그인'}
             </button>
           </div>
-          
-           <div className="text-center text-sm">
-             <Link href="/auth/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
-               계정이 없으신가요? 회원가입
-             </Link>
+
+          <div className="text-center text-sm">
+            <Link href="/auth/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
+              계정이 없으신가요? 회원가입
+            </Link>
           </div>
         </form>
       </div>

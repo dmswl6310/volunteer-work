@@ -70,3 +70,21 @@ export async function getMyPageData(userId: string, email?: string, name?: strin
         throw new Error('Failed to load user data');
     }
 }
+
+export async function checkUserApproval(userId: string) {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { isApproved: true, role: true },
+        });
+
+        if (!user) {
+            return { success: false, error: 'User not found' };
+        }
+
+        return { success: true, isApproved: user.isApproved, role: user.role };
+    } catch (error) {
+        console.error('Error checking user approval:', error);
+        return { success: false, error: 'Failed to check user status' };
+    }
+}
