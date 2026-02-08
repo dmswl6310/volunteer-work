@@ -8,11 +8,12 @@ import PostCard from './PostCard';
 interface InfiniteScrollBoardProps {
   initialPosts: PostWithAuthor[];
   initialNextId: number | null;
-  sort?: 'latest' | 'popular';
+  sort?: 'latest' | 'deadline';
   category?: string;
+  status?: 'recruiting' | 'closed' | 'all';
 }
 
-export default function InfiniteScrollBoard({ initialPosts, initialNextId, sort = 'latest', category }: InfiniteScrollBoardProps) {
+export default function InfiniteScrollBoard({ initialPosts, initialNextId, sort = 'latest', category, status = 'recruiting' }: InfiniteScrollBoardProps) {
   const [posts, setPosts] = useState<PostWithAuthor[]>(initialPosts);
   const [nextId, setNextId] = useState<number | null>(initialNextId);
   const { ref, inView } = useInView();
@@ -21,12 +22,13 @@ export default function InfiniteScrollBoard({ initialPosts, initialNextId, sort 
   useEffect(() => {
     setPosts(initialPosts);
     setNextId(initialNextId);
-  }, [sort, category, initialPosts, initialNextId]);
+    // Explicitly reset scroll or state if needed, though initialPosts update handles it
+  }, [sort, category, status, initialPosts, initialNextId]);
 
   const loadMorePosts = async () => {
     if (nextId === null) return;
 
-    const newPosts = await getPosts({ page: nextId, sort, category });
+    const newPosts = await getPosts({ page: nextId, sort, category, status });
     setPosts((prev) => [...prev, ...newPosts.posts]);
     setNextId(newPosts.nextId);
   };

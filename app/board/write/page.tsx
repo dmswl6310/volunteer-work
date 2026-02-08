@@ -117,7 +117,13 @@ export default function WritePage() {
         <div className="flex gap-4">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">마감 기한</label>
-            <input type="date" name="dueDate" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" />
+            <input 
+              type="date" 
+              name="dueDate" 
+              required 
+              min={new Date().toISOString().split('T')[0]}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" 
+            />
           </div>
           <div className="flex items-center pt-6">
             <label className="flex items-center space-x-2 cursor-pointer">

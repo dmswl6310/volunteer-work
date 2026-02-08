@@ -9,10 +9,9 @@ export default function SignupPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    username: '', // ID(Account)
     email: '',
     password: '',
-    name: '',
+    nickname: '', // Maps to username in DB
     contact: '',
     address: '',
     job: '',
@@ -29,58 +28,55 @@ export default function SignupPage() {
     setError(null);
 
     // Basic validation
-    if (!formData.username || !formData.address || !formData.job) {
+    if (!formData.email || !formData.password || !formData.nickname || !formData.contact || !formData.address || !formData.job) {
       setError('모든 필드를 입력해주세요.');
       setLoading(false);
       return;
     }
 
     try {
-      // 1. Sign up with Supabase Auth (using email)
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            name: formData.name,
-            username: formData.username,
-          }
-        }
-      });
-
-      if (authError) throw authError;
-
-      if (authData.user) {
-        // 2. Create Public User Record
-        const { error: dbError } = await supabase
-          .from('users')
-          .insert({
-            id: authData.user.id,
+        // 1. SignUp with Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signUp({
             email: formData.email,
-            username: formData.username,
-            name: formData.name,
-            contact: formData.contact,
-            address: formData.address,
-            job: formData.job,
-            role: 'user',
-            is_approved: false,
-          });
+            password: formData.password,
+            options: {
+                data: {
+                    username: formData.nickname,
+                }
+            }
+        });
 
-        if (dbError) {
-          console.error('DB Error:', JSON.stringify(dbError, null, 2));
-          if (dbError.code === '23505') { // Unique violation
-            if (dbError.message.includes('username')) throw new Error('이미 사용 중인 아이디입니다.');
-            if (dbError.message.includes('email')) throw new Error('이미 가입된 이메일입니다.');
-          }
-          throw new Error('계정 정보 저장 중 오류가 발생했습니다.');
+        if (authError) throw authError;
+
+        if (authData.user) {
+            // 2. Create DB Record via Server Action
+            // Import dynamically or assume it's available (needs 'use client' so we must import server action)
+            // But we can't import server action directly in some setups without passing it down? 
+            // Next.js App Router supports importing server actions in client components.
+            const { createUserRecord } = await import('@/actions/auth');
+            
+            const result = await createUserRecord({
+                id: authData.user.id,
+                email: formData.email,
+                username: formData.nickname, // Nickname as unique username
+                name: formData.nickname, // Use nickname for name as well, or we could ask for real name. User said "Nickname" is required.
+                contact: formData.contact,
+                address: formData.address,
+                job: formData.job
+            });
+
+            if (!result.success) {
+                throw new Error(result.error);
+            }
+
+            // 3. Force SignOut (Require Admin Approval)
+            await supabase.auth.signOut();
+
+            alert('회원가입 요청이 완료되었습니다.\n관리자 승인 후 로그인하실 수 있습니다.');
+            router.push('/'); 
         }
-
-        alert('회원가입 요청이 완료되었습니다. 관리자 승인 후 로그인 가능합니다.');
-        router.push('/'); // Redirect to Login (which is now root)
-      }
     } catch (err: any) {
       if (err.message?.includes('User already registered') || err.message?.includes('already registered')) {
-        // Suppress console error for this expected case and show friendly message
         setError('이미 가입된 이메일입니다. <a href="/" class="underline font-bold">로그인하기</a>');
       } else {
         console.error(err);
@@ -97,19 +93,20 @@ export default function SignupPage() {
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">회원가입</h2>
           <p className="mt-2 text-sm text-gray-600">
-            필수 정보를 모두 입력해주세요.
+            관리자 승인 후 이용 가능합니다.
           </p>
         </div>
         <form className="mt-8 space-y-4" onSubmit={handleSignup}>
+          
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">아이디 (계정)</label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">이메일 (아이디)</label>
             <input
-              id="username"
-              name="username"
-              type="text"
+              id="email"
+              name="email"
+              type="email"
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              value={formData.username}
+              value={formData.email}
               onChange={handleChange}
             />
           </div>
@@ -128,14 +125,14 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">이름</label>
+            <label htmlFor="nickname" className="block text-sm font-medium text-gray-700">닉네임</label>
             <input
-              id="name"
-              name="name"
+              id="nickname"
+              name="nickname"
               type="text"
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              value={formData.name}
+              value={formData.nickname}
               onChange={handleChange}
             />
           </div>
@@ -149,19 +146,6 @@ export default function SignupPage() {
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               value={formData.contact}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">SNS (E-mail)</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              value={formData.email}
               onChange={handleChange}
             />
           </div>
@@ -193,9 +177,7 @@ export default function SignupPage() {
           </div>
 
           {error && (
-            <div className="text-red-500 text-sm text-center">
-              {error}
-            </div>
+            <div className="text-red-500 text-sm text-center" dangerouslySetInnerHTML={{__html: error}} />
           )}
 
           <div className="pt-4">
@@ -204,7 +186,7 @@ export default function SignupPage() {
               disabled={loading}
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              {loading ? '가입 처리 중...' : '가입완료'}
+              {loading ? '가입 처리 중...' : '가입하기'}
             </button>
           </div>
 

@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
 export type PostWithAuthor = Prisma.PostGetPayload<{
-  include: { author: { select: { name: true; email: true } } };
+  include: { author: { select: { name: true; email: true; username: true } } };
 }>;
 
 export async function getPosts({
@@ -12,25 +12,45 @@ export async function getPosts({
   limit = 10,
   sort = 'latest',
   category,
+  status = 'recruiting',
 }: {
   page?: number;
   limit?: number;
-  sort?: 'latest' | 'popular' | 'views';
+  sort?: 'latest' | 'deadline';
   category?: string;
+  status?: 'recruiting' | 'closed' | 'all';
 }) {
   const skip = (page - 1) * limit;
+  const now = new Date();
 
-  const where: Prisma.PostWhereInput = {
-    isRecruiting: true, // Only show active posts by default
-    ...(category && { category: { contains: category } }),
-  };
+  // Build where clause based on status
+  const where: Prisma.PostWhereInput = {};
 
-  let orderBy: Prisma.PostOrderByWithRelationInput = { createdAt: 'desc' };
+  if (category) {
+    where.category = { contains: category };
+  }
 
-  if (sort === 'popular') {
-    orderBy = { scraps: 'desc' }; // Assuming scraps indicate popularity
-  } else if (sort === 'views') {
-    orderBy = { views: 'desc' };
+  if (status === 'recruiting') {
+    where.AND = [
+      { isRecruiting: true },
+      { dueDate: { gte: now } }
+    ];
+  } else if (status === 'closed') {
+    where.OR = [
+      { isRecruiting: false },
+      { dueDate: { lt: now } }
+    ];
+  }
+  // if status === 'all', we don't add restrictions on isRecruiting/dueDate
+
+  let orderBy: Prisma.PostOrderByWithRelationInput | Prisma.PostOrderByWithRelationInput[] = { createdAt: 'desc' };
+
+  if (sort === 'deadline') {
+    // Sort by due date ascending (soonest first), then by creation date
+    orderBy = [
+        { dueDate: 'asc' }, 
+        { createdAt: 'desc' }
+    ];
   }
 
   try {
@@ -44,6 +64,7 @@ export async function getPosts({
           select: {
             name: true,
             email: true,
+            username: true, // Nickname
           },
         },
       },
@@ -63,11 +84,11 @@ export async function getUrgentPosts() {
         isUrgent: true,
         isRecruiting: true,
       },
-      take: 5,
+      take: 10, 
       orderBy: { createdAt: 'desc' },
       include: {
         author: {
-          select: { name: true },
+          select: { name: true, username: true },
         },
       },
     });

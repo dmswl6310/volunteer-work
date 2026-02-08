@@ -45,7 +45,7 @@ export default function PostCard({ post }: PostCardProps) {
               <div className="flex items-center space-x-2 text-xs text-gray-500 mb-1">
                  <span className="font-medium text-gray-700">{post.category || '기타'}</span>
                  <span>·</span>
-                 <span>{post.author.name || '익명'}</span>
+                 <span>{post.author.username || post.author.name || '익명'}</span>
               </div>
           </div>
           

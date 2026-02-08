@@ -1,6 +1,7 @@
 import { getPosts } from '@/actions/posts';
 import UrgentSection from '@/components/UrgentSection';
 import InfiniteScrollBoard from '@/components/InfiniteScrollBoard';
+import StatusFilter from '@/components/StatusFilter';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -15,12 +16,13 @@ const CATEGORIES = [
   { id: '기타', name: '기타' },
 ];
 
-export default async function BoardPage(props: { searchParams: Promise<{ sort?: 'latest' | 'popular'; category?: string }> }) {
+export default async function BoardPage(props: { searchParams: Promise<{ sort?: 'latest' | 'deadline'; category?: string; status?: 'recruiting' | 'closed' | 'all' }> }) {
   const searchParams = await props.searchParams;
   const sort = searchParams.sort || 'latest';
   const category = searchParams.category === 'all' ? undefined : searchParams.category;
+  const status = searchParams.status || 'recruiting';
   
-  const initialData = await getPosts({ page: 1, limit: 10, sort, category });
+  const initialData = await getPosts({ page: 1, limit: 10, sort, category, status });
 
   return (
     <div className="pb-20 relative min-h-screen">
@@ -28,19 +30,21 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
       <div className="bg-white sticky top-0 z-30 px-4 py-3 border-b border-gray-100 shadow-sm">
          <div className="flex items-center justify-between mb-3">
              <h1 className="text-xl font-bold text-gray-900 tracking-tight">봉사활동 찾기</h1>
-             <div className="flex space-x-3">
+             <div className="flex space-x-3 items-center">
+                <StatusFilter />
+                <span className="text-gray-200">|</span>
                 <Link 
-                  href={`/board?sort=latest${category ? `&category=${category}` : ''}`} 
+                  href={`/board?sort=latest${category ? `&category=${category}` : ''}&status=${status}`} 
                   className={`text-sm font-medium transition-colors ${sort === 'latest' ? 'text-gray-900' : 'text-gray-400 hover:text-indigo-600'}`}
                 >
                   최신순
                 </Link>
                 <span className="text-gray-200">|</span>
                 <Link 
-                  href={`/board?sort=popular${category ? `&category=${category}` : ''}`} 
-                  className={`text-sm font-medium transition-colors ${sort === 'popular' ? 'text-gray-900' : 'text-gray-400 hover:text-indigo-600'}`}
+                  href={`/board?sort=deadline${category ? `&category=${category}` : ''}&status=${status}`} 
+                  className={`text-sm font-medium transition-colors ${sort === 'deadline' ? 'text-gray-900' : 'text-gray-400 hover:text-indigo-600'}`}
                 >
-                  인기순
+                  마감임박순
                 </Link>
              </div>
          </div>
@@ -64,8 +68,8 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
       </div>
 
       <div className="p-4 space-y-6">
-        {/* Only show Urgent Section if no category filter or 'all' (optional, but usually urgent is global) */}
-        {!category && <UrgentSection />}
+        {/* Urgent Section Always Visible */}
+        <UrgentSection />
         
         <InfiniteScrollBoard 
           initialPosts={initialData.posts} 

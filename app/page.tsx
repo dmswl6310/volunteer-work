@@ -14,12 +14,25 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Check if already logged in AND approved
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        router.replace('/board');
+        const { data: userData } = await supabase
+          .from('users')
+          .select('is_approved')
+          .eq('id', session.user.id)
+          .single();
+
+        if (userData && userData.is_approved) {
+          router.replace('/board');
+        } else {
+           // If logged in but not approved, force sign out quietly
+           await supabase.auth.signOut();
+        }
       }
-    });
+    };
+    checkSession();
   }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -36,8 +49,7 @@ export default function LoginPage() {
       if (authError) throw authError;
 
       if (data.user) {
-        // Check approval status and role (optional check here if needed, but per request "If logged in, auto move to board")
-        // We can do brief check
+        // Check approval status immediately
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('is_approved')
@@ -45,8 +57,8 @@ export default function LoginPage() {
           .single();
         
         if (userData && !userData.is_approved) {
-             await supabase.auth.signOut();
-             throw new Error('관리자 승인 대기 중입니다.');
+             await supabase.auth.signOut(); // Immediately invalidate session
+             throw new Error('가입 승인 대기 중입니다.\n관리자가 승인하면 로그인할 수 있습니다.');
         }
 
         router.push('/board');
