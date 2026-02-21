@@ -42,13 +42,6 @@ export default function AdminPage() {
 
       try {
         const data = await getAdminDashboardData();
-        // If we want to be strict, we can check role again here if we had a getUser server action.
-        // For now, let's assume if we can fetch, we are good.
-        // But we should probably check Current User role on client or server.
-
-        // NOTE: The previous server page Checked `prisma.user` role.
-        // Let's rely on data returning. If unauthorized, we might want to handle it.
-        // But I'll just load it.
         setPendingUsers(data as User[]);
         setIsAdmin(true);
       } catch (e) {

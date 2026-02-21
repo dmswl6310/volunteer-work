@@ -3,8 +3,7 @@ import { notFound } from 'next/navigation';
 import ApplyButton from './ApplyButton';
 import ReviewList from '@/components/ReviewList';
 import ScrapButton from '@/components/ScrapButton';
-import { supabase } from '@/lib/supabase';
-import prisma from '@/lib/prisma';
+import { createServerSupabaseClient } from '@/lib/supabase';
 import Link from 'next/link';
 
 export default async function PostDetailPage(props: { params: Promise<{ id: string }> }) {
@@ -15,38 +14,31 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
     notFound();
   }
 
+  const supabase = await createServerSupabaseClient();
+
   // Fetch Approved Participants
-  const approvedApps = await prisma.application.findMany({
-    where: { postId: post.id, status: 'approved' },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          username: true // Include username
-        }
-      }
-    }
-  });
+  const { data: approvedApps } = await supabase
+    .from('applications')
+    .select('*, users(id, name, username)')
+    .eq('post_id', post.id)
+    .eq('status', 'approved');
 
   // Check if current user has scrapped this post
   const { data: { user } } = await supabase.auth.getUser();
   let isScraped = false;
 
   if (user) {
-    const scrap = await prisma.postScrap.findUnique({
-      where: {
-        postId_userId: {
-          postId: post.id,
-          userId: user.id,
-        },
-      },
-    });
+    const { data: scrap } = await supabase
+      .from('post_scraps')
+      .select('id')
+      .eq('post_id', post.id)
+      .eq('user_id', user.id)
+      .maybeSingle();
     isScraped = !!scrap;
   }
 
   // Check Due Date
-  const isExpired = post.dueDate ? new Date(post.dueDate) < new Date() : false;
+  const isExpired = post.due_date ? new Date(post.due_date) < new Date() : false;
 
   return (
     <div className="pb-24 bg-white min-h-screen">
@@ -63,8 +55,8 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
 
       {/* Image Header */}
       <div className="relative w-full aspect-video bg-gray-200">
-        {post.imageUrl ? (
-          <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
+        {post.image_url ? (
+          <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
             No Image
@@ -79,9 +71,9 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
             <span className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-full">
               {post.category}
             </span>
-            {post.dueDate && (
+            {post.due_date && (
               <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${isExpired ? 'bg-gray-100 text-gray-500' : 'bg-red-50 text-red-500'}`}>
-                {isExpired ? '마감됨' : `D-${Math.ceil((new Date(post.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))}`}
+                {isExpired ? '마감됨' : `D-${Math.ceil((new Date(post.due_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))}`}
               </span>
             )}
           </div>
@@ -90,7 +82,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
             {post.title}
           </h1>
           <div className="flex items-center text-sm text-gray-500 space-x-3">
-            <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+            <span>{new Date(post.created_at).toLocaleDateString()}</span>
             <span>·</span>
             <span>조회 {post.views}</span>
           </div>
@@ -119,33 +111,33 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
           <div className="bg-gray-50 p-4 rounded-xl text-center">
             <p className="text-xs text-gray-500 mb-1">참여 인원</p>
             <p className="text-lg font-bold text-indigo-600">
-              {post.currentParticipants} / {post.maxParticipants}명
+              {post.current_participants} / {post.max_participants}명
             </p>
           </div>
           <div className="bg-gray-50 p-4 rounded-xl text-center">
             <p className="text-xs text-gray-500 mb-1">마감 기한</p>
             <p className="text-sm font-bold text-gray-900">
-              {post.dueDate ? new Date(post.dueDate).toLocaleDateString() : '상시 모집'}
+              {post.due_date ? new Date(post.due_date).toLocaleDateString() : '상시 모집'}
             </p>
           </div>
         </div>
 
         {/* Approved Participants List */}
         <div className="mb-10">
-          <h3 className="font-bold text-gray-900 mb-3">참여 확정 명단 ({approvedApps.length}명)</h3>
-          {approvedApps.length === 0 ? (
+          <h3 className="font-bold text-gray-900 mb-3">참여 확정 명단 ({approvedApps?.length ?? 0}명)</h3>
+          {!approvedApps || approvedApps.length === 0 ? (
             <div className="p-4 bg-gray-50 rounded-xl text-sm text-gray-500 text-center">
               아직 승인된 참여자가 없습니다.
             </div>
           ) : (
             <div className="grid grid-cols-4 gap-3">
-              {approvedApps.map(app => (
+              {approvedApps.map((app: any) => (
                 <div key={app.id} className="flex flex-col items-center">
                   <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold text-xs mb-1">
-                    {app.user.name?.[0] || 'U'}
+                    {app.users?.name?.[0] || 'U'}
                   </div>
                   <span className="text-xs text-gray-700 truncate w-full text-center">
-                    {app.user.name && app.user.name !== 'User' ? app.user.name : app.user.username}
+                    {app.users?.name && app.users.name !== 'User' ? app.users.name : app.users?.username}
                   </span>
                 </div>
               ))}
@@ -171,7 +163,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
         <div className="flex-1 ml-4">
           <ApplyButton
             postId={post.id}
-            isRecruiting={post.isRecruiting && !isExpired}
+            isRecruiting={post.is_recruiting && !isExpired}
           />
         </div>
       </div>

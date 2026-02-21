@@ -1,6 +1,4 @@
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import prisma from '@/lib/prisma';
+import { createServerSupabaseClient } from '@/lib/supabase';
 import { redirect } from 'next/navigation';
 import BottomNav from '@/components/BottomNav';
 
@@ -9,19 +7,7 @@ export default async function MainLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const cookieStore = await cookies();
-
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                get(name: string) {
-                    return cookieStore.get(name)?.value;
-                },
-            },
-        }
-    );
+    const supabase = await createServerSupabaseClient();
 
     const {
         data: { user },
@@ -31,16 +17,14 @@ export default async function MainLayout({
         redirect('/auth/login');
     }
 
-    // Check approval status directly from DB (bypassing RLS)
-    const dbUser = await prisma.user.findUnique({
-        where: { id: user.id },
-        select: { isApproved: true }
-    });
+    // Check approval status
+    const { data: dbUser } = await supabase
+        .from('users')
+        .select('is_approved')
+        .eq('id', user.id)
+        .maybeSingle();
 
-    if (!dbUser || !dbUser.isApproved) {
-        // Create a way to sign out?
-        // Since this is server component, we can't easily sign out client-side.
-        // But we can redirect to a page that handles sign out, or back to login with error.
+    if (!dbUser || !dbUser.is_approved) {
         redirect('/auth/login?error=approval_pending');
     }
 

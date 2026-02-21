@@ -1,11 +1,10 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import prisma from '@/lib/prisma';
 
 export async function GET() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const ADMIN_CREDENTIALS = {
@@ -33,7 +32,7 @@ export async function GET() {
             message += `Auth Error: ${error.message}. `;
 
             // Try login to get ID if already exists
-            const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+            const { data: loginData } = await supabase.auth.signInWithPassword({
                 email: ADMIN_CREDENTIALS.email,
                 password: ADMIN_CREDENTIALS.password,
             });
@@ -52,15 +51,10 @@ export async function GET() {
             return NextResponse.json({ success: false, message });
         }
 
-        // 2. Upsert User in Database (Force Admin Role)
-        // Prisma bypasses RLS
-        const user = await prisma.user.upsert({
-            where: { email: ADMIN_CREDENTIALS.email },
-            update: {
-                role: 'admin',
-                isApproved: true,
-            },
-            create: {
+        // 2. Upsert User in Database
+        const { data: user, error: upsertError } = await supabase
+            .from('users')
+            .upsert({
                 id: userId,
                 email: ADMIN_CREDENTIALS.email,
                 username: ADMIN_CREDENTIALS.username,
@@ -69,9 +63,12 @@ export async function GET() {
                 address: ADMIN_CREDENTIALS.address,
                 job: ADMIN_CREDENTIALS.job,
                 role: 'admin',
-                isApproved: true,
-            },
-        });
+                is_approved: true,
+            }, { onConflict: 'email' })
+            .select()
+            .single();
+
+        if (upsertError) throw upsertError;
 
         return NextResponse.json({
             success: true,
