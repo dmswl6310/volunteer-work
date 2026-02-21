@@ -35,49 +35,73 @@ export default function SignupPage() {
     }
 
     try {
-        // 1. SignUp with Supabase Auth
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-            email: formData.email,
-            password: formData.password,
-            options: {
-                data: {
-                    username: formData.nickname,
-                }
-            }
+      // 1. Prevent Supabase Auth from throwing generic "already registered" error by checking DB first.
+      // We do this by calling our custom createUserRecord first to run validations.
+      // To do this safely without creating orphan DB records, we will run the validation only,
+      // but since our createUserRecord actually inserts, we should refactor or just let the server action
+      // do the whole insertion.
+
+      // Wait, let's just use the server action to run the check *first* before Supabase Auth.
+      // We can query the DB directly here in the client to check for existing emails!
+      const { data: existingEmail } = await supabase
+        .from('users')
+        .select('id, is_approved')
+        .eq('email', formData.email)
+        .maybeSingle();
+
+      if (existingEmail) {
+        if (!existingEmail.is_approved) {
+          setError('현재 관리자 승인 대기 중인 이메일입니다.');
+        } else {
+          setError('이미 존재하는 계정입니다.');
+        }
+        setLoading(false);
+        return;
+      }
+
+      // If no existing email, proceed with Supabase Auth SignUp
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            username: formData.nickname,
+          }
+        }
+      });
+
+      if (authError) throw authError;
+
+      if (authData.user) {
+        // 2. Create DB Record via Server Action
+        const { createUserRecord } = await import('@/actions/auth');
+
+        const result = await createUserRecord({
+          id: authData.user.id,
+          email: formData.email,
+          username: formData.nickname,
+          name: formData.nickname,
+          contact: formData.contact,
+          address: formData.address,
+          job: formData.job
         });
 
-        if (authError) throw authError;
-
-        if (authData.user) {
-            // 2. Create DB Record via Server Action
-            // Import dynamically or assume it's available (needs 'use client' so we must import server action)
-            // But we can't import server action directly in some setups without passing it down? 
-            // Next.js App Router supports importing server actions in client components.
-            const { createUserRecord } = await import('@/actions/auth');
-            
-            const result = await createUserRecord({
-                id: authData.user.id,
-                email: formData.email,
-                username: formData.nickname, // Nickname as unique username
-                name: formData.nickname, // Use nickname for name as well, or we could ask for real name. User said "Nickname" is required.
-                contact: formData.contact,
-                address: formData.address,
-                job: formData.job
-            });
-
-            if (!result.success) {
-                throw new Error(result.error);
-            }
-
-            // 3. Force SignOut (Require Admin Approval)
-            await supabase.auth.signOut();
-
-            alert('회원가입 요청이 완료되었습니다.\n관리자 승인 후 로그인하실 수 있습니다.');
-            router.push('/'); 
+        if (!result.success) {
+          await supabase.auth.signOut(); // Clean up the auth session if DB insertion failed
+          setError(result.error || '회원가입 처리 중 문제가 발생했습니다.');
+          return;
         }
+
+        // 3. Force SignOut (Require Admin Approval)
+        await supabase.auth.signOut();
+
+        alert('회원가입 요청이 완료되었습니다.\n관리자 승인 후 로그인하실 수 있습니다.');
+        router.push('/');
+      }
     } catch (err: any) {
       if (err.message?.includes('User already registered') || err.message?.includes('already registered')) {
-        setError('이미 가입된 이메일입니다. <a href="/" class="underline font-bold">로그인하기</a>');
+        // Fallback just in case
+        setError('이미 존재하는 계정입니다.');
       } else {
         console.error(err);
         setError(err.message || '회원가입 실패');
@@ -97,7 +121,7 @@ export default function SignupPage() {
           </p>
         </div>
         <form className="mt-8 space-y-4" onSubmit={handleSignup}>
-          
+
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">이메일 (아이디)</label>
             <input
@@ -177,7 +201,7 @@ export default function SignupPage() {
           </div>
 
           {error && (
-            <div className="text-red-500 text-sm text-center" dangerouslySetInnerHTML={{__html: error}} />
+            <div className="text-red-500 text-sm text-center" dangerouslySetInnerHTML={{ __html: error }} />
           )}
 
           <div className="pt-4">

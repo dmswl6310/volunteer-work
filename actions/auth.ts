@@ -28,15 +28,18 @@ export async function createUserRecord(data: CreateUserParams) {
       return { success: false, error: '이미 사용 중인 닉네임입니다.' };
     }
 
-    // 이메일 중복 체크
+    // 이메일 중복 및 승인 상태 체크
     const { data: existingEmail } = await supabase
       .from('users')
-      .select('id')
+      .select('id, is_approved')
       .eq('email', data.email)
       .maybeSingle();
 
-    if (existingEmail) {
-      return { success: false, error: '이미 가입된 이메일입니다.' };
+    if (existingEmail && existingEmail.id !== data.id) {
+      if (!existingEmail.is_approved) {
+        return { success: false, error: '현재 관리자 승인 대기 중인 이메일입니다.' };
+      }
+      return { success: false, error: '이미 존재하는 계정입니다.' };
     }
 
     const { error } = await supabase.from('users').upsert({
