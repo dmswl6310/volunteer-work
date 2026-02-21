@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { checkUserApproval } from '@/actions/user';
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,21 +24,29 @@ export default function LoginPage() {
         password,
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        setError(authError.message || '이메일 또는 비밀번호가 잘못되었습니다.');
+        return;
+      }
 
       if (data.user) {
-        // Check approval status
-        // Check approval status via Server Action
-        const checkResult = await checkUserApproval(data.user.id);
+        // Query user info directly using the client-side supabase instance
+        const { data: userRecord, error: userError } = await supabase
+          .from('users')
+          .select('is_approved, role')
+          .eq('id', data.user.id)
+          .maybeSingle();
 
-        if (!checkResult.success) {
+        if (userError || !userRecord) {
           await supabase.auth.signOut();
-          throw new Error(checkResult.error || '사용자 정보를 확인할 수 없습니다.');
+          setError('등록되지 않은 사용자이거나 삭제된 계정입니다. 관리자에게 문의해주세요.');
+          return;
         }
 
-        if (!checkResult.isApproved) {
+        if (!userRecord.is_approved) {
           await supabase.auth.signOut();
-          throw new Error('관리자 승인 대기 중입니다. 승인 후 이용 가능합니다.');
+          setError('관리자 승인 대기 중입니다. 승인 후 이용 가능합니다.');
+          return;
         }
 
         // Success
