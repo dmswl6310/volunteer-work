@@ -1,11 +1,28 @@
 'use server';
 
-import prisma from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { createServerSupabaseClient } from '@/lib/supabase';
 
-export type PostWithAuthor = Prisma.PostGetPayload<{
-  include: { author: { select: { name: true; email: true; username: true } } };
-}>;
+export type PostWithAuthor = {
+  id: string;
+  title: string;
+  content: string | null;
+  image_url: string | null;
+  category: string | null;
+  max_participants: number;
+  current_participants: number;
+  is_urgent: boolean;
+  is_recruiting: boolean;
+  due_date: string | null;
+  views: number;
+  scraps: number;
+  created_at: string;
+  author_id: string;
+  author: {
+    name: string;
+    email: string;
+    username: string;
+  } | null;
+};
 
 export async function getPosts({
   page = 1,
@@ -20,57 +37,40 @@ export async function getPosts({
   category?: string;
   status?: 'recruiting' | 'closed' | 'all';
 }) {
-  const skip = (page - 1) * limit;
-  const now = new Date();
-
-  // Build where clause based on status
-  const where: Prisma.PostWhereInput = {};
-
-  if (category) {
-    where.category = { contains: category };
-  }
-
-  if (status === 'recruiting') {
-    where.AND = [
-      { isRecruiting: true },
-      { dueDate: { gte: now } }
-    ];
-  } else if (status === 'closed') {
-    where.OR = [
-      { isRecruiting: false },
-      { dueDate: { lt: now } }
-    ];
-  }
-  // if status === 'all', we don't add restrictions on isRecruiting/dueDate
-
-  let orderBy: Prisma.PostOrderByWithRelationInput | Prisma.PostOrderByWithRelationInput[] = { createdAt: 'desc' };
-
-  if (sort === 'deadline') {
-    // Sort by due date ascending (soonest first), then by creation date
-    orderBy = [
-        { dueDate: 'asc' }, 
-        { createdAt: 'desc' }
-    ];
-  }
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+  const now = new Date().toISOString();
 
   try {
-    const posts = await prisma.post.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy,
-      include: {
-        author: {
-          select: {
-            name: true,
-            email: true,
-            username: true, // Nickname
-          },
-        },
-      },
-    });
+    const supabase = await createServerSupabaseClient();
+    let query = supabase
+      .from('posts')
+      .select('*, author:users(name, email, username)')
+      .range(from, to);
 
-    return { posts, nextId: posts.length === limit ? page + 1 : null };
+    if (category) {
+      query = query.ilike('category', `%${category}%`);
+    }
+
+    if (status === 'recruiting') {
+      query = query.eq('is_recruiting', true).gte('due_date', now);
+    } else if (status === 'closed') {
+      query = query.or(`is_recruiting.eq.false,due_date.lt.${now}`);
+    }
+
+    if (sort === 'deadline') {
+      query = query.order('due_date', { ascending: true }).order('created_at', { ascending: false });
+    } else {
+      query = query.order('created_at', { ascending: false });
+    }
+
+    const { data: posts, error } = await query;
+    if (error) throw error;
+
+    return {
+      posts: (posts ?? []) as PostWithAuthor[],
+      nextId: (posts?.length ?? 0) === limit ? page + 1 : null,
+    };
   } catch (error) {
     console.error('Error fetching posts:', error);
     return { posts: [], nextId: null };
@@ -79,20 +79,17 @@ export async function getPosts({
 
 export async function getUrgentPosts() {
   try {
-    const posts = await prisma.post.findMany({
-      where: {
-        isUrgent: true,
-        isRecruiting: true,
-      },
-      take: 10, 
-      orderBy: { createdAt: 'desc' },
-      include: {
-        author: {
-          select: { name: true, username: true },
-        },
-      },
-    });
-    return posts;
+    const supabase = await createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*, author:users(name, username)')
+      .eq('is_urgent', true)
+      .eq('is_recruiting', true)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (error) throw error;
+    return data ?? [];
   } catch (error) {
     console.error('Error fetching urgent posts:', error);
     return [];

@@ -1,70 +1,79 @@
 'use server';
 
-import prisma from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
+import { createServerSupabaseClient } from '@/lib/supabase';
 
 export async function getMyPageData(userId: string, email?: string, name?: string) {
     try {
-        let user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: {
-                applications: {
-                    include: { post: true },
-                    orderBy: { createdAt: 'desc' }
-                },
-                postScraps: {
-                    include: { post: true },
-                    orderBy: { createdAt: 'desc' }
-                },
-                posts: {
-                    orderBy: { createdAt: 'desc' },
-                    include: {
-                        applications: {
-                            where: { status: 'pending' },
-                            include: { user: true }
-                        }
-                    }
-                },
-                reviews: {
-                    include: { post: true },
-                    orderBy: { createdAt: 'desc' }
-                }
-            }
-        });
+        const supabase = await createServerSupabaseClient();
 
-        // Auto-heal if missing
+        const { data: user } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', userId)
+            .maybeSingle();
+
+        // auto-heal
         if (!user && email) {
             console.warn(`User ${userId} missing in MyPage. Auto-healing...`);
             const emailPrefix = email.split('@')[0];
             let newUsername = emailPrefix;
             let counter = 1;
-            while (await prisma.user.findUnique({ where: { username: newUsername } })) {
+            while (true) {
+                const { data: taken } = await supabase
+                    .from('users')
+                    .select('id')
+                    .eq('username', newUsername)
+                    .maybeSingle();
+                if (!taken) break;
                 newUsername = `${emailPrefix}${counter}`;
                 counter++;
             }
-
-            user = await prisma.user.create({
-                data: {
-                    id: userId,
-                    email: email,
-                    username: newUsername,
-                    name: name || 'User',
-                    contact: '010-0000-0000',
-                    address: 'Unknown',
-                    job: 'Unknown',
-                    role: 'user',
-                    isApproved: true
-                },
-                include: {
-                    applications: { include: { post: true } },
-                    postScraps: { include: { post: true } },
-                    posts: { include: { applications: { include: { user: true } } } },
-                    reviews: { include: { post: true } }
-                }
+            await supabase.from('users').insert({
+                id: userId,
+                email,
+                username: newUsername,
+                name: name || 'User',
+                contact: '010-0000-0000',
+                address: 'Unknown',
+                job: 'Unknown',
+                role: 'user',
+                is_approved: true,
             });
         }
 
-        return user;
+        if (!user) return null;
+
+        // 관련 데이터 병렬 조회
+        const [applicationsRes, scrapsRes, postsRes, reviewsRes] = await Promise.all([
+            supabase
+                .from('applications')
+                .select('*, posts(*)')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false }),
+            supabase
+                .from('post_scraps')
+                .select('*, posts(*)')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false }),
+            supabase
+                .from('posts')
+                .select('*, applications(*, users(*))')
+                .eq('author_id', userId)
+                .order('created_at', { ascending: false }),
+            supabase
+                .from('reviews')
+                .select('*, posts(*)')
+                .eq('author_id', userId)
+                .order('created_at', { ascending: false }),
+        ]);
+
+        return {
+            ...user,
+            applications: applicationsRes.data ?? [],
+            postScraps: scrapsRes.data ?? [],
+            posts: postsRes.data ?? [],
+            reviews: reviewsRes.data ?? [],
+        };
     } catch (error) {
         console.error('Error fetching user data:', error);
         throw new Error('Failed to load user data');
@@ -73,16 +82,18 @@ export async function getMyPageData(userId: string, email?: string, name?: strin
 
 export async function checkUserApproval(userId: string) {
     try {
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { isApproved: true, role: true },
-        });
+        const supabase = await createServerSupabaseClient();
+        const { data: user, error } = await supabase
+            .from('users')
+            .select('is_approved, role')
+            .eq('id', userId)
+            .maybeSingle();
 
-        if (!user) {
+        if (error || !user) {
             return { success: false, error: 'User not found' };
         }
 
-        return { success: true, isApproved: user.isApproved, role: user.role };
+        return { success: true, isApproved: user.is_approved, role: user.role };
     } catch (error) {
         console.error('Error checking user approval:', error);
         return { success: false, error: 'Failed to check user status' };

@@ -1,83 +1,88 @@
 'use server';
 
-import prisma from '@/lib/prisma';
+import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 
 export async function applyForPost(postId: string, userId: string, email?: string) {
-  // 0. Auto-Heal User Check
-  const userExists = await prisma.user.findUnique({ where: { id: userId } });
+  const supabase = await createServerSupabaseClient();
+
+  // 0. 유저 존재 체크 (auto-heal)
+  const { data: userExists } = await supabase
+    .from('users')
+    .select('id')
+    .eq('id', userId)
+    .maybeSingle();
+
   if (!userExists) {
     console.warn(`User ${userId} not found in DB during application. Auto-creating...`);
-    if (!email) {
-      throw new Error('User record missing and no email provided for auto-registration.');
-    }
+    if (!email) throw new Error('User record missing and no email provided for auto-registration.');
+
     const emailPrefix = email.split('@')[0];
     let newUsername = emailPrefix;
     let counter = 1;
-    while (await prisma.user.findUnique({ where: { username: newUsername } })) {
+    while (true) {
+      const { data: taken } = await supabase
+        .from('users')
+        .select('id')
+        .eq('username', newUsername)
+        .maybeSingle();
+      if (!taken) break;
       newUsername = `${emailPrefix}${counter}`;
       counter++;
     }
 
-    await prisma.user.create({
-      data: {
-        id: userId, // CRITICAL: Use Auth Key
-        email: email,
-        username: newUsername,
-        name: 'User',
-        contact: '010-0000-0000',
-        address: 'Unknown',
-        job: 'Unknown',
-        role: 'user',
-        isApproved: true,
-      },
+    await supabase.from('users').insert({
+      id: userId,
+      email,
+      username: newUsername,
+      name: 'User',
+      contact: '010-0000-0000',
+      address: 'Unknown',
+      job: 'Unknown',
+      role: 'user',
+      is_approved: true,
     });
-    console.log(`User ${userId} auto-created.`);
   }
 
-  // 1. Check if post exists and is recruiting
-  const post = await prisma.post.findUnique({
-    where: { id: postId },
-  });
+  // 1. 게시글 조회
+  const { data: post } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('id', postId)
+    .single();
 
-  if (!post || !post.isRecruiting) {
+  if (!post || !post.is_recruiting) {
     throw new Error('모집이 종료되었거나 존재하지 않는 게시글입니다.');
   }
 
-  // Check due date if exists
-  if (post.dueDate && new Date(post.dueDate) < new Date()) {
+  if (post.due_date && new Date(post.due_date) < new Date()) {
     throw new Error('마감 기한이 지났습니다.');
   }
 
-  // 2. Check capacity (Rough check, strictly check on approval)
-  if (post.currentParticipants >= post.maxParticipants) {
+  if (post.current_participants >= post.max_participants) {
     throw new Error('모집 인원이 마감되었습니다.');
   }
 
-  // 3. Check existing application
-  const existingApp = await prisma.application.findUnique({
-    where: {
-      postId_userId: {
-        postId,
-        userId,
-      },
-    },
-  });
+  // 2. 중복 신청 체크
+  const { data: existingApp } = await supabase
+    .from('applications')
+    .select('id')
+    .eq('post_id', postId)
+    .eq('user_id', userId)
+    .maybeSingle();
 
   if (existingApp) {
     throw new Error('이미 신청한 봉사활동입니다.');
   }
 
-  // 4. Create Application
-  try {
-    await prisma.application.create({
-      data: {
-        postId,
-        userId,
-        status: 'pending',
-      },
-    });
-  } catch (error) {
+  // 3. 신청 생성
+  const { error } = await supabase.from('applications').insert({
+    post_id: postId,
+    user_id: userId,
+    status: 'pending',
+  });
+
+  if (error) {
     console.error(error);
     throw new Error('신청 중 오류가 발생했습니다.');
   }
@@ -86,66 +91,68 @@ export async function applyForPost(postId: string, userId: string, email?: strin
 }
 
 export async function updateApplicationStatus(applicationId: string, newStatus: 'approved' | 'rejected') {
-  const app = await prisma.application.findUnique({
-    where: { id: applicationId },
-    include: { post: true }
-  });
+  const supabase = await createServerSupabaseClient();
+
+  const { data: app } = await supabase
+    .from('applications')
+    .select('*, posts(*)')
+    .eq('id', applicationId)
+    .single();
 
   if (!app) throw new Error('신청 내역을 찾을 수 없습니다.');
-  if (app.status === newStatus) return; // No change
+  if (app.status === newStatus) return;
 
-  try {
-    await prisma.$transaction(async (tx) => {
-      // If approving, increment count
-      if (newStatus === 'approved' && app.status !== 'approved') {
-        if (app.post.currentParticipants >= app.post.maxParticipants) {
-          throw new Error('모집 인원이 초과되어 승인할 수 없습니다.');
-        }
-        await tx.post.update({
-          where: { id: app.postId },
-          data: { currentParticipants: { increment: 1 } }
-        });
-      }
-      // If was approved and now rejecting (unlikely flow but possible), decrement?
-      // User flow: Pending -> Approve/Reject.
-      // If Confirmed -> Reject?
-
-      await tx.application.update({
-        where: { id: applicationId },
-        data: { status: newStatus }
-      });
-    });
-  } catch (error: any) {
-    throw new Error(error.message || '상태 변경 중 오류가 발생했습니다.');
+  if (newStatus === 'approved' && app.status !== 'approved') {
+    const post = app.posts;
+    if (post.current_participants >= post.max_participants) {
+      throw new Error('모집 인원이 초과되어 승인할 수 없습니다.');
+    }
+    const { error: postError } = await supabase
+      .from('posts')
+      .update({ current_participants: post.current_participants + 1 })
+      .eq('id', app.post_id);
+    if (postError) throw new Error(postError.message);
   }
+
+  const { error } = await supabase
+    .from('applications')
+    .update({ status: newStatus })
+    .eq('id', applicationId);
+
+  if (error) throw new Error(error.message || '상태 변경 중 오류가 발생했습니다.');
 
   revalidatePath('/mypage');
 }
 
 export async function cancelApplication(applicationId: string) {
-  const app = await prisma.application.findUnique({
-    where: { id: applicationId },
-    include: { post: true }
-  });
+  const supabase = await createServerSupabaseClient();
+
+  const { data: app } = await supabase
+    .from('applications')
+    .select('*, posts(*)')
+    .eq('id', applicationId)
+    .single();
 
   if (!app) throw new Error('신청 내역을 찾을 수 없습니다.');
 
-  try {
-    await prisma.$transaction(async (tx) => {
-      if (app.status === 'approved' || app.status === 'confirmed') {
-        await tx.post.update({
-          where: { id: app.postId },
-          data: { currentParticipants: { decrement: 1 } }
-        });
-      }
-      await tx.application.delete({
-        where: { id: applicationId }
-      });
-    });
-  } catch (error) {
+  if (app.status === 'approved' || app.status === 'confirmed') {
+    const post = app.posts;
+    await supabase
+      .from('posts')
+      .update({ current_participants: Math.max(0, post.current_participants - 1) })
+      .eq('id', app.post_id);
+  }
+
+  const { error } = await supabase
+    .from('applications')
+    .delete()
+    .eq('id', applicationId);
+
+  if (error) {
     console.error(error);
     throw new Error('취소 처리 중 오류가 발생했습니다.');
   }
+
   revalidatePath('/mypage');
-  revalidatePath(`/board/${app.postId}`);
+  revalidatePath(`/board/${app.post_id}`);
 }

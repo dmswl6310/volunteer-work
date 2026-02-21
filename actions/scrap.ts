@@ -1,48 +1,35 @@
 'use server';
 
-import prisma from '@/lib/prisma';
+import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 
 export async function toggleScrap(postId: string, userId: string) {
   try {
-    const existingScrap = await prisma.postScrap.findUnique({
-      where: {
-        postId_userId: {
-          postId,
-          userId,
-        },
-      },
-    });
+    const supabase = await createServerSupabaseClient();
+
+    const { data: existingScrap } = await supabase
+      .from('post_scraps')
+      .select('id')
+      .eq('post_id', postId)
+      .eq('user_id', userId)
+      .maybeSingle();
 
     if (existingScrap) {
-      // Unscrap
-      await prisma.$transaction([
-        prisma.postScrap.delete({
-          where: { id: existingScrap.id },
-        }),
-        prisma.post.update({
-          where: { id: postId },
-          data: { scraps: { decrement: 1 } },
-        }),
-      ]);
+      // 스크랩 취소
+      await supabase.from('post_scraps').delete().eq('id', existingScrap.id);
+      // 현재 scraps 값 읽어서 -1
+      const { data: post } = await supabase.from('posts').select('scraps').eq('id', postId).single();
+      await supabase.from('posts').update({ scraps: Math.max(0, (post?.scraps ?? 1) - 1) }).eq('id', postId);
     } else {
-      // Scrap
-      await prisma.$transaction([
-        prisma.postScrap.create({
-          data: {
-            postId,
-            userId,
-          },
-        }),
-        prisma.post.update({
-          where: { id: postId },
-          data: { scraps: { increment: 1 } },
-        }),
-      ]);
+      // 스크랩
+      await supabase.from('post_scraps').insert({ post_id: postId, user_id: userId });
+      // 현재 scraps 값 읽어서 +1
+      const { data: post } = await supabase.from('posts').select('scraps').eq('id', postId).single();
+      await supabase.from('posts').update({ scraps: (post?.scraps ?? 0) + 1 }).eq('id', postId);
     }
 
     revalidatePath(`/board/${postId}`);
-    revalidatePath(`/board`); // Update list view counts
+    revalidatePath('/board');
   } catch (error) {
     console.error('Error toggling scrap:', error);
     throw new Error('스크랩 처리 중 오류가 발생했습니다.');

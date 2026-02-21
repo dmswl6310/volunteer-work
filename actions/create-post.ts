@@ -1,6 +1,6 @@
 'use server';
 
-import prisma from '@/lib/prisma';
+import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -13,74 +13,66 @@ export async function createPost(formData: FormData) {
   const imageUrl = formData.get('imageUrl') as string;
   const isUrgent = formData.get('isUrgent') === 'true';
   const dueDateStr = formData.get('dueDate') as string;
-
-  if (!userId) {
-    throw new Error('Unauthorized');
-  }
-
-  // Basic Validation
-  if (!title || !content || !category) {
-    throw new Error('필수 항목을 입력해주세요.');
-  }
-
-  const dueDate = dueDateStr ? new Date(dueDateStr) : null;
   const email = formData.get('email') as string;
   const name = formData.get('name') as string;
 
-  try {
-    // 1. Check if user exists in DB
-    const userExists = await prisma.user.findUnique({
-      where: { id: userId },
-    });
+  if (!userId) throw new Error('Unauthorized');
+  if (!title || !content || !category) throw new Error('필수 항목을 입력해주세요.');
 
-    // 2. If user does not exist, AUTO-HEAL (Create the user)
-    if (!userExists) {
-      console.warn(`User ${userId} not found in DB. Auto-creating...`);
+  const dueDate = dueDateStr ? new Date(dueDateStr).toISOString() : null;
+  const supabase = await createServerSupabaseClient();
 
-      if (!email) {
-        throw new Error('User email not provided for auto-registration.');
-      }
+  // 유저 존재 체크 (auto-heal)
+  const { data: userExists } = await supabase
+    .from('users')
+    .select('id')
+    .eq('id', userId)
+    .maybeSingle();
 
-      const emailPrefix = email.split('@')[0];
-      let newUsername = emailPrefix;
+  if (!userExists) {
+    console.warn(`User ${userId} not found in DB. Auto-creating...`);
+    if (!email) throw new Error('User email not provided for auto-registration.');
 
-      // Ensure username uniqueness
-      let counter = 1;
-      while (await prisma.user.findUnique({ where: { username: newUsername } })) {
-        newUsername = `${emailPrefix}${counter}`;
-        counter++;
-      }
-
-      await prisma.user.create({
-        data: {
-          id: userId,
-          email: email,
-          username: newUsername,
-          name: name || 'User', // Use provided name
-          contact: '010-0000-0000', // Default contact
-          address: 'Unknown', // Default address
-          job: 'Unknown', // Default job
-          role: 'user',
-          isApproved: true, // Auto-approve for now or false depending on logic
-        },
-      });
-      console.log(`User ${userId} auto-created.`);
+    const emailPrefix = email.split('@')[0];
+    let newUsername = emailPrefix;
+    let counter = 1;
+    while (true) {
+      const { data: taken } = await supabase
+        .from('users')
+        .select('id')
+        .eq('username', newUsername)
+        .maybeSingle();
+      if (!taken) break;
+      newUsername = `${emailPrefix}${counter}`;
+      counter++;
     }
 
-    await prisma.post.create({
-      data: {
-        title,
-        content,
-        category,
-        maxParticipants,
-        authorId: userId,
-        imageUrl,
-        isRecruiting: true,
-        isUrgent,
-        dueDate
-      },
+    await supabase.from('users').insert({
+      id: userId,
+      email,
+      username: newUsername,
+      name: name || 'User',
+      contact: '010-0000-0000',
+      address: 'Unknown',
+      job: 'Unknown',
+      role: 'user',
+      is_approved: true,
     });
-  } catch (error) {
+  }
+
+  const { error } = await supabase.from('posts').insert({
+    title,
+    content,
+    category,
+    max_participants: maxParticipants,
+    author_id: userId,
+    image_url: imageUrl || null,
+    is_recruiting: true,
+    is_urgent: isUrgent,
+    due_date: dueDate,
+  });
+
+  if (error) {
     console.error(error);
     throw new Error('게시글 작성 실패');
   }

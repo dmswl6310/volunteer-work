@@ -1,13 +1,13 @@
 'use server';
 
-import prisma from '@/lib/prisma';
+import { createServerSupabaseClient } from '@/lib/supabase';
 
 export type CreateUserParams = {
-  id: string; // Supabase Auth ID
+  id: string;
   email: string;
-  password?: string; // Not stored in DB, handled by Supabase
-  username: string; // Nickname
-  name: string; // Real Name (or mapped from Nickname if UI simplifies)
+  password?: string;
+  username: string;
+  name: string;
   contact: string;
   address: string;
   job: string;
@@ -15,39 +15,43 @@ export type CreateUserParams = {
 
 export async function createUserRecord(data: CreateUserParams) {
   try {
-    // Check for duplicate nickname (username in DB schema)
-    const existingUser = await prisma.user.findUnique({
-      where: { username: data.username },
-    });
+    const supabase = await createServerSupabaseClient();
+
+    // 닉네임 중복 체크
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', data.username)
+      .maybeSingle();
 
     if (existingUser) {
       return { success: false, error: '이미 사용 중인 닉네임입니다.' };
     }
 
-    // Check for duplicate email just in case
-    const existingEmail = await prisma.user.findUnique({
-      where: { email: data.email },
-    });
+    // 이메일 중복 체크
+    const { data: existingEmail } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', data.email)
+      .maybeSingle();
 
     if (existingEmail) {
-        // If auth created but DB failed previously, this might happen.
-        // But usually we want to fail.
-       return { success: false, error: '이미 가입된 이메일입니다.' };
+      return { success: false, error: '이미 가입된 이메일입니다.' };
     }
 
-    await prisma.user.create({
-      data: {
-        id: data.id,
-        email: data.email,
-        username: data.username, // Using nickname as username column
-        name: data.name, 
-        contact: data.contact,
-        address: data.address,
-        job: data.job,
-        role: 'user',
-        isApproved: false, // Default to pending
-      },
-    });
+    const { error } = await supabase.from('users').upsert({
+      id: data.id,
+      email: data.email,
+      username: data.username,
+      name: data.name,
+      contact: data.contact,
+      address: data.address,
+      job: data.job,
+      role: 'user',
+      is_approved: false,
+    }, { onConflict: 'id' });
+
+    if (error) throw error;
 
     return { success: true };
   } catch (error: any) {
