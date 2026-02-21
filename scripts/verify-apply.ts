@@ -1,38 +1,46 @@
-import { PrismaClient } from '@prisma/client';
+import { createClient } from '@supabase/supabase-js';
 import { applyForPost } from '../actions/apply';
 
-const prisma = new PrismaClient();
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function main() {
   console.log('--- Starting Verification ---');
 
-  // 1. Create a dummy user
-  const user = await prisma.user.upsert({
-    where: { email: 'test@example.com' },
-    update: {},
-    create: {
+  // 1. Upsert dummy user
+  const { data: user, error: userError } = await supabase
+    .from('users')
+    .upsert({
       email: 'test@example.com',
       username: 'testuser',
       name: 'Test User',
       role: 'user',
-      isApproved: true,
+      is_approved: true,
       contact: '010-1234-5678',
       address: 'Test City',
       job: 'Tester',
-    },
-  });
+    }, { onConflict: 'email' })
+    .select()
+    .single();
+
+  if (userError) throw userError;
   console.log('User created/found:', user.id);
 
   // 2. Create a dummy post
-  const post = await prisma.post.create({
-    data: {
+  const { data: post, error: postError } = await supabase
+    .from('posts')
+    .insert({
       title: 'Test Volunteer Event',
-      authorId: user.id,
+      author_id: user.id,
       content: 'This is a test event.',
-      maxParticipants: 5,
-      isRecruiting: true,
-    },
-  });
+      max_participants: 5,
+      is_recruiting: true,
+    })
+    .select()
+    .single();
+
+  if (postError) throw postError;
   console.log('Post created:', post.id);
 
   // 3. Apply for the post
@@ -45,14 +53,12 @@ async function main() {
   }
 
   // 4. Verify application
-  const app = await prisma.application.findUnique({
-    where: {
-      postId_userId: {
-        postId: post.id,
-        userId: user.id,
-      },
-    },
-  });
+  const { data: app } = await supabase
+    .from('applications')
+    .select('*')
+    .eq('post_id', post.id)
+    .eq('user_id', user.id)
+    .maybeSingle();
 
   if (app) {
     console.log('SUCCESS: Application found in DB:', app);
@@ -62,19 +68,13 @@ async function main() {
 
   // Cleanup
   console.log('Cleaning up...');
-  await prisma.application.deleteMany({ where: { postId: post.id } });
-  await prisma.post.delete({ where: { id: post.id } });
-  // Keep user for future tests or delete if you want strictly clean slate
-  // await prisma.user.delete({ where: { id: user.id } });
+  await supabase.from('applications').delete().eq('post_id', post.id);
+  await supabase.from('posts').delete().eq('id', post.id);
 
   console.log('--- Verification Complete ---');
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

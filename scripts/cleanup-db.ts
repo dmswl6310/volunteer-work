@@ -1,21 +1,20 @@
 
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function main() {
     console.log('Starting cleanup...');
 
     // 1. Find non-admin users
-    const usersToDelete = await prisma.user.findMany({
-        where: {
-            role: {
-                not: 'admin'
-            }
-        },
-        select: { id: true }
-    });
+    const { data: usersToDelete } = await supabase
+        .from('users')
+        .select('id')
+        .neq('role', 'admin');
 
-    const userIds = usersToDelete.map((u: any) => u.id);
+    const userIds = (usersToDelete ?? []).map((u) => u.id);
     console.log(`Found ${userIds.length} non-admin users to delete.`);
 
     if (userIds.length === 0) {
@@ -23,105 +22,47 @@ async function main() {
         return;
     }
 
-    // 2. Initial Deletions (Dependencies)
-    // Delete ReviewLikes by these users
-    const deleteReviewLikes = prisma.reviewLike.deleteMany({
-        where: { userId: { in: userIds } }
-    });
+    // 2. Find reviews and posts authored by these users
+    const { data: reviews } = await supabase
+        .from('reviews')
+        .select('id')
+        .in('author_id', userIds);
+    const reviewIds = (reviews ?? []).map((r) => r.id);
 
-    // Delete PostScraps by these users
-    const deletePostScraps = prisma.postScrap.deleteMany({
-        where: { userId: { in: userIds } }
-    });
+    const { data: posts } = await supabase
+        .from('posts')
+        .select('id')
+        .in('author_id', userIds);
+    const postIds = (posts ?? []).map((p) => p.id);
 
-    // Delete Applications by these users
-    const deleteApplications = prisma.application.deleteMany({
-        where: { userId: { in: userIds } }
-    });
-
-    // 3. Complex Deletions (Content with potential dependencies)
-    // Delete Reviews by these users (and their likes first?)
-    // Likes on these reviews need to be deleted.
-    // Find reviews by these users
-    const reviewsToDelete = await prisma.review.findMany({
-        where: { authorId: { in: userIds } },
-        select: { id: true }
-    });
-    const reviewIds = reviewsToDelete.map((r: any) => r.id);
-
-    // Delete likes on these reviews (even from admin)
-    const deleteLikesOnReviews = prisma.reviewLike.deleteMany({
-        where: { reviewId: { in: reviewIds } }
-    });
-
-    // Now delete the reviews
-    const deleteReviews = prisma.review.deleteMany({
-        where: { id: { in: reviewIds } }
-    });
-
-
-    // Delete Posts by these users
-    // Posts have: applications, reviews, scraps, etc.
-    // We need to find posts by these users
-    const postsToDelete = await prisma.post.findMany({
-        where: { authorId: { in: userIds } },
-        select: { id: true }
-    });
-    const postIds = postsToDelete.map((p: any) => p.id);
-
-    // Delete dependent data for these posts
-    const deleteAppsOnPosts = prisma.application.deleteMany({
-        where: { postId: { in: postIds } }
-    });
-    const deleteScrapsOnPosts = prisma.postScrap.deleteMany({
-        where: { postId: { in: postIds } }
-    });
-    const deleteReviewsOnPosts = prisma.review.deleteMany({
-        where: { postId: { in: postIds } }
-    }); // Note: we might have already deleted some reviews if author was deleted, but this catches reviews by OTHERS on these posts.
-    // Wait, if I delete a post, I must delete reviews on it.
-    // Above I deleted reviews trigger by AUTHOR.
-    // Now I delete reviews triggered by POST.
-
-    // 4. Finally Delete Posts and Users
-    const deletePosts = prisma.post.deleteMany({
-        where: { id: { in: postIds } }
-    });
-
-    const deleteUsers = prisma.user.deleteMany({
-        where: { id: { in: userIds } }
-    });
-
-    // Execute in transaction (or order)
-    // Since some logic required fetching IDs (reviews, posts), we can't do one big transaction easily with raw deleteMany unless we use cascade.
-    // We will run them in sequence.
-
+    // 3. Delete all dependencies
     console.log('Deleting dependent data...');
-    await prisma.$transaction([
-        deleteReviewLikes,
-        deletePostScraps,
-        deleteApplications, // Applications by users
-        deleteLikesOnReviews,
-        deleteReviews, // Reviews by users
-        deleteAppsOnPosts, // Apps on posts by users
-        deleteScrapsOnPosts, // Scraps on posts by users
-        deleteReviewsOnPosts, // Reviews on posts by users
-    ]);
 
+    if (reviewIds.length > 0) {
+        await supabase.from('review_likes').delete().in('review_id', reviewIds);
+    }
+    await supabase.from('review_likes').delete().in('user_id', userIds);
+    await supabase.from('post_scraps').delete().in('user_id', userIds);
+    await supabase.from('applications').delete().in('user_id', userIds);
+    await supabase.from('reviews').delete().in('author_id', userIds);
+
+    if (postIds.length > 0) {
+        await supabase.from('applications').delete().in('post_id', postIds);
+        await supabase.from('post_scraps').delete().in('post_id', postIds);
+        await supabase.from('reviews').delete().in('post_id', postIds);
+    }
+
+    // 4. Delete posts and users
     console.log('Deleting content and users...');
-    await prisma.$transaction([
-        deletePosts,
-        deleteUsers
-    ]);
+    if (postIds.length > 0) {
+        await supabase.from('posts').delete().in('id', postIds);
+    }
+    await supabase.from('users').delete().in('id', userIds);
 
     console.log('Cleanup completed successfully.');
 }
 
-main()
-    .catch((e) => {
-        console.error(e);
-        process.exit(1);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });
+main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+});
