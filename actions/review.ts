@@ -17,8 +17,8 @@ export async function createReview(postId: string, userId: string, content: stri
   if (!application) {
     return { error: '해당 봉사활동 신청 내역이 없습니다.' };
   }
-  if (application.status !== 'confirmed') {
-    return { error: '봉사활동 참여가 확인된 사용자만 후기를 작성할 수 있습니다. (주최자 승인 필요)' };
+  if (application.status !== 'approved' && application.status !== 'confirmed') {
+    return { error: '주최자에게 참여 승인을 받은 사용자만 후기를 작성할 수 있습니다.' };
   }
 
   const dueDate = application.posts?.due_date ? new Date(application.posts.due_date) : null;
