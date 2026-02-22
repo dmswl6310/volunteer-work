@@ -26,16 +26,16 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
   // Check if current user has scrapped this post
   const { data: { user } } = await supabase.auth.getUser();
   let isScraped = false;
+  let hasApplied = false;
   const isAuthor = !!user && user.id === (post as any).author_id;
 
   if (user) {
-    const { data: scrap } = await supabase
-      .from('post_scraps')
-      .select('id')
-      .eq('post_id', post.id)
-      .eq('user_id', user.id)
-      .maybeSingle();
-    isScraped = !!scrap;
+    const [scrapRes, applyRes] = await Promise.all([
+      supabase.from('post_scraps').select('id').eq('post_id', post.id).eq('user_id', user.id).maybeSingle(),
+      supabase.from('applications').select('id').eq('post_id', post.id).eq('user_id', user.id).maybeSingle(),
+    ]);
+    isScraped = !!scrapRes.data;
+    hasApplied = !!applyRes.data;
   }
 
   // Check Due Date
@@ -166,6 +166,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
             postId={post.id}
             isRecruiting={post.is_recruiting && !isExpired}
             isAuthor={isAuthor}
+            hasApplied={hasApplied}
           />
         </div>
       </div>
