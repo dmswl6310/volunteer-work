@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { createReview } from '@/actions/review';
 import { supabase } from '@/lib/supabase';
 
-export default function WriteReviewPage(props: { params: Promise<{ postId: string }> }) {
-  const params = use(props.params);
+export default function WriteReviewPage() {
   const router = useRouter();
+  const params = useParams();
+  const postId = params.postId as string;
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -24,9 +25,9 @@ export default function WriteReviewPage(props: { params: Promise<{ postId: strin
         return;
       }
 
-      await createReview(params.postId, user.id, content);
+      await createReview(postId, user.id, content);
       alert('후기가 등록되었습니다.');
-      router.push(`/board/${params.postId}`);
+      router.push(`/board/${postId}`);
     } catch (error: any) {
       alert(error.message);
     } finally {

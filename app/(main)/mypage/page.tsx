@@ -84,8 +84,12 @@ export default function MyPage() {
 
   if (!user) return null; // Or redirect handled above
 
-  // Aggregate incoming requests
-  const incomingRequests = user.posts.flatMap((p: any) => p.applications.map((app: any) => ({ ...app, post: p })));
+  // Aggregate incoming requests (only show pending ones)
+  const incomingRequests = user.posts.flatMap((p: any) => 
+    p.applications
+      .filter((app: any) => app.status === 'pending')
+      .map((app: any) => ({ ...app, post: p }))
+  );
 
   return (
     <div className="bg-gray-50 min-h-screen pb-24">
