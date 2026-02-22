@@ -23,11 +23,11 @@ export default function IncomingRequestItem({ application }: { application: any 
     <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-lg shadow-sm">
       <div>
         <p className="font-bold text-gray-900">
-          {application.user.name && application.user.name !== 'User' ? application.user.name : application.user.username}
-          <span className="text-gray-500 font-normal text-sm ml-1">(@{application.user.username})</span>
+          {application.users?.name && application.users.name !== 'User' ? application.users.name : application.users?.username}
+          <span className="text-gray-500 font-normal text-sm ml-1">(@{application.users?.username})</span>
         </p>
         <p className="text-sm text-gray-500">
-          신청일: {new Date(application.createdAt).toLocaleDateString()}
+          신청일: {new Date(application.created_at).toLocaleDateString()}
         </p>
         <p className="text-xs text-gray-400 mt-1">
           게시글: {application.post.title}
