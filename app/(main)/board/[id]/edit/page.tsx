@@ -36,7 +36,7 @@ export default function EditPage() {
       // 로그인 체크
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        alert('로그인이 필요합니다.');
+        alert('로그인 후 이용해 주세요.');
         router.push('/auth/login');
         return;
       }
@@ -49,14 +49,14 @@ export default function EditPage() {
         .single();
 
       if (error || !post) {
-        alert('게시글을 찾을 수 없습니다.');
+        alert('존재하지 않거나 삭제된 게시글입니다.');
         router.push('/board');
         return;
       }
 
       // 본인 게시글인지 확인
       if (post.author_id !== user.id) {
-        alert('수정 권한이 없습니다.');
+        alert('게시글을 수정할 권한이 없습니다.');
         router.push(`/board/${postId}`);
         return;
       }
@@ -115,7 +115,7 @@ export default function EditPage() {
         .upload(filename, selectedImage);
 
       if (uploadError) {
-        alert('이미지 업로드 실패: 다시 시도해주세요.');
+        alert('이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.');
         setLoading(false);
         return;
       }
@@ -127,7 +127,10 @@ export default function EditPage() {
     try {
       await updatePost(postId, data);
     } catch (error: any) {
-      alert(error.message || '수정 중 오류가 발생했습니다.');
+      if (error?.message === 'NEXT_REDIRECT') {
+        throw error;
+      }
+      alert(error.message || '게시글 수정 중 오류가 발생했습니다.');
       setLoading(false);
     }
   };
@@ -215,11 +218,10 @@ export default function EditPage() {
             {CATEGORIES.map(cat => (
               <label key={cat} className="cursor-pointer" onClick={() => { setSelectedCategory(cat); setCategoryError(null); }}>
                 <input type="radio" name="category" value={cat} className="peer hidden" readOnly checked={selectedCategory === cat} />
-                <div className={`px-4 py-2 rounded-full border text-sm transition-all ${
-                  selectedCategory === cat
-                    ? 'bg-indigo-600 text-white border-indigo-600'
-                    : 'border-gray-200 text-gray-600'
-                }`}>
+                <div className={`px-4 py-2 rounded-full border text-sm transition-all ${selectedCategory === cat
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'border-gray-200 text-gray-600'
+                  }`}>
                   {cat}
                 </div>
               </label>
@@ -258,9 +260,8 @@ export default function EditPage() {
         </div>
 
         {/* 모집 상태 */}
-        <div className={`flex items-center justify-between p-4 rounded-xl border-2 transition-colors ${
-          formData.isRecruiting ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
-        }`}>
+        <div className={`flex items-center justify-between p-4 rounded-xl border-2 transition-colors ${formData.isRecruiting ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
+          }`}>
           <div>
             <p className={`font-bold ${formData.isRecruiting ? 'text-green-700' : 'text-red-700'}`}>
               {formData.isRecruiting ? '🟢 모집 중' : '🔴 모집 마감'}
@@ -272,11 +273,10 @@ export default function EditPage() {
           <button
             type="button"
             onClick={() => setFormData({ ...formData, isRecruiting: !formData.isRecruiting })}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
-              formData.isRecruiting
-                ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                : 'bg-green-100 text-green-600 hover:bg-green-200'
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${formData.isRecruiting
+              ? 'bg-red-100 text-red-600 hover:bg-red-200'
+              : 'bg-green-100 text-green-600 hover:bg-green-200'
+              }`}
           >
             {formData.isRecruiting ? '마감으로 변경' : '모집 재개'}
           </button>

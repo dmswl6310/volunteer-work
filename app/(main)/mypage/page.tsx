@@ -40,7 +40,7 @@ export default function MyPage() {
 
     try {
       await updateUserProfile(user.id, editForm);
-      alert('프로필이 수정되었습니다.');
+      alert('프로필 정보가 성공적으로 수정되었습니다.');
       setIsEditing(false);
       // Reload data
       window.location.reload();
@@ -68,7 +68,7 @@ export default function MyPage() {
         setUser(userData);
       } catch (error) {
         console.error(error);
-        alert('정보를 불러오는데 실패했습니다.');
+        alert('내 정보를 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.');
       } finally {
         setLoading(false);
       }
@@ -85,7 +85,7 @@ export default function MyPage() {
   if (!user) return null; // Or redirect handled above
 
   // Aggregate incoming requests (only show pending ones)
-  const incomingRequests = user.posts.flatMap((p: any) => 
+  const incomingRequests = user.posts.flatMap((p: any) =>
     p.applications
       .filter((app: any) => app.status === 'pending')
       .map((app: any) => ({ ...app, post: p }))

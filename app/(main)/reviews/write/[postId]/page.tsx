@@ -20,16 +20,16 @@ export default function WriteReviewPage() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        alert('로그인이 필요합니다.');
+        alert('로그인 후 이용해 주세요.');
         router.push('/auth/login');
         return;
       }
 
       await createReview(postId, user.id, content);
-      alert('후기가 등록되었습니다.');
+      alert('소중한 활동 후기가 성공적으로 등록되었습니다.');
       router.push(`/board/${postId}`);
     } catch (error: any) {
-      alert(error.message);
+      alert(error.message || '후기 등록 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setIsSubmitting(false);
     }
@@ -38,7 +38,7 @@ export default function WriteReviewPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <h1 className="text-2xl font-bold mb-6">봉사활동 후기 작성</h1>
-      
+
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
         <div className="mb-4">
           <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">

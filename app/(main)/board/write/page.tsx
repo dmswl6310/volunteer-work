@@ -26,7 +26,7 @@ export default function WritePage() {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        alert('로그인이 필요합니다.');
+        alert('로그인 후 이용해 주세요.');
         router.push('/auth/login');
       } else {
         setUserId(user.id);
@@ -78,7 +78,7 @@ export default function WritePage() {
 
       if (error) {
         console.error('Image upload failed:', error);
-        alert(`이미지 업로드 실패: ${error.message}`);
+        alert('이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.');
         // Proceed without image or return? Let's proceed for robustness in demo
       } else {
         const { data: publicUrlData } = supabase.storage.from('posts').getPublicUrl(filename);
@@ -91,7 +91,10 @@ export default function WritePage() {
       await createPost(formData); // Server Action
       // Redirect handled by Server Action
     } catch (error: any) {
-      alert(error.message);
+      if (error?.message === 'NEXT_REDIRECT') {
+        throw error;
+      }
+      alert(error.message || '게시글 등록 중 오류가 발생했습니다.');
       setLoading(false);
     }
   };
@@ -128,12 +131,12 @@ export default function WritePage() {
         <div className="flex gap-4">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">마감 기한</label>
-            <input 
-              type="date" 
-              name="dueDate" 
-              required 
+            <input
+              type="date"
+              name="dueDate"
+              required
               min={new Date().toISOString().split('T')[0]}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" 
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
             />
           </div>
           <div className="flex items-center pt-6">
@@ -151,11 +154,10 @@ export default function WritePage() {
             {CATEGORIES.map(cat => (
               <label key={cat} className="cursor-pointer" onClick={() => { setSelectedCategory(cat); setCategoryError(null); }}>
                 <input type="radio" name="category" value={cat} className="peer hidden" readOnly checked={selectedCategory === cat} />
-                <div className={`px-4 py-2 rounded-full border text-sm transition-all ${
-                  selectedCategory === cat
-                    ? 'bg-indigo-600 text-white border-indigo-600'
-                    : 'border-gray-200 text-gray-600'
-                }`}>
+                <div className={`px-4 py-2 rounded-full border text-sm transition-all ${selectedCategory === cat
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'border-gray-200 text-gray-600'
+                  }`}>
                   {cat}
                 </div>
               </label>
