@@ -25,7 +25,13 @@ export default function WriteReviewPage() {
         return;
       }
 
-      await createReview(postId, user.id, content);
+      const result = await createReview(postId, user.id, content);
+
+      if (result?.error) {
+        alert(result.error);
+        return;
+      }
+
       alert('소중한 활동 후기가 성공적으로 등록되었습니다.');
       router.push(`/board/${postId}`);
     } catch (error: any) {

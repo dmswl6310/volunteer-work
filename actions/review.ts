@@ -15,15 +15,15 @@ export async function createReview(postId: string, userId: string, content: stri
     .maybeSingle();
 
   if (!application) {
-    throw new Error('해당 봉사활동 신청 내역이 없습니다.');
+    return { error: '해당 봉사활동 신청 내역이 없습니다.' };
   }
   if (application.status !== 'confirmed') {
-    throw new Error('봉사활동 참여가 확인된 사용자만 후기를 작성할 수 있습니다. (주최자 승인 필요)');
+    return { error: '봉사활동 참여가 확인된 사용자만 후기를 작성할 수 있습니다. (주최자 승인 필요)' };
   }
 
   const dueDate = application.posts?.due_date ? new Date(application.posts.due_date) : null;
   if (dueDate && dueDate > new Date()) {
-    throw new Error('봉사활동 기간이 종료된 후에만 후기를 작성할 수 있습니다.');
+    return { error: '봉사활동 기간이 종료된 후에만 후기를 작성할 수 있습니다.' };
   }
 
   // 중복 후기 체크
@@ -35,7 +35,7 @@ export async function createReview(postId: string, userId: string, content: stri
     .maybeSingle();
 
   if (existingReview) {
-    throw new Error('이미 이 봉사활동에 대한 후기를 작성하셨습니다.');
+    return { error: '이미 이 봉사활동에 대한 후기를 작성하셨습니다.' };
   }
 
   const { error } = await supabase.from('reviews').insert({
@@ -47,10 +47,11 @@ export async function createReview(postId: string, userId: string, content: stri
 
   if (error) {
     console.error('Error creating review:', error);
-    throw new Error('후기 작성 중 오류가 발생했습니다.');
+    return { error: '후기 작성 중 오류가 발생했습니다.' };
   }
 
   revalidatePath(`/board/${postId}`);
+  return { success: true };
 }
 
 export async function getReviews(postId: string) {
