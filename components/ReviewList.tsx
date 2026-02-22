@@ -3,7 +3,7 @@ import { getReviews } from '@/actions/review';
 interface ReviewWithAuthor {
   id: string;
   content: string;
-  createdAt: Date;
+  created_at: string;
   author: {
     name: string | null;
     email: string;
@@ -34,7 +34,7 @@ export default async function ReviewList({ postId }: { postId: string }) {
                 {review.author.name && review.author.name !== 'User' ? review.author.name : review.author.username}
               </span>
               <span className="text-xs text-gray-400">
-                {new Date(review.createdAt).toLocaleDateString()}
+                {new Date(review.created_at).toLocaleDateString()}
               </span>
             </div>
             <p className="text-gray-700 whitespace-pre-wrap text-sm leading-relaxed">
