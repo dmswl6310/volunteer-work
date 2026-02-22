@@ -232,14 +232,14 @@ export default function MyPage() {
               {user.applications.map((app: any) => (
                 <div key={app.id} className="p-4">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-gray-800">{app.post.title}</h3>
+                    <h3 className="font-bold text-gray-800">{app.posts?.title || '알 수 없는 게시글'}</h3>
                     <StatusBadge status={app.status} />
                   </div>
                   <div className="flex justify-between items-center mt-2">
-                    <span className="text-xs text-gray-500">{new Date(app.createdAt).toLocaleDateString()} 신청</span>
+                    <span className="text-xs text-gray-500">{new Date(app.created_at || app.createdAt).toLocaleDateString()} 신청</span>
                     {app.status === 'pending' && <CancelApplicationButton applicationId={app.id} />}
                     {app.status === 'approved' && (
-                      <Link href={`/reviews/write/${app.postId}`} className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded font-bold">후기작성</Link>
+                      <Link href={`/reviews/write/${app.post_id || app.postId}`} className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded font-bold">후기작성</Link>
                     )}
                   </div>
                 </div>
@@ -276,9 +276,9 @@ export default function MyPage() {
           ) : (
             <div className="bg-white rounded-xl shadow-sm divide-y divide-gray-100">
               {user.postScraps.map((scrap: any) => (
-                <Link key={scrap.id} href={`/board/${scrap.post.id}`} className="block p-4 hover:bg-gray-50">
-                  <h3 className="font-bold text-gray-800">{scrap.post.title}</h3>
-                  <p className="text-xs text-gray-400 mt-1">{new Date(scrap.createdAt).toLocaleDateString()} 찜함</p>
+                <Link key={scrap.id} href={`/board/${scrap.post_id || scrap.posts?.id}`} className="block p-4 hover:bg-gray-50">
+                  <h3 className="font-bold text-gray-800">{scrap.posts?.title || '알 수 없는 게시글'}</h3>
+                  <p className="text-xs text-gray-400 mt-1">{new Date(scrap.created_at || scrap.createdAt).toLocaleDateString()} 찜함</p>
                 </Link>
               ))}
             </div>
@@ -294,9 +294,9 @@ export default function MyPage() {
             <div className="bg-white rounded-xl shadow-sm divide-y divide-gray-100">
               {user.reviews.map((review: any) => (
                 <div key={review.id} className="p-4">
-                  <h3 className="font-bold text-sm mb-1">{review.post?.title || '삭제된 게시글'}</h3>
+                  <h3 className="font-bold text-sm mb-1">{review.posts?.title || '삭제된 게시글'}</h3>
                   <p className="text-sm text-gray-600 line-clamp-2">{review.content}</p>
-                  <span className="text-xs text-gray-400 mt-2 block">{new Date(review.createdAt).toLocaleDateString()}</span>
+                  <span className="text-xs text-gray-400 mt-2 block">{new Date(review.created_at || review.createdAt).toLocaleDateString()}</span>
                 </div>
               ))}
             </div>
