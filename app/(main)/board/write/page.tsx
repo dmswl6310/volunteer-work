@@ -60,7 +60,8 @@ export default function WritePage() {
     // Note: User needs to create a 'posts' bucket in Supabase Storage with public access policy
     let imageUrl = '';
     if (selectedImage) {
-      const filename = `${Date.now()}-${selectedImage.name}`;
+      const ext = selectedImage.name.split('.').pop() || 'jpg';
+      const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       const { data, error } = await supabase.storage
         .from('posts')
         .upload(filename, selectedImage);
