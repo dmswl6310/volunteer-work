@@ -34,6 +34,12 @@ export default function SignupPage() {
       return;
     }
 
+    if (formData.password.length < 6) {
+      setError('비밀번호는 최소 6자 이상이어야 합니다.');
+      setLoading(false);
+      return;
+    }
+
     try {
       // 1. Prevent Supabase Auth from throwing generic "already registered" error by checking DB first.
       // We do this by calling our custom createUserRecord first to run validations.
@@ -100,11 +106,10 @@ export default function SignupPage() {
       }
     } catch (err: any) {
       if (err.message?.includes('User already registered') || err.message?.includes('already registered')) {
-        // Fallback just in case
         setError('이미 존재하는 계정입니다.');
       } else {
         console.error(err);
-        setError(err.message || '회원가입 실패');
+        setError('회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
       }
     } finally {
       setLoading(false);
@@ -201,7 +206,7 @@ export default function SignupPage() {
           </div>
 
           {error && (
-            <div className="text-red-500 text-sm text-center" dangerouslySetInnerHTML={{ __html: error }} />
+            <div className="text-red-500 text-sm text-center">{error}</div>
           )}
 
           <div className="pt-4">

@@ -25,7 +25,7 @@ export default function LoginPage() {
       });
 
       if (authError) {
-        setError(authError.message || '이메일 또는 비밀번호가 잘못되었습니다.');
+        setError('이메일 또는 비밀번호가 올바르지 않습니다.');
         return;
       }
 
@@ -54,7 +54,7 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       console.error(err);
-      setError(err.message || '로그인 실패');
+      setError('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setLoading(false);
     }
