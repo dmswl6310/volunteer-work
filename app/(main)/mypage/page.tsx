@@ -260,7 +260,7 @@ export default function MyPage() {
                   <h3 className="font-bold text-sm truncate mb-1">{post.title}</h3>
                   <div className="flex justify-between text-xs text-gray-500">
                     <span>{post.currentParticipants}/{post.maxParticipants}명</span>
-                    <span>{post.isRecruiting ? '모집중' : '마감'}</span>
+                    <span>{post.is_recruiting ? '모집중' : '마감'}</span>
                   </div>
                 </Link>
               ))}
