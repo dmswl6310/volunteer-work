@@ -77,6 +77,7 @@ export async function applyForPost(postId: string, userId: string, email?: strin
 
   // 3. 신청 생성
   const { error } = await supabase.from('applications').insert({
+    id: crypto.randomUUID(),
     post_id: postId,
     user_id: userId,
     status: 'pending',

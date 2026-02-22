@@ -39,6 +39,7 @@ export async function createReview(postId: string, userId: string, content: stri
   }
 
   const { error } = await supabase.from('reviews').insert({
+    id: crypto.randomUUID(),
     post_id: postId,
     author_id: userId,
     content,

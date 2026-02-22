@@ -22,7 +22,7 @@ export async function toggleScrap(postId: string, userId: string) {
       await supabase.from('posts').update({ scraps: Math.max(0, (post?.scraps ?? 1) - 1) }).eq('id', postId);
     } else {
       // 스크랩
-      await supabase.from('post_scraps').insert({ post_id: postId, user_id: userId });
+      await supabase.from('post_scraps').insert({ id: crypto.randomUUID(), post_id: postId, user_id: userId });
       // 현재 scraps 값 읽어서 +1
       const { data: post } = await supabase.from('posts').select('scraps').eq('id', postId).single();
       await supabase.from('posts').update({ scraps: (post?.scraps ?? 0) + 1 }).eq('id', postId);
