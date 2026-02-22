@@ -8,11 +8,24 @@ import { applyForPost } from '@/actions/apply';
 interface ApplyButtonProps {
   postId: string;
   isRecruiting: boolean;
+  isAuthor: boolean;
 }
 
-export default function ApplyButton({ postId, isRecruiting }: ApplyButtonProps) {
+export default function ApplyButton({ postId, isRecruiting, isAuthor }: ApplyButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
+  // 작성자에게는 수정하기 버튼 표시
+  if (isAuthor) {
+    return (
+      <button
+        onClick={() => router.push(`/board/${postId}/edit`)}
+        className="w-full bg-gray-700 text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition-colors"
+      >
+        수정하기
+      </button>
+    );
+  }
 
   const handleApply = async () => {
     setLoading(true);
