@@ -26,6 +26,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
   // Check if current user has scrapped this post
   const { data: { user } } = await supabase.auth.getUser();
   let isScraped = false;
+  const isAuthor = !!user && user.id === (post as any).author_id;
 
   if (user) {
     const { data: scrap } = await supabase
@@ -164,6 +165,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
           <ApplyButton
             postId={post.id}
             isRecruiting={post.is_recruiting && !isExpired}
+            isAuthor={isAuthor}
           />
         </div>
       </div>
