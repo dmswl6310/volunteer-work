@@ -11,10 +11,10 @@ export default function IncomingRequestItem({ application }: { application: any 
     setLoading(true);
     try {
       await updateApplicationStatus(application.id, status);
-      alert('처리되었습니다.');
+      alert(`${status === 'approved' ? '승인' : '거절'}되었습니다.`);
+      window.location.reload();
     } catch (error: any) {
       alert(error.message);
-    } finally {
       setLoading(false);
     }
   };
