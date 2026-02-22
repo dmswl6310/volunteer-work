@@ -17,6 +17,10 @@ export default function WritePage() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  // Category State
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [categoryError, setCategoryError] = useState<string | null>(null);
+
   useEffect(() => {
     // Check Auth
     const checkAuth = async () => {
@@ -42,6 +46,12 @@ export default function WritePage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!userId) return;
+
+    if (!selectedCategory) {
+      setCategoryError('카테고리를 선택해주세요.');
+      return;
+    }
+    setCategoryError(null);
     setLoading(true);
 
     const form = e.currentTarget;
@@ -139,14 +149,19 @@ export default function WritePage() {
           <label className="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {CATEGORIES.map(cat => (
-              <label key={cat} className="cursor-pointer">
-                <input type="radio" name="category" value={cat} className="peer hidden" required />
-                <div className="px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 transition-all">
+              <label key={cat} className="cursor-pointer" onClick={() => { setSelectedCategory(cat); setCategoryError(null); }}>
+                <input type="radio" name="category" value={cat} className="peer hidden" readOnly checked={selectedCategory === cat} />
+                <div className={`px-4 py-2 rounded-full border text-sm transition-all ${
+                  selectedCategory === cat
+                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    : 'border-gray-200 text-gray-600'
+                }`}>
                   {cat}
                 </div>
               </label>
             ))}
           </div>
+          {categoryError && <p className="mt-1 text-sm text-red-500">{categoryError}</p>}
         </div>
 
         {/* Content */}
