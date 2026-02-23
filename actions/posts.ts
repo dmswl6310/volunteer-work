@@ -30,12 +30,14 @@ export async function getPosts({
   sort = 'latest',
   category,
   status = 'recruiting',
+  q,
 }: {
   page?: number;
   limit?: number;
   sort?: 'latest' | 'deadline';
   category?: string;
   status?: 'recruiting' | 'closed' | 'all';
+  q?: string;
 }) {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
@@ -50,6 +52,10 @@ export async function getPosts({
 
     if (category) {
       query = query.ilike('category', `%${category}%`);
+    }
+
+    if (q) {
+      query = query.or(`title.ilike.%${q}%,content.ilike.%${q}%`);
     }
 
     if (status === 'recruiting') {
