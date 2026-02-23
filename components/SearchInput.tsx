@@ -9,7 +9,8 @@ export default function SearchInput() {
     const initialQuery = searchParams.get('q') || '';
 
     const [query, setQuery] = useState(initialQuery);
-    const [isExpanded, setIsExpanded] = useState(!!initialQuery); // Expand if there's already a search
+    const [displayedQuery, setDisplayedQuery] = useState(initialQuery); // Optimistic UI state
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -18,10 +19,13 @@ export default function SearchInput() {
         // Default to reset pagination on search
         params.delete('page');
 
-        if (query.trim()) {
-            params.set('q', query.trim());
+        const trimmedQuery = query.trim();
+        if (trimmedQuery) {
+            params.set('q', trimmedQuery);
+            setDisplayedQuery(trimmedQuery); // Update immediately
         } else {
             params.delete('q');
+            setDisplayedQuery('');
         }
 
         setIsExpanded(false); // Close the search input overlay on search submit
@@ -44,18 +48,20 @@ export default function SearchInput() {
         <div className="flex justify-end items-center h-10">
             {!isExpanded ? (
                 <div className="flex items-center space-x-2">
-                    {initialQuery && (
+                    {displayedQuery && (
                         <div
                             className="flex items-center bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-sm font-medium border border-indigo-100 cursor-pointer hover:bg-indigo-100 transition-colors"
                             onClick={toggleSearch}
                         >
-                            <span className="truncate max-w-[120px]">{initialQuery}</span>
+                            <span className="truncate max-w-[120px]">{displayedQuery}</span>
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     const params = new URLSearchParams(searchParams.toString());
                                     params.delete('q');
                                     params.delete('page');
+                                    setDisplayedQuery('');
+                                    setQuery('');
                                     router.push(`/board?${params.toString()}`);
                                 }}
                                 className="ml-1.5 p-0.5 text-indigo-400 hover:text-indigo-600 rounded-full hover:bg-indigo-200 transition-colors"
