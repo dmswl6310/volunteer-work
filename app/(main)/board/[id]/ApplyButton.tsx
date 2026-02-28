@@ -10,9 +10,10 @@ interface ApplyButtonProps {
   isRecruiting: boolean;
   isAuthor: boolean;
   hasApplied: boolean;
+  isFull?: boolean;
 }
 
-export default function ApplyButton({ postId, isRecruiting, isAuthor, hasApplied }: ApplyButtonProps) {
+export default function ApplyButton({ postId, isRecruiting, isAuthor, hasApplied, isFull }: ApplyButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [applied, setApplied] = useState(hasApplied);
@@ -44,8 +45,8 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, hasApplied
   // 모집 마감인 경우
   if (!isRecruiting) {
     return (
-      <button disabled className="w-full bg-gray-300 text-white font-bold py-3 rounded-xl cursor-not-allowed">
-        모집 마감
+      <button disabled className={`w-full text-white font-bold py-3 rounded-xl cursor-not-allowed ${isFull ? 'bg-orange-500' : 'bg-gray-300'}`}>
+        {isFull ? '모집 마감' : '모집 마감'}
       </button>
     );
   }

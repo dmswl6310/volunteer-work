@@ -11,6 +11,7 @@ export default function PostCard({ post }: PostCardProps) {
   const dueDate = post.due_date ? new Date(post.due_date) : null;
   if (dueDate) dueDate.setHours(0, 0, 0, 0);
   const isExpired = dueDate ? dueDate < today : false;
+  const isFull = post.current_participants >= post.max_participants;
   const isClosed = !post.is_recruiting || isExpired;
 
   return (
@@ -59,8 +60,11 @@ export default function PostCard({ post }: PostCardProps) {
 
           <div className="flex items-center justify-between mt-2">
             <div className="flex items-center space-x-2 text-xs">
-              {!isClosed && (
+              {!isClosed && !isFull && (
                 <span className="font-bold text-green-600">모집중</span>
+              )}
+              {!isClosed && isFull && (
+                <span className="font-bold text-orange-500">모집 마감</span>
               )}
               <span className="text-gray-400">
                 {post.current_participants}/{post.max_participants}명

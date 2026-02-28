@@ -50,6 +50,8 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
     diffDays = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   }
 
+  const isFull = post.current_participants >= post.max_participants;
+
   return (
     <div className="pb-24 bg-white min-h-screen">
       {/* Top Nav (Optional, since we have BottomNav, but detail usually has Back button) */}
@@ -81,9 +83,14 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
             <span className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-full">
               {post.category}
             </span>
-            {post.due_date && (
-              <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${isExpired ? 'bg-gray-100 text-gray-500' : 'bg-red-50 text-red-500'}`}>
-                {isExpired ? '마감됨' : (diffDays === 0 ? 'D-Day' : `D-${diffDays}`)}
+            {post.due_date && post.is_recruiting && !isExpired && !isFull && (
+              <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full bg-red-50 text-red-500`}>
+                {diffDays === 0 ? 'D-Day' : `D-${diffDays}`}
+              </span>
+            )}
+            {(!post.is_recruiting || isExpired || isFull) && (
+              <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${isFull && !isExpired && post.is_recruiting ? 'bg-orange-50 text-orange-500' : 'bg-gray-100 text-gray-500'}`}>
+                {isExpired || !post.is_recruiting ? '마감됨' : '모집 마감'}
               </span>
             )}
           </div>
@@ -173,9 +180,10 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
         <div className="flex-1 ml-4">
           <ApplyButton
             postId={post.id}
-            isRecruiting={post.is_recruiting && !isExpired}
+            isRecruiting={post.is_recruiting && !isExpired && !isFull}
             isAuthor={isAuthor}
             hasApplied={hasApplied}
+            isFull={isFull}
           />
         </div>
       </div>

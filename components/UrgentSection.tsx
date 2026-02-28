@@ -24,7 +24,9 @@ export default async function UrgentSection() {
           const dueDate = post.dueDate ? new Date(post.dueDate) : null;
           if (dueDate) dueDate.setHours(0, 0, 0, 0);
           const diffDays = dueDate ? Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : 0;
-          const dDayText = diffDays > 0 ? `D-${diffDays}` : (diffDays === 0 ? 'D-Day' : '마감');
+          const isFull = post.currentParticipants >= post.maxParticipants;
+          let dDayText = diffDays > 0 ? `D-${diffDays}` : (diffDays === 0 ? 'D-Day' : '마감');
+          if (diffDays >= 0 && isFull) dDayText = '모집 마감';
 
           return (
             <Link
@@ -48,7 +50,7 @@ export default async function UrgentSection() {
                 <div className="flex-1 flex flex-col justify-between py-1">
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="inline-block px-1.5 py-0.5 text-[10px] font-bold text-red-600 bg-red-50 rounded">
+                      <span className={`inline-block px-1.5 py-0.5 text-[10px] font-bold rounded ${isFull ? 'text-orange-600 bg-orange-50' : 'text-red-600 bg-red-50'}`}>
                         {dDayText}
                       </span>
                     </div>
