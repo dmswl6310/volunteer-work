@@ -39,7 +39,16 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
   }
 
   // Check Due Date
-  const isExpired = post.due_date ? new Date(post.due_date) < new Date() : false;
+  let isExpired = false;
+  let diffDays = 0;
+  if (post.due_date) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(post.due_date);
+    dueDate.setHours(0, 0, 0, 0);
+    isExpired = dueDate < today;
+    diffDays = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  }
 
   return (
     <div className="pb-24 bg-white min-h-screen">
@@ -74,7 +83,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
             </span>
             {post.due_date && (
               <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${isExpired ? 'bg-gray-100 text-gray-500' : 'bg-red-50 text-red-500'}`}>
-                {isExpired ? '마감됨' : `D-${Math.ceil((new Date(post.due_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))}`}
+                {isExpired ? '마감됨' : (diffDays === 0 ? 'D-Day' : `D-${diffDays}`)}
               </span>
             )}
           </div>

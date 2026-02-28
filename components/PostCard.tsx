@@ -7,15 +7,16 @@ interface PostCardProps {
 
 export default function PostCard({ post }: PostCardProps) {
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const dueDate = post.due_date ? new Date(post.due_date) : null;
+  if (dueDate) dueDate.setHours(0, 0, 0, 0);
   const isExpired = dueDate ? dueDate < today : false;
   const isClosed = !post.is_recruiting || isExpired;
 
   return (
     <Link href={`/board/${post.id}`} className="block group">
-      <div className={`bg-white p-4 border-b border-gray-100 flex gap-4 transition-colors ${
-        isClosed ? 'opacity-50 grayscale' : 'hover:bg-gray-50'
-      }`}>
+      <div className={`bg-white p-4 border-b border-gray-100 flex gap-4 transition-colors ${isClosed ? 'opacity-50 grayscale' : 'hover:bg-gray-50'
+        }`}>
         {/* Image - Left Side */}
         <div className="relative w-24 h-24 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
           {post.image_url ? (
