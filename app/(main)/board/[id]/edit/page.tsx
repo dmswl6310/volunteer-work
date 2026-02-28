@@ -194,7 +194,7 @@ export default function EditPage() {
               value={formData.dueDate}
               onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
               required
-              min={new Date().toISOString().split('T')[0]}
+              min={new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0]}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
             />
           </div>

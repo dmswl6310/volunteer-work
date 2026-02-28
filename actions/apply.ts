@@ -55,8 +55,14 @@ export async function applyForPost(postId: string, userId: string, email?: strin
     throw new Error('모집이 종료되었거나 존재하지 않는 게시글입니다.');
   }
 
-  if (post.due_date && new Date(post.due_date) < new Date()) {
-    throw new Error('마감 기한이 지났습니다.');
+  if (post.due_date) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(post.due_date);
+    dueDate.setHours(0, 0, 0, 0);
+    if (dueDate < today) {
+      throw new Error('마감 기한이 지났습니다.');
+    }
   }
 
   if (post.current_participants >= post.max_participants) {

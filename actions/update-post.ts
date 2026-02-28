@@ -40,7 +40,7 @@ export async function updatePost(postId: string, formData: FormData) {
   );
   if (profanityError) throw new Error(profanityError);
 
-  const dueDate = dueDateStr ? new Date(dueDateStr).toISOString() : null;
+  const dueDate = dueDateStr ? `${dueDateStr}T23:59:59.999+09:00` : null;
 
   const { error } = await supabase
     .from('posts')

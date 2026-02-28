@@ -27,7 +27,7 @@ export async function createPost(formData: FormData) {
   );
   if (profanityError) throw new Error(profanityError);
 
-  const dueDate = dueDateStr ? new Date(dueDateStr).toISOString() : null;
+  const dueDate = dueDateStr ? `${dueDateStr}T23:59:59.999+09:00` : null;
   const supabase = await createServerSupabaseClient();
 
   // 유저 존재 체크 (auto-heal)
