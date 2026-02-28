@@ -38,7 +38,7 @@ export async function updatePost(postId: string, formData: FormData) {
     { label: '제목', value: title },
     { label: '내용', value: content }
   );
-  if (profanityError) throw new Error(profanityError);
+  if (profanityError) return { error: profanityError };
 
   const dueDate = dueDateStr ? `${dueDateStr}T23:59:59.999+09:00` : null;
 
@@ -62,5 +62,6 @@ export async function updatePost(postId: string, formData: FormData) {
   }
 
   revalidatePath(`/board/${postId}`);
-  redirect(`/board/${postId}`);
+  // redirect(`/board/${postId}`);
+  return { success: true };
 }

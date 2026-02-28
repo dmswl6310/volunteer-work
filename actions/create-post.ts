@@ -25,7 +25,7 @@ export async function createPost(formData: FormData) {
     { label: '제목', value: title },
     { label: '내용', value: content }
   );
-  if (profanityError) throw new Error(profanityError);
+  if (profanityError) return { error: profanityError };
 
   const dueDate = dueDateStr ? `${dueDateStr}T23:59:59.999+09:00` : null;
   const supabase = await createServerSupabaseClient();
@@ -86,5 +86,6 @@ export async function createPost(formData: FormData) {
   }
 
   revalidatePath('/board');
-  redirect('/board');
+  // redirect('/board'); (Server Action 내에서 redirect는 에러를 throw하므로 클라이언트에서 처리하도록 변경)
+  return { success: true };
 }

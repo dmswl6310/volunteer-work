@@ -88,12 +88,16 @@ export default function WritePage() {
     formData.append('imageUrl', imageUrl);
 
     try {
-      await createPost(formData); // Server Action
-      // Redirect handled by Server Action
-    } catch (error: any) {
-      if (error?.message === 'NEXT_REDIRECT') {
-        throw error;
+      const result = await createPost(formData); // Server Action
+      if (result?.error) {
+        alert(result.error);
+        setLoading(false);
+        return;
       }
+      if (result?.success) {
+        router.push('/board');
+      }
+    } catch (error: any) {
       alert(error.message || '게시글 등록 중 오류가 발생했습니다.');
       setLoading(false);
     }

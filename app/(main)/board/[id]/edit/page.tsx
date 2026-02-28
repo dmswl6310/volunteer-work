@@ -125,11 +125,16 @@ export default function EditPage() {
     data.append('imageUrl', imageUrl);
 
     try {
-      await updatePost(postId, data);
-    } catch (error: any) {
-      if (error?.message === 'NEXT_REDIRECT') {
-        throw error;
+      const result = await updatePost(postId, data);
+      if (result?.error) {
+        alert(result.error);
+        setLoading(false);
+        return;
       }
+      if (result?.success) {
+        router.push(`/board/${postId}`);
+      }
+    } catch (error: any) {
       alert(error.message || '게시글 수정 중 오류가 발생했습니다.');
       setLoading(false);
     }
