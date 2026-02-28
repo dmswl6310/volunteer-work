@@ -3,6 +3,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { validateNoProfanity } from '@/lib/profanity';
 
 export async function updatePost(postId: string, formData: FormData) {
   const supabase = await createServerSupabaseClient();
@@ -31,6 +32,13 @@ export async function updatePost(postId: string, formData: FormData) {
   const imageUrl = formData.get('imageUrl') as string;
 
   if (!title || !content || !category) throw new Error('필수 항목을 입력해주세요.');
+
+  // 욕설 필터링
+  const profanityError = validateNoProfanity(
+    { label: '제목', value: title },
+    { label: '내용', value: content }
+  );
+  if (profanityError) throw new Error(profanityError);
 
   const dueDate = dueDateStr ? new Date(dueDateStr).toISOString() : null;
 

@@ -2,8 +2,14 @@
 
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
+import { checkProfanity } from '@/lib/profanity';
 
 export async function createReview(postId: string, userId: string, content: string) {
+  // 욕설 필터링 (DB 조회 전 사전 차단)
+  if (checkProfanity(content)) {
+    return { error: '후기 내용에 부적절한 표현이 포함되어 있습니다.' };
+  }
+
   const supabase = await createServerSupabaseClient();
 
   // 확정된 신청 확인
