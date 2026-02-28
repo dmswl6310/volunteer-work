@@ -42,11 +42,11 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, hasApplied
     );
   }
 
-  // 모집 마감인 경우
+  // 모집 마감/완료인 경우
   if (!isRecruiting) {
     return (
       <button disabled className={`w-full text-white font-bold py-3 rounded-xl cursor-not-allowed ${isFull ? 'bg-orange-500' : 'bg-gray-300'}`}>
-        {isFull ? '모집 마감' : '모집 마감'}
+        {isFull ? '모집 완료' : '모집 마감'}
       </button>
     );
   }

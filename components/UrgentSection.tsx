@@ -26,7 +26,7 @@ export default async function UrgentSection() {
           const diffDays = dueDate ? Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : 0;
           const isFull = post.currentParticipants >= post.maxParticipants;
           let dDayText = diffDays > 0 ? `D-${diffDays}` : (diffDays === 0 ? 'D-Day' : '마감');
-          if (diffDays >= 0 && isFull) dDayText = '모집 마감';
+          if (diffDays >= 0 && isFull) dDayText = '모집 완료';
 
           return (
             <Link

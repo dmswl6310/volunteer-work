@@ -64,7 +64,7 @@ export default function PostCard({ post }: PostCardProps) {
                 <span className="font-bold text-green-600">모집중</span>
               )}
               {!isClosed && isFull && (
-                <span className="font-bold text-orange-500">모집 마감</span>
+                <span className="font-bold text-orange-500">모집 완료</span>
               )}
               <span className="text-gray-400">
                 {post.current_participants}/{post.max_participants}명

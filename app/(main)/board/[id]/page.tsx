@@ -90,7 +90,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
             )}
             {(!post.is_recruiting || isExpired || isFull) && (
               <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${isFull && !isExpired && post.is_recruiting ? 'bg-orange-50 text-orange-500' : 'bg-gray-100 text-gray-500'}`}>
-                {isExpired || !post.is_recruiting ? '마감됨' : '모집 마감'}
+                {isExpired || !post.is_recruiting ? '마감됨' : '모집 완료'}
               </span>
             )}
           </div>
