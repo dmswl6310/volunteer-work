@@ -1,7 +1,7 @@
 /**
- * 마이페이지 로딩 스피너
+ * 후기 게시판 로딩 스피너
  */
-export default function MyPageLoading() {
+export default function ReviewsLoading() {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <div className="flex flex-col items-center gap-3">
