@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ToastProvider';
 import { applyForPost } from '@/actions/apply';
 
 interface ApplyButtonProps {
@@ -15,6 +16,7 @@ interface ApplyButtonProps {
 
 export default function ApplyButton({ postId, isRecruiting, isAuthor, hasApplied, isFull }: ApplyButtonProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [applied, setApplied] = useState(hasApplied);
 
@@ -64,13 +66,13 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, hasApplied
 
       await applyForPost(postId, user.id, user.email || undefined);
       setApplied(true); // 성공 시 버튼 상태 변경
-      alert('봉사활동 참여 신청이 완료되었습니다.\n관리자 승인 후 최종 확정됩니다.');
+      showToast('봉사활동 참여 신청이 완료되었습니다.\n관리자 승인 후 최종 확정됩니다.', 'success');
     } catch (error: any) {
       if (error.message?.includes('이미 신청')) {
-        alert('이미 참여 신청한 봉사활동입니다.');
+        showToast('이미 참여 신청한 봉사활동입니다.', 'warning');
         setApplied(true); // 중복 신청이면 버튼도 막기
       } else {
-        alert(error.message || '신청 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+        showToast(error.message || '신청 중 오류가 발생했습니다.', 'error');
       }
     } finally {
       setLoading(false);

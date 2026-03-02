@@ -2,20 +2,22 @@
 
 import { updateApplicationStatus } from '@/actions/apply';
 import { useState } from 'react';
+import { useToast } from './ToastProvider';
 
 /** 들어오는 신청 항목 컴포넌트 (승인/거절 버튼 포함) */
 export default function IncomingRequestItem({ application }: { application: any }) {
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
 
   const handleStatus = async (status: 'approved' | 'rejected') => {
     if (!confirm(`${status === 'approved' ? '승인' : '거절'}하시겠습니까?`)) return;
     setLoading(true);
     try {
       await updateApplicationStatus(application.id, status);
-      alert(`${status === 'approved' ? '승인' : '거절'}되었습니다.`);
+      showToast(`${status === 'approved' ? '승인' : '거절'}되었습니다.`, 'success');
       window.location.reload();
     } catch (error: any) {
-      alert(error.message);
+      showToast(error.message, 'error');
       setLoading(false);
     }
   };

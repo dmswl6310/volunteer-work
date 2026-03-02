@@ -5,10 +5,12 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { createPost } from '@/actions/create-post';
 import { CATEGORIES } from '@/lib/constants';
+import { useToast } from '@/components/ToastProvider';
 
 export default function WritePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
   const [userId, setUserId] = useState<string | null>(null);
 
   // Image Upload State
@@ -24,7 +26,7 @@ export default function WritePage() {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        alert('로그인 후 이용해 주세요.');
+        showToast('로그인 후 이용해 주세요.', 'warning');
         router.push('/auth/login');
       } else {
         setUserId(user.id);
@@ -76,7 +78,7 @@ export default function WritePage() {
 
       if (error) {
         console.error('Image upload failed:', error);
-        alert('이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+        showToast('이미지 업로드에 실패했습니다.', 'error');
         // Proceed without image or return? Let's proceed for robustness in demo
       } else {
         const { data: publicUrlData } = supabase.storage.from('posts').getPublicUrl(filename);
@@ -88,7 +90,7 @@ export default function WritePage() {
     try {
       const result = await createPost(formData); // Server Action
       if (result?.error) {
-        alert(result.error);
+        showToast(result.error, 'warning');
         setLoading(false);
         return;
       }
@@ -96,7 +98,7 @@ export default function WritePage() {
         router.push('/board');
       }
     } catch (error: any) {
-      alert(error.message || '게시글 등록 중 오류가 발생했습니다.');
+      showToast(error.message || '게시글 등록 중 오류가 발생했습니다.', 'error');
       setLoading(false);
     }
   };

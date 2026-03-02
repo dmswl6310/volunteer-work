@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { approveUser, getAdminDashboardData } from '@/actions/admin';
 import Link from 'next/link';
+import { useToast } from '@/components/ToastProvider';
 
 interface User {
   id: string;
@@ -19,6 +20,7 @@ interface User {
 
 export default function AdminPage() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [pendingUsers, setPendingUsers] = useState<User[]>([]);
@@ -31,22 +33,13 @@ export default function AdminPage() {
         return;
       }
 
-      // We can double check role from metadata if available, OR just valid server fetch
-      // Let's fetch the data which will fail or return empty if not admin logic on server?
-      // Actually, the server action `getAdminDashboardData` currently doesn't check role again inside (it trusts caller?).
-      // TODO: We should verify role in `getAdminDashboardData` for security, but for now let's check basic auth.
-
-      // Wait, `getAdminDashboardData` is just a data fetcher. 
-      // We need to ensure Client-side thinks we are admin to render UI.
-      // Assuming secure backend, if we fetch and get error, we redirect.
-
       try {
         const data = await getAdminDashboardData();
         setPendingUsers(data as User[]);
         setIsAdmin(true);
       } catch (e) {
         console.error(e);
-        alert('접근 권한이 없거나 오류가 발생했습니다.');
+        showToast('접근 권한이 없거나 오류가 발생했습니다.', 'error');
         router.replace('/');
       } finally {
         setLoading(false);
@@ -102,7 +95,7 @@ export default function AdminPage() {
                   <form action={async () => {
                     if (confirm(`${u.name}님의 가입을 승인하시겠습니까?`)) {
                       await approveUser(u.id);
-                      alert('승인되었습니다.');
+                      showToast('승인되었습니다.', 'success');
                       // Reload
                       const newData = await getAdminDashboardData();
                       setPendingUsers(newData as User[]);

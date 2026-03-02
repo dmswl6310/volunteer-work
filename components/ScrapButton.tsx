@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { toggleScrap } from '@/actions/scrap';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { useToast } from './ToastProvider';
 
 interface ScrapButtonProps {
   postId: string;
@@ -16,6 +17,7 @@ export default function ScrapButton({ postId, initialIsScraped, initialScrapCoun
   const [isScraped, setIsScraped] = useState(initialIsScraped);
   const [scrapCount, setScrapCount] = useState(initialScrapCount);
   const router = useRouter();
+  const { showToast } = useToast();
 
   const handleToggle = async () => {
     // 냙관적 UI 업데이트
@@ -44,7 +46,7 @@ export default function ScrapButton({ postId, initialIsScraped, initialScrapCoun
       // 에러 시 원래 상태로 복구
       setIsScraped(previousIsScraped);
       setScrapCount(previousCount);
-      alert('오류가 발생했습니다.');
+      showToast('오류가 발생했습니다.', 'error');
     }
   };
 

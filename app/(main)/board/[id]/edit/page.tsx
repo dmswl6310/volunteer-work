@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter, useParams } from 'next/navigation';
 import { updatePost } from '@/actions/update-post';
 import { CATEGORIES } from '@/lib/constants';
+import { useToast } from '@/components/ToastProvider';
 
 export default function EditPage() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function EditPage() {
   const postId = params.id as string;
 
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
   const [initialLoading, setInitialLoading] = useState(true);
 
   const [formData, setFormData] = useState({
@@ -35,7 +37,7 @@ export default function EditPage() {
       // 로그인 체크
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        alert('로그인 후 이용해 주세요.');
+        showToast('로그인 후 이용해 주세요.', 'warning');
         router.push('/auth/login');
         return;
       }
@@ -48,14 +50,14 @@ export default function EditPage() {
         .single();
 
       if (error || !post) {
-        alert('존재하지 않거나 삭제된 게시글입니다.');
+        showToast('존재하지 않거나 삭제된 게시글입니다.', 'error');
         router.push('/board');
         return;
       }
 
       // 본인 게시글인지 확인
       if (post.author_id !== user.id) {
-        alert('게시글을 수정할 권한이 없습니다.');
+        showToast('게시글을 수정할 권한이 없습니다.', 'error');
         router.push(`/board/${postId}`);
         return;
       }
@@ -114,7 +116,7 @@ export default function EditPage() {
         .upload(filename, selectedImage);
 
       if (uploadError) {
-        alert('이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+        showToast('이미지 업로드에 실패했습니다.', 'error');
         setLoading(false);
         return;
       }
@@ -126,7 +128,7 @@ export default function EditPage() {
     try {
       const result = await updatePost(postId, data);
       if (result?.error) {
-        alert(result.error);
+        showToast(result.error, 'warning');
         setLoading(false);
         return;
       }
@@ -134,7 +136,7 @@ export default function EditPage() {
         router.push(`/board/${postId}`);
       }
     } catch (error: any) {
-      alert(error.message || '게시글 수정 중 오류가 발생했습니다.');
+      showToast(error.message || '게시글 수정 중 오류가 발생했습니다.', 'error');
       setLoading(false);
     }
   };

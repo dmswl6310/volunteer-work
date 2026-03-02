@@ -1,32 +1,34 @@
+'use client';
+
+/**
+ * 마이페이지 로딩 스켈레톤 UI
+ */
 export default function MyPageLoading() {
-    return (
-        <div className="bg-gray-50 min-h-screen pb-24">
-            {/* Header */}
-            <div className="bg-white px-4 py-3 border-b border-gray-200 sticky top-0 z-30">
-                <h1 className="text-lg font-bold text-center">내 정보</h1>
-            </div>
-
-            <div className="p-4 space-y-6">
-                <section className="bg-white rounded-2xl p-6 shadow-sm">
-                    <div className="flex animate-pulse space-x-4 mb-6">
-                        <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
-                        <div className="flex-1 py-1 space-y-3">
-                            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                            <div className="h-3 bg-gray-200 rounded w-1/3"></div>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="h-10 bg-gray-100 rounded-xl"></div>
-                        <div className="h-10 bg-gray-100 rounded-xl"></div>
-                        <div className="col-span-2 h-10 bg-gray-100 rounded-xl"></div>
-                    </div>
-                </section>
-
-                <section className="animate-pulse">
-                    <div className="h-6 bg-gray-200 rounded w-1/4 mb-3"></div>
-                    <div className="h-24 bg-white rounded-xl shadow-sm"></div>
-                </section>
-            </div>
+  return (
+    <div className="pb-20 bg-gray-50 min-h-screen">
+      {/* 프로필 헤더 스켈레톤 */}
+      <div className="bg-indigo-600 px-6 pt-8 pb-16">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 bg-indigo-400 rounded-full animate-pulse"></div>
+          <div className="space-y-2">
+            <div className="h-5 w-24 bg-indigo-400 rounded animate-pulse"></div>
+            <div className="h-3 w-32 bg-indigo-400 rounded animate-pulse"></div>
+          </div>
         </div>
-    );
+      </div>
+
+      {/* 컨텐츠 스켈레톤 */}
+      <div className="px-4 -mt-8 space-y-4">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="bg-white rounded-xl shadow-sm p-6">
+            <div className="h-5 w-32 bg-gray-200 rounded animate-pulse mb-4"></div>
+            <div className="space-y-3">
+              <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+              <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

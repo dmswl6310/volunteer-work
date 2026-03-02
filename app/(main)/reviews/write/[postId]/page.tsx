@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createReview } from '@/actions/review';
 import { supabase } from '@/lib/supabase';
+import { useToast } from '@/components/ToastProvider';
 
 export default function WriteReviewPage() {
   const router = useRouter();
@@ -11,6 +12,7 @@ export default function WriteReviewPage() {
   const postId = params.postId as string;
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +22,7 @@ export default function WriteReviewPage() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        alert('로그인 후 이용해 주세요.');
+        showToast('로그인 후 이용해 주세요.', 'warning');
         router.push('/auth/login');
         return;
       }
@@ -28,14 +30,14 @@ export default function WriteReviewPage() {
       const result = await createReview(postId, user.id, content);
 
       if (result?.error) {
-        alert(result.error);
+        showToast(result.error, 'warning');
         return;
       }
 
-      alert('소중한 활동 후기가 성공적으로 등록되었습니다.');
+      showToast('소중한 활동 후기가 성공적으로 등록되었습니다.', 'success');
       router.push(`/board/${postId}`);
     } catch (error: any) {
-      alert(error.message || '후기 등록 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      showToast(error.message || '후기 등록 중 오류가 발생했습니다.', 'error');
     } finally {
       setIsSubmitting(false);
     }

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { updateUserProfile } from '@/actions/user-update';
+import { useToast } from './ToastProvider';
 
 interface ProfileEditFormProps {
     user: {
@@ -18,6 +19,7 @@ interface ProfileEditFormProps {
 export default function ProfileEditForm({ user }: ProfileEditFormProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { showToast } = useToast();
     const [editForm, setEditForm] = useState({
         name: user.name || '',
         contact: user.contact || '',
@@ -32,10 +34,10 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
         setLoading(true);
         try {
             await updateUserProfile(user.id, editForm);
-            alert('프로필 정보가 성공적으로 수정되었습니다.');
+            showToast('프로필 정보가 성공적으로 수정되었습니다.', 'success');
             setIsEditing(false);
         } catch (error: any) {
-            alert(error.message);
+            showToast(error.message, 'error');
         } finally {
             setLoading(false);
         }
