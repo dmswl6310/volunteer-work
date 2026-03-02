@@ -6,6 +6,7 @@ import CancelApplicationButton from '@/components/CancelApplicationButton';
 import LogoutButton from '@/components/LogoutButton';
 import { getMyPageData } from '@/actions/user';
 import ProfileEditForm from '@/components/ProfileEditForm';
+import StatusBadge from '@/components/StatusBadge';
 
 export default async function MyPage() {
   const supabase = await createServerSupabaseClient();
@@ -123,7 +124,7 @@ export default async function MyPage() {
                 <Link key={post.id} href={`/board/${post.id}`} className="min-w-[200px] bg-white p-4 rounded-xl shadow-sm border border-gray-100 block">
                   <h3 className="font-bold text-sm truncate mb-1">{post.title}</h3>
                   <div className="flex justify-between text-xs text-gray-500">
-                    <span>{post.currentParticipants}/{post.maxParticipants}명</span>
+                    <span>{post.current_participants}/{post.max_participants}명</span>
                     <span>{post.is_recruiting ? '모집중' : '마감'}</span>
                   </div>
                 </Link>
@@ -168,29 +169,5 @@ export default async function MyPage() {
         </section>
       </div>
     </div>
-  );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const styles: any = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    approved: 'bg-green-100 text-green-800',
-    rejected: 'bg-red-100 text-red-800',
-    confirmed: 'bg-blue-100 text-blue-800',
-    cancelled: 'bg-gray-100 text-gray-800',
-  };
-
-  const labels: any = {
-    pending: '대기',
-    approved: '승인',
-    rejected: '반려',
-    confirmed: '완료',
-    cancelled: '취소',
-  };
-
-  return (
-    <span className={`px-2 py-0.5 rounded text-xs font-bold ${styles[status] || 'bg-gray-100'}`}>
-      {labels[status] || status}
-    </span>
   );
 }

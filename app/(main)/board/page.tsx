@@ -4,17 +4,14 @@ import InfiniteScrollBoard from '@/components/InfiniteScrollBoard';
 import StatusFilter from '@/components/StatusFilter';
 import SearchInput from '@/components/SearchInput';
 import Link from 'next/link';
+import { CATEGORIES } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
-const CATEGORIES = [
+/** 필터용 카테고리 목록 ('전체' 포함) */
+const FILTER_CATEGORIES = [
   { id: 'all', name: '전체' },
-  { id: '교육', name: '교육' },
-  { id: '환경', name: '환경' },
-  { id: '의료', name: '의료' },
-  { id: '동물', name: '동물' },
-  { id: '문화', name: '문화' },
-  { id: '기타', name: '기타' },
+  ...CATEGORIES.map(cat => ({ id: cat, name: cat })),
 ];
 
 export default async function BoardPage(props: { searchParams: Promise<{ sort?: 'latest' | 'deadline'; category?: string; status?: 'recruiting' | 'closed' | 'all'; q?: string }> }) {
@@ -61,7 +58,7 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
 
         {/* Category Filter */}
         <div className="flex space-x-2 overflow-x-auto pb-1 scrollbar-hide">
-          {CATEGORIES.map((cat) => (
+          {FILTER_CATEGORIES.map((cat) => (
             <Link
               key={cat.id}
               href={`/board?category=${cat.id}&sort=${sort}&status=${status}${q ? `&q=${q}` : ''}`}

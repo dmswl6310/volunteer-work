@@ -71,7 +71,8 @@ export async function getPosts({
     }
 
     if (status === 'recruiting') {
-      query = query.eq('is_recruiting', true).gte('due_date', now);
+      // 상시 모집(due_date가 null)이거나 마감일이 지나지 않은 모집중 게시글
+      query = query.eq('is_recruiting', true).or(`due_date.is.null,due_date.gte.${now}`);
     } else if (status === 'closed') {
       query = query.or(`is_recruiting.eq.false,due_date.lt.${now}`);
     }

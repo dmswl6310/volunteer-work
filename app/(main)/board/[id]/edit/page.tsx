@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter, useParams } from 'next/navigation';
 import { updatePost } from '@/actions/update-post';
-
-const CATEGORIES = ['교육봉사', '환경정화', '동물보호', '노인돕기', '기타'];
+import { CATEGORIES } from '@/lib/constants';
 
 export default function EditPage() {
   const router = useRouter();

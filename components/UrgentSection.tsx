@@ -22,10 +22,10 @@ export default async function UrgentSection() {
         {urgentPosts.map((post) => {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
-          const dueDate = post.dueDate ? new Date(post.dueDate) : null;
+          const dueDate = post.due_date ? new Date(post.due_date) : null;
           if (dueDate) dueDate.setHours(0, 0, 0, 0);
           const diffDays = dueDate ? Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : 0;
-          const isFull = post.currentParticipants >= post.maxParticipants;
+          const isFull = post.current_participants >= post.max_participants;
           let dDayText = diffDays > 0 ? `D-${diffDays}` : (diffDays === 0 ? 'D-Day' : '마감');
           if (diffDays >= 0 && isFull) dDayText = '모집 완료';
 
@@ -38,8 +38,8 @@ export default async function UrgentSection() {
               <div className="flex p-3 gap-3">
                 {/* Image */}
                 <div className="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                  {post.imageUrl ? (
-                    <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
+                  {post.image_url ? (
+                    <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
                       <span className="text-[10px]">No Img</span>
@@ -61,7 +61,7 @@ export default async function UrgentSection() {
 
                   <div className="flex justify-between items-end text-xs mt-2">
                     <span className="text-gray-600 font-medium">{post.author.username || post.author.name || '익명'}</span>
-                    <span className="text-gray-400">{post.currentParticipants}/{post.maxParticipants}명</span>
+                    <span className="text-gray-400">{post.current_participants}/{post.max_participants}명</span>
                   </div>
                 </div>
               </div>

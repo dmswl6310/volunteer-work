@@ -4,9 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { createPost } from '@/actions/create-post';
-
-// Categories mock
-const CATEGORIES = ['교육봉사', '환경정화', '동물보호', '노인돕기', '기타'];
+import { CATEGORIES } from '@/lib/constants';
 
 export default function WritePage() {
   const router = useRouter();
@@ -183,12 +181,10 @@ export default function WritePage() {
             <input type="range" name="maxParticipants" min="1" max="50" defaultValue="10"
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
               onChange={(e) => {
-                const val = e.target.value;
-                const span = document.getElementById('participant-count');
-                if (span) span.innerText = `${val}명`;
+                e.target.nextElementSibling!.textContent = `${e.target.value}명`;
               }}
             />
-            <span id="participant-count" className="text-lg font-bold text-indigo-600 min-w-[3rem]">10명</span>
+            <span className="text-lg font-bold text-indigo-600 min-w-[3rem]">10명</span>
           </div>
         </div>
 
