@@ -1,10 +1,11 @@
 import { getPost } from '@/actions/get-post';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import ApplyButton from './ApplyButton';
 import ReviewList from '@/components/ReviewList';
 import ScrapButton from '@/components/ScrapButton';
 import { createServerSupabaseClient } from '@/lib/supabase';
-import Link from 'next/link';
 
 export default async function PostDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -68,7 +69,14 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
       {/* 이미지 헤더 */}
       <div className="relative w-full aspect-video bg-gray-200">
         {post.image_url ? (
-          <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" />
+          <Image 
+            src={post.image_url} 
+            alt={post.title} 
+            fill 
+            className="object-cover" 
+            sizes="(max-width: 448px) 100vw, 448px"
+            priority
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
             No Image

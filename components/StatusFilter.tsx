@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 /** 모집 상태 필터 드롭다운 (모집중/마감/전체) */
@@ -8,18 +9,31 @@ export default function StatusFilter() {
   const searchParams = useSearchParams();
   const currentStatus = searchParams.get('status') || 'recruiting';
 
+  const [activeStatus, setActiveStatus] = useState(currentStatus);
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setActiveStatus(currentStatus);
+  }, [currentStatus]);
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const status = e.target.value;
+    // 1. UI 즉각 변경
+    setActiveStatus(status);
+
+    // 2. 실제 URL 및 서버 데이터 변경 요청
     const params = new URLSearchParams(searchParams.toString());
     params.set('status', status);
-    // Reset page if needed, but we don't have page param in URL yet (infinite scroll handles it internally locally)
-    router.push(`/board?${params.toString()}`);
+    
+    startTransition(() => {
+      router.push(`/board?${params.toString()}`, { scroll: false });
+    });
   };
 
   return (
     <div className="relative">
       <select
-        value={currentStatus}
+        value={activeStatus}
         onChange={handleChange}
         className="appearance-none pl-3 pr-8 py-1.5 rounded-full text-sm font-bold bg-white border border-gray-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
       >

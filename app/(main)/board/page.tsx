@@ -4,15 +4,10 @@ import InfiniteScrollBoard from '@/components/InfiniteScrollBoard';
 import StatusFilter from '@/components/StatusFilter';
 import SearchInput from '@/components/SearchInput';
 import Link from 'next/link';
-import { CATEGORIES } from '@/lib/constants';
+import CategoryFilter from '@/components/CategoryFilter';
+import SortFilter from '@/components/SortFilter';
 
 export const dynamic = 'force-dynamic';
-
-/** 필터용 카테고리 목록 ('전체' 포함) */
-const FILTER_CATEGORIES = [
-  { id: 'all', name: '전체' },
-  ...CATEGORIES.map(cat => ({ id: cat, name: cat })),
-];
 
 export default async function BoardPage(props: { searchParams: Promise<{ sort?: 'latest' | 'deadline'; category?: string; status?: 'recruiting' | 'closed' | 'all'; q?: string }> }) {
   const searchParams = await props.searchParams;
@@ -39,38 +34,11 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
         {/* Sort & Status Filters Row */}
         <div className="flex items-center justify-between mb-3 mt-1">
           <StatusFilter />
-          <div className="flex space-x-3 items-center">
-            <Link
-              href={`/board?sort=latest${category ? `&category=${category}` : ''}&status=${status}${q ? `&q=${q}` : ''}`}
-              className={`text-sm font-medium transition-colors ${sort === 'latest' ? 'text-gray-900' : 'text-gray-400 hover:text-indigo-600'}`}
-            >
-              최신순
-            </Link>
-            <span className="text-gray-200">|</span>
-            <Link
-              href={`/board?sort=deadline${category ? `&category=${category}` : ''}&status=${status}${q ? `&q=${q}` : ''}`}
-              className={`text-sm font-medium transition-colors ${sort === 'deadline' ? 'text-gray-900' : 'text-gray-400 hover:text-indigo-600'}`}
-            >
-              마감임박순
-            </Link>
-          </div>
+          <SortFilter />
         </div>
 
         {/* Category Filter */}
-        <div className="flex space-x-2 overflow-x-auto pb-1 scrollbar-hide">
-          {FILTER_CATEGORIES.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/board?category=${cat.id}&sort=${sort}&status=${status}${q ? `&q=${q}` : ''}`}
-              className={`whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${(searchParams.category === cat.id || (!searchParams.category && cat.id === 'all'))
-                ? 'bg-indigo-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-            >
-              {cat.name}
-            </Link>
-          ))}
-        </div>
+        <CategoryFilter />
       </div>
 
       <div className="p-4 space-y-6">

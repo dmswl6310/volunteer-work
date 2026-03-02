@@ -1,5 +1,6 @@
 import type { PostWithAuthor } from '@/actions/posts';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface PostCardProps {
   post: PostWithAuthor;
@@ -22,10 +23,12 @@ export default function PostCard({ post }: PostCardProps) {
         {/* 이미지 - 왼쪽 */}
         <div className="relative w-24 h-24 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
           {post.image_url ? (
-            <img
+            <Image
               src={post.image_url}
               alt={post.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="96px"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">

@@ -1,5 +1,6 @@
 import { getUrgentPosts } from '@/actions/posts';
 import Link from 'next/link';
+import Image from 'next/image';
 
 /** 긴급 봉사활동 가로 스크롤 섹션 (서버 컴포넌트) */
 export default async function UrgentSection() {
@@ -37,9 +38,15 @@ export default async function UrgentSection() {
             >
               <div className="flex p-3 gap-3">
                 {/* Image */}
-                <div className="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                <div className="relative w-24 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
                   {post.image_url ? (
-                    <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" />
+                    <Image 
+                      src={post.image_url} 
+                      alt={post.title} 
+                      fill 
+                      className="object-cover" 
+                      sizes="96px"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
                       <span className="text-[10px]">No Img</span>
