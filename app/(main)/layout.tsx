@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { redirect } from 'next/navigation';
 import BottomNav from '@/components/BottomNav';
+import PullToRefresh from '@/components/PullToRefresh';
 
 export default async function MainLayout({
     children,
@@ -31,7 +32,9 @@ export default async function MainLayout({
     return (
         <>
             <main className="max-w-md mx-auto min-h-screen bg-white pb-20">
-                {children}
+                <PullToRefresh>
+                    {children}
+                </PullToRefresh>
             </main>
             <BottomNav />
         </>

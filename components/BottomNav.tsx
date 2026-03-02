@@ -47,7 +47,7 @@ export default function BottomNav() {
             <Link 
               key={tab.name} 
               href={tab.href}
-              className={`flex flex-col items-center space-y-1 ${
+              className={`touch-feedback flex flex-col items-center space-y-1 ${
                 active ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-900'
               }`}
             >

@@ -40,3 +40,27 @@ body {
 .animate-slide-down {
   animation: slide-down 0.3s ease-out;
 }
+
+/* 모바일 터치 피드백 */
+.touch-feedback {
+  transition: transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.touch-feedback:active {
+  transform: scale(0.97);
+}
+
+/* iOS safe-area padding */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* 전역 터치 하이라이트 비활성화 (모바일) */
+* {
+  -webkit-tap-highlight-color: transparent;
+}

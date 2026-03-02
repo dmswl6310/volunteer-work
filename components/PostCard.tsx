@@ -16,7 +16,7 @@ export default function PostCard({ post }: PostCardProps) {
   const isClosed = !post.is_recruiting || isExpired;
 
   return (
-    <Link href={`/board/${post.id}`} className="block group">
+    <Link href={`/board/${post.id}`} className="block group touch-feedback">
       <div className={`bg-white p-4 border-b border-gray-100 flex gap-4 transition-colors ${isClosed ? 'opacity-50 grayscale' : 'hover:bg-gray-50'
         }`}>
         {/* 이미지 - 왼쪽 */}
