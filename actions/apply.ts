@@ -2,47 +2,23 @@
 
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
+import { ensureUserExists } from '@/lib/auto-heal-user';
 
+/**
+ * 봉사활동 게시글에 참여 신청을 합니다.
+ * - 유저 존재 여부 확인 (없으면 자동 생성)
+ * - 게시글 모집 상태/마감일/인원 검증
+ * - 중복 신청 방지
+ *
+ * @param postId - 신청할 게시글 ID
+ * @param userId - 신청하는 유저 ID
+ * @param email - 유저 이메일 (auto-heal 시 필요)
+ */
 export async function applyForPost(postId: string, userId: string, email?: string) {
   const supabase = await createServerSupabaseClient();
 
-  // 0. 유저 존재 체크 (auto-heal)
-  const { data: userExists } = await supabase
-    .from('users')
-    .select('id')
-    .eq('id', userId)
-    .maybeSingle();
-
-  if (!userExists) {
-    console.warn(`User ${userId} not found in DB during application. Auto-creating...`);
-    if (!email) throw new Error('User record missing and no email provided for auto-registration.');
-
-    const emailPrefix = email.split('@')[0];
-    let newUsername = emailPrefix;
-    let counter = 1;
-    while (true) {
-      const { data: taken } = await supabase
-        .from('users')
-        .select('id')
-        .eq('username', newUsername)
-        .maybeSingle();
-      if (!taken) break;
-      newUsername = `${emailPrefix}${counter}`;
-      counter++;
-    }
-
-    await supabase.from('users').insert({
-      id: userId,
-      email,
-      username: newUsername,
-      name: 'User',
-      contact: '010-0000-0000',
-      address: 'Unknown',
-      job: 'Unknown',
-      role: 'user',
-      is_approved: true,
-    });
-  }
+  // 유저 존재 확인 (없으면 자동 생성)
+  await ensureUserExists(supabase, userId, email);
 
   // 1. 게시글 조회
   const { data: post } = await supabase
@@ -97,6 +73,13 @@ export async function applyForPost(postId: string, userId: string, email?: strin
   revalidatePath(`/board/${postId}`);
 }
 
+/**
+ * 봉사활동 신청의 상태를 변경합니다. (승인/거절)
+ * 승인 시 게시글의 참여자 수를 증가시킵니다.
+ *
+ * @param applicationId - 신청 ID
+ * @param newStatus - 변경할 상태 ('approved' | 'rejected')
+ */
 export async function updateApplicationStatus(applicationId: string, newStatus: 'approved' | 'rejected') {
   const supabase = await createServerSupabaseClient();
 
@@ -131,6 +114,12 @@ export async function updateApplicationStatus(applicationId: string, newStatus: 
   revalidatePath('/mypage');
 }
 
+/**
+ * 봉사활동 신청을 취소합니다.
+ * 이미 승인/확정된 신청이면 참여자 수를 감소시킵니다.
+ *
+ * @param applicationId - 취소할 신청 ID
+ */
 export async function cancelApplication(applicationId: string) {
   const supabase = await createServerSupabaseClient();
 

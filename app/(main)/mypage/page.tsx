@@ -34,7 +34,7 @@ export default async function MyPage() {
 
   if (!user) return null;
 
-  // Aggregate incoming requests (only show pending ones)
+  // 들어온 신청 목록 (대기 중인 것만 표시)
   const incomingRequests = user.posts.flatMap((p: any) =>
     p.applications
       .filter((app: any) => app.status === 'pending')

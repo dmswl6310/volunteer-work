@@ -4,6 +4,17 @@ import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 import { checkProfanity } from '@/lib/profanity';
 
+/**
+ * 봉사활동 후기를 작성합니다.
+ * - 욕설 필터링 적용
+ * - 승인된 신청자만 작성 가능
+ * - 활동 종료 후에만 작성 가능
+ * - 중복 후기 방지
+ *
+ * @param postId - 게시글 ID
+ * @param userId - 작성자 ID
+ * @param content - 후기 내용
+ */
 export async function createReview(postId: string, userId: string, content: string) {
   // 욕설 필터링 (DB 조회 전 사전 차단)
   if (checkProfanity(content)) {
@@ -60,6 +71,11 @@ export async function createReview(postId: string, userId: string, content: stri
   return { success: true };
 }
 
+/**
+ * 특정 게시글의 후기 목록을 조회합니다.
+ * @param postId - 게시글 ID
+ * @returns 후기 배열
+ */
 export async function getReviews(postId: string) {
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase
@@ -71,6 +87,10 @@ export async function getReviews(postId: string) {
   return data ?? [];
 }
 
+/**
+ * 전체 후기 목록을 최신순으로 조회합니다. (최대 20건)
+ * @returns 후기 배열
+ */
 export async function getAllReviews() {
   try {
     const supabase = await createServerSupabaseClient();

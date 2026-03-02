@@ -11,6 +11,7 @@ interface ReviewWithAuthor {
   };
 }
 
+/** 게시글 후기 목록 컴포넌트 (서버 컴포넌트) */
 export default async function ReviewList({ postId }: { postId: string }) {
   const reviews = await getReviews(postId);
 

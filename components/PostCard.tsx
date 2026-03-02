@@ -5,6 +5,7 @@ interface PostCardProps {
   post: PostWithAuthor;
 }
 
+/** 봉사활동 게시글 카드 컴포넌트 (목록 페이지에서 사용) */
 export default function PostCard({ post }: PostCardProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -18,7 +19,7 @@ export default function PostCard({ post }: PostCardProps) {
     <Link href={`/board/${post.id}`} className="block group">
       <div className={`bg-white p-4 border-b border-gray-100 flex gap-4 transition-colors ${isClosed ? 'opacity-50 grayscale' : 'hover:bg-gray-50'
         }`}>
-        {/* Image - Left Side */}
+        {/* 이미지 - 왼쪽 */}
         <div className="relative w-24 h-24 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
           {post.image_url ? (
             <img
@@ -43,7 +44,7 @@ export default function PostCard({ post }: PostCardProps) {
           )}
         </div>
 
-        {/* Content - Right Side */}
+        {/* 컨텐츠 - 오른쪽 */}
         <div className="flex-1 flex flex-col justify-between py-0.5">
           <div>
             <div className="flex justify-between items-start mb-1">
@@ -71,7 +72,7 @@ export default function PostCard({ post }: PostCardProps) {
               </span>
             </div>
 
-            {/* D-day: 마감된 게시글은 표시 안 함 */}
+            {/* D-day: 마감되지 않은 게시글만 표시 */}
             {!isClosed && dueDate && (
               <span className="text-xs font-medium text-red-500">
                 D-{Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))}

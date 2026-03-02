@@ -3,6 +3,7 @@
 import { updateApplicationStatus } from '@/actions/apply';
 import { useState } from 'react';
 
+/** 들어오는 신청 항목 컴포넌트 (승인/거절 버튼 포함) */
 export default function IncomingRequestItem({ application }: { application: any }) {
   const [loading, setLoading] = useState(false);
 

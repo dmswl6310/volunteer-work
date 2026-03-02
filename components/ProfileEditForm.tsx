@@ -14,6 +14,7 @@ interface ProfileEditFormProps {
     };
 }
 
+/** 프로필 수정 폼 컴포넌트 (보기/수정 모드 전환) */
 export default function ProfileEditForm({ user }: ProfileEditFormProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);

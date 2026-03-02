@@ -16,14 +16,14 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
 
   const supabase = await createServerSupabaseClient();
 
-  // Fetch Approved Participants
+  // 승인된 참여자 목록 조회
   const { data: approvedApps } = await supabase
     .from('applications')
     .select('*, users(id, name, username)')
     .eq('post_id', post.id)
     .eq('status', 'approved');
 
-  // Check if current user has scrapped this post
+  // 현재 유저의 스크랩 여부 확인
   const { data: { user } } = await supabase.auth.getUser();
   let isScraped = false;
   let hasApplied = false;
@@ -38,7 +38,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
     hasApplied = !!applyRes.data;
   }
 
-  // Check Due Date
+  // 마감일 확인
   let isExpired = false;
   let diffDays = 0;
   if (post.due_date) {
@@ -54,7 +54,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
 
   return (
     <div className="pb-24 bg-white min-h-screen">
-      {/* Top Nav (Optional, since we have BottomNav, but detail usually has Back button) */}
+      {/* 상단 네비게이션 (뒤로가기 버튼) */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-gray-100">
         <Link href="/board" className="p-2 -ml-2 rounded-full hover:bg-gray-100">
           <svg className="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -62,10 +62,10 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
           </svg>
         </Link>
         <h2 className="text-sm font-bold text-gray-900 truncate max-w-[200px]">{post.title}</h2>
-        <div className="w-8"></div> {/* Spacer */}
+        <div className="w-8"></div> {/* 레이아웃 여백 */}
       </div>
 
-      {/* Image Header */}
+      {/* 이미지 헤더 */}
       <div className="relative w-full aspect-video bg-gray-200">
         {post.image_url ? (
           <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" />
@@ -77,7 +77,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
       </div>
 
       <div className="px-5 py-6">
-        {/* Title & Category */}
+        {/* 제목 및 카테고리 */}
         <div className="mb-6">
           <div className="flex items-center space-x-2 mb-2">
             <span className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-full">
@@ -105,7 +105,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
           </div>
         </div>
 
-        {/* Organizer Profile */}
+        {/* 주최자 프로필 */}
         <div className="flex items-center p-4 bg-gray-50 rounded-xl mb-8">
           <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-lg mr-4">
             {post.author.name?.[0] || 'A'}
@@ -118,12 +118,12 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
           </div>
         </div>
 
-        {/* Content */}
+        {/* 본문 */}
         <div className="prose prose-indigo max-w-none mb-10 text-gray-800 leading-relaxed whitespace-pre-wrap">
           {post.content}
         </div>
 
-        {/* Info Grid */}
+        {/* 정보 그리드 */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="bg-gray-50 p-4 rounded-xl text-center">
             <p className="text-xs text-gray-500 mb-1">참여 인원</p>
@@ -139,7 +139,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
           </div>
         </div>
 
-        {/* Approved Participants List */}
+        {/* 참여 확정 명단 */}
         <div className="mb-10">
           <h3 className="font-bold text-gray-900 mb-3">참여 확정 명단 ({approvedApps?.length ?? 0}명)</h3>
           {!approvedApps || approvedApps.length === 0 ? (
@@ -162,13 +162,13 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
           )}
         </div>
 
-        {/* Reviews Section */}
+        {/* 후기 섹션 */}
         <div className="mb-8">
           <ReviewList postId={post.id} />
         </div>
       </div>
 
-      {/* Bottom Sticky Action Bar */}
+      {/* 하단 고정 액션 바 */}
       <div className="fixed bottom-[64px] left-0 right-0 p-4 bg-white border-t border-gray-100 flex items-center justify-between safe-area-bottom max-w-md mx-auto z-40 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <div className="flex items-center space-x-4">
           <ScrapButton

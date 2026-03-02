@@ -13,6 +13,14 @@ export type CreateUserParams = {
   job: string;
 };
 
+/**
+ * 회원가입 시 유저 레코드를 생성합니다.
+ * - 닉네임/이메일 중복 검사
+ * - 관리자 승인 대기 상태로 생성
+ *
+ * @param data - 유저 정보 (id, email, username, name, contact, address, job)
+ * @returns 성공 시 { success: true }, 실패 시 { success: false, error: string }
+ */
 export async function createUserRecord(data: CreateUserParams) {
   try {
     const supabase = await createServerSupabaseClient();

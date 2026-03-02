@@ -1,7 +1,18 @@
 'use server';
 
 import { createServerSupabaseClient } from '@/lib/supabase';
+import { ensureUserExists } from '@/lib/auto-heal-user';
 
+/**
+ * 마이페이지에 필요한 유저 데이터를 조회합니다.
+ * - 프로필 정보
+ * - 신청 내역, 스크랩, 작성 게시글, 작성 후기
+ * - 유저가 DB에 없으면 자동 생성 (auto-heal)
+ *
+ * @param userId - 조회할 유저 ID
+ * @param email - 유저 이메일 (auto-heal 시 필요)
+ * @param name - 유저 이름 (auto-heal 시 사용)
+ */
 export async function getMyPageData(userId: string, email?: string, name?: string) {
     try {
         const supabase = await createServerSupabaseClient();
@@ -12,33 +23,9 @@ export async function getMyPageData(userId: string, email?: string, name?: strin
             .eq('id', userId)
             .maybeSingle();
 
-        // auto-heal
+        // 유저가 없으면 자동 생성
         if (!user && email) {
-            console.warn(`User ${userId} missing in MyPage. Auto-healing...`);
-            const emailPrefix = email.split('@')[0];
-            let newUsername = emailPrefix;
-            let counter = 1;
-            while (true) {
-                const { data: taken } = await supabase
-                    .from('users')
-                    .select('id')
-                    .eq('username', newUsername)
-                    .maybeSingle();
-                if (!taken) break;
-                newUsername = `${emailPrefix}${counter}`;
-                counter++;
-            }
-            await supabase.from('users').insert({
-                id: userId,
-                email,
-                username: newUsername,
-                name: name || 'User',
-                contact: '010-0000-0000',
-                address: 'Unknown',
-                job: 'Unknown',
-                role: 'user',
-                is_approved: true,
-            });
+            await ensureUserExists(supabase, userId, email, name);
         }
 
         if (!user) return null;
@@ -80,6 +67,11 @@ export async function getMyPageData(userId: string, email?: string, name?: strin
     }
 }
 
+/**
+ * 유저의 관리자 승인 상태를 확인합니다.
+ * @param userId - 확인할 유저 ID
+ * @returns 승인 여부와 역할 정보
+ */
 export async function checkUserApproval(userId: string) {
     try {
         const supabase = await createServerSupabaseClient();

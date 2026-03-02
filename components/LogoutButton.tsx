@@ -4,13 +4,14 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { LogOut } from 'lucide-react';
 
+/** 로그아웃 버튼 컴포넌트 */
 export default function LogoutButton() {
     const router = useRouter();
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
-        router.push('/'); // Go to login/landing
-        router.refresh(); // Clear server cache
+        router.push('/'); // 로그인 페이지로 이동
+        router.refresh(); // 서버 캐시 초기화
     };
 
     return (

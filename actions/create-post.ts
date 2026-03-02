@@ -2,9 +2,18 @@
 
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { validateNoProfanity } from '@/lib/profanity';
+import { ensureUserExists } from '@/lib/auto-heal-user';
 
+/**
+ * 새로운 봉사활동 게시글을 작성합니다.
+ * - 욕설 필터링 적용
+ * - 유저 존재 확인 (auto-heal)
+ * - Supabase posts 테이블에 삽입
+ *
+ * @param formData - 게시글 작성 폼 데이터
+ * @returns 성공 시 { success: true }, 욕설 감지 시 { error: string }
+ */
 export async function createPost(formData: FormData) {
   const title = formData.get('title') as string;
   const content = formData.get('content') as string;
@@ -30,43 +39,8 @@ export async function createPost(formData: FormData) {
   const dueDate = dueDateStr ? `${dueDateStr}T23:59:59.999+09:00` : null;
   const supabase = await createServerSupabaseClient();
 
-  // 유저 존재 체크 (auto-heal)
-  const { data: userExists } = await supabase
-    .from('users')
-    .select('id')
-    .eq('id', userId)
-    .maybeSingle();
-
-  if (!userExists) {
-    console.warn(`User ${userId} not found in DB. Auto-creating...`);
-    if (!email) throw new Error('User email not provided for auto-registration.');
-
-    const emailPrefix = email.split('@')[0];
-    let newUsername = emailPrefix;
-    let counter = 1;
-    while (true) {
-      const { data: taken } = await supabase
-        .from('users')
-        .select('id')
-        .eq('username', newUsername)
-        .maybeSingle();
-      if (!taken) break;
-      newUsername = `${emailPrefix}${counter}`;
-      counter++;
-    }
-
-    await supabase.from('users').insert({
-      id: userId,
-      email,
-      username: newUsername,
-      name: name || 'User',
-      contact: '010-0000-0000',
-      address: 'Unknown',
-      job: 'Unknown',
-      role: 'user',
-      is_approved: true,
-    });
-  }
+  // 유저 존재 확인 (없으면 자동 생성)
+  await ensureUserExists(supabase, userId, email, name);
 
   const { error } = await supabase.from('posts').insert({
     title,

@@ -17,7 +17,7 @@ export default async function MainLayout({
         redirect('/auth/login');
     }
 
-    // Check approval status
+    // 승인 상태 확인
     const { data: dbUser } = await supabase
         .from('users')
         .select('is_approved')

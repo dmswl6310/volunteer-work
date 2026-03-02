@@ -3,6 +3,10 @@
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 
+/**
+ * 신규 가입 유저를 승인합니다.
+ * @param userId - 승인할 유저 ID
+ */
 export async function approveUser(userId: string) {
   try {
     const supabase = await createServerSupabaseClient();
@@ -19,6 +23,11 @@ export async function approveUser(userId: string) {
   }
 }
 
+/**
+ * 봉사활동 신청을 승인합니다.
+ * 모집 인원 초과 시 에러를 발생시킵니다.
+ * @param applicationId - 승인할 신청 ID
+ */
 export async function approveApplication(applicationId: string) {
   try {
     const supabase = await createServerSupabaseClient();
@@ -58,6 +67,10 @@ export async function approveApplication(applicationId: string) {
   }
 }
 
+/**
+ * 봉사활동 신청을 거절합니다.
+ * @param applicationId - 거절할 신청 ID
+ */
 export async function rejectApplication(applicationId: string) {
   try {
     const supabase = await createServerSupabaseClient();
@@ -70,9 +83,14 @@ export async function rejectApplication(applicationId: string) {
     revalidatePath('/admin');
   } catch (error) {
     console.error('Error rejecting application:', error);
+    throw new Error('신청 거절 중 오류가 발생했습니다.');
   }
 }
 
+/**
+ * 관리자 대시보드에 표시할 미승인 유저 목록을 조회합니다.
+ * @returns 미승인 유저 배열
+ */
 export async function getAdminDashboardData() {
   try {
     const supabase = await createServerSupabaseClient();

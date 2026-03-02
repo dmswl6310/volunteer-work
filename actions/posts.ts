@@ -24,6 +24,18 @@ export type PostWithAuthor = {
   } | null;
 };
 
+/**
+ * 게시글 목록을 페이지네이션, 정렬, 필터링 조건에 따라 조회합니다.
+ * 무한 스크롤 및 검색/카테고리 필터를 지원합니다.
+ *
+ * @param page - 페이지 번호 (기본: 1)
+ * @param limit - 페이지당 게시글 수 (기본: 10)
+ * @param sort - 정렬 방식 ('latest' | 'deadline')
+ * @param category - 카테고리 필터
+ * @param status - 모집 상태 필터 ('recruiting' | 'closed' | 'all')
+ * @param q - 검색어
+ * @returns 게시글 배열과 다음 페이지 ID
+ */
 export async function getPosts({
   page = 1,
   limit = 10,
@@ -83,6 +95,10 @@ export async function getPosts({
   }
 }
 
+/**
+ * 긴급 봉사활동 게시글을 조회합니다. (최대 10건)
+ * @returns 긴급 게시글 배열
+ */
 export async function getUrgentPosts() {
   try {
     const supabase = await createServerSupabaseClient();

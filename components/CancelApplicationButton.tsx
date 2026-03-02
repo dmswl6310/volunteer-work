@@ -3,6 +3,7 @@
 import { cancelApplication } from '@/actions/apply';
 import { useState } from 'react';
 
+/** 신청 취소 버튼 컴포넌트 */
 export default function CancelApplicationButton({ applicationId }: { applicationId: string }) {
   const [loading, setLoading] = useState(false);
 

@@ -14,16 +14,16 @@ interface InfiniteScrollBoardProps {
   q?: string;
 }
 
+/** 무한 스크롤로 게시글 목록을 불러오는 클라이언트 컴포넌트 */
 export default function InfiniteScrollBoard({ initialPosts, initialNextId, sort = 'latest', category, status = 'recruiting', q }: InfiniteScrollBoardProps) {
   const [posts, setPosts] = useState<PostWithAuthor[]>(initialPosts);
   const [nextId, setNextId] = useState<number | null>(initialNextId);
   const { ref, inView } = useInView();
 
-  // Reset state when sort changes
+  // 정렬/필터 변경 시 상태 초기화
   useEffect(() => {
     setPosts(initialPosts);
     setNextId(initialNextId);
-    // Explicitly reset scroll or state if needed, though initialPosts update handles it
   }, [sort, category, status, q, initialPosts, initialNextId]);
 
   const loadMorePosts = async () => {

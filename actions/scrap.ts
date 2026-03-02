@@ -3,6 +3,13 @@
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 
+/**
+ * 게시글 스크랩을 토글합니다. (스크랩/스크랩 취소)
+ * post_scraps 테이블과 posts.scraps 카운터를 동시에 업데이트합니다.
+ *
+ * @param postId - 스크랩할 게시글 ID
+ * @param userId - 유저 ID
+ */
 export async function toggleScrap(postId: string, userId: string) {
   try {
     const supabase = await createServerSupabaseClient();

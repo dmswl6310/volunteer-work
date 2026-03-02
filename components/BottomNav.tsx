@@ -4,10 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, ClipboardList, User } from 'lucide-react';
 
+/** 하단 탭 네비게이션 컴포넌트 (모바일 하단 고정) */
 export default function BottomNav() {
   const pathname = usePathname();
 
-  // Hide on login/signup/root pages
+  // 로그인/회원가입/루트 페이지에서는 숨김
   const isAuthPage = pathname === '/' || pathname.startsWith('/auth');
   const isAdminPage = pathname.startsWith('/admin');
 
@@ -24,7 +25,7 @@ export default function BottomNav() {
     },
     {
       name: '후기',
-      href: '/reviews', // User said "Review Board", assuming /reviews route, need to create or verify
+      href: '/reviews',
       icon: ClipboardList,
       isActive: pathname.startsWith('/reviews')
     },

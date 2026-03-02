@@ -11,13 +11,14 @@ interface ScrapButtonProps {
   initialScrapCount: number;
 }
 
+/** 게시글 스크랩 토글 버튼 (냙관적 UI 업데이트 적용) */
 export default function ScrapButton({ postId, initialIsScraped, initialScrapCount }: ScrapButtonProps) {
   const [isScraped, setIsScraped] = useState(initialIsScraped);
   const [scrapCount, setScrapCount] = useState(initialScrapCount);
   const router = useRouter();
 
   const handleToggle = async () => {
-    // Optimistic update
+    // 냙관적 UI 업데이트
     const previousIsScraped = isScraped;
     const previousCount = scrapCount;
 
@@ -40,7 +41,7 @@ export default function ScrapButton({ postId, initialIsScraped, initialScrapCoun
       await toggleScrap(postId, user.id);
     } catch (error) {
       console.error('Failed to toggle scrap', error);
-      // Revert on error
+      // 에러 시 원래 상태로 복구
       setIsScraped(previousIsScraped);
       setScrapCount(previousCount);
       alert('오류가 발생했습니다.');

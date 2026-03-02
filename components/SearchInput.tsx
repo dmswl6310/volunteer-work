@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
+/** 검색 입력 컴포넌트 (확장/접기 애니메이션 지원) */
 export default function SearchInput() {
     const router = useRouter();
     const searchParams = useSearchParams();

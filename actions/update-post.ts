@@ -2,9 +2,17 @@
 
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { validateNoProfanity } from '@/lib/profanity';
 
+/**
+ * 기존 게시글을 수정합니다.
+ * - 작성자 본인 확인
+ * - 욕설 필터링 적용
+ *
+ * @param postId - 수정할 게시글 ID
+ * @param formData - 수정할 폼 데이터
+ * @returns 성공 시 { success: true }, 욕설 감지 시 { error: string }
+ */
 export async function updatePost(postId: string, formData: FormData) {
   const supabase = await createServerSupabaseClient();
 

@@ -2,6 +2,11 @@
 
 import { createServerSupabaseClient } from '@/lib/supabase';
 
+/**
+ * 게시글 상세 정보를 조회합니다. (작성자 정보, 후기 수 포함)
+ * @param id - 게시글 ID
+ * @returns 게시글 데이터 또는 null
+ */
 export async function getPost(id: string) {
   try {
     const supabase = await createServerSupabaseClient();

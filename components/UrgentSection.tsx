@@ -1,6 +1,7 @@
 import { getUrgentPosts } from '@/actions/posts';
 import Link from 'next/link';
 
+/** 긴급 봉사활동 가로 스크롤 섹션 (서버 컴포넌트) */
 export default async function UrgentSection() {
   const urgentPosts = await getUrgentPosts();
 
@@ -13,7 +14,7 @@ export default async function UrgentSection() {
           <span className="w-2 h-2 rounded-full bg-red-500 mr-2 animate-pulse"></span>
           긴급 봉사활동
         </h2>
-        {/* Scroll Hint */}
+        {/* 스크롤 힌트 */}
         <span className="text-xs text-gray-400">옆으로 넘겨보세요 &rarr;</span>
       </div>
 

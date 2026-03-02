@@ -5,17 +5,18 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
+/** 상단 네비게이션 헤더 컴포넌트 (데스크톱 표시, 로그인 상태 관리) */
 export default function Header() {
   const router = useRouter();
   const [session, setSession] = useState<any>(null);
 
   useEffect(() => {
-    // 1. Get initial session
+    // 1. 초기 세션 가져오기
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
 
-    // 2. Listen for auth changes
+    // 2. 인증 상태 변경 감지
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -36,12 +37,12 @@ export default function Header() {
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-        {/* Logo */}
+        {/* 로고 */}
         <Link href="/" className="font-bold text-xl text-indigo-600 tracking-tight">
           Together
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* 데스크톱 네비게이션 */}
         <div className="hidden md:flex space-x-6 text-sm font-medium text-gray-600">
           <Link href="/board" className="hover:text-indigo-600 transition">
             봉사활동 찾기
@@ -53,7 +54,7 @@ export default function Header() {
           )}
         </div>
 
-        {/* Auth Buttons */}
+        {/* 인증 버튼 */}
         <div className="flex space-x-3 text-sm font-medium">
           {session ? (
             <>
