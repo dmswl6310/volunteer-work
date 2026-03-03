@@ -1,6 +1,7 @@
 import type { PostWithAuthor } from '@/actions/posts';
 import Link from 'next/link';
 import Image from 'next/image';
+import FallbackImage from '@/components/FallbackImage';
 
 interface PostCardProps {
   post: PostWithAuthor;
@@ -31,9 +32,7 @@ export default function PostCard({ post }: PostCardProps) {
               sizes="96px"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
-              <span className="text-xs">No Img</span>
-            </div>
+            <FallbackImage category={post.category ?? undefined} className="rounded-lg" iconSize={24} />
           )}
           {post.is_urgent && !isClosed && (
             <span className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg">

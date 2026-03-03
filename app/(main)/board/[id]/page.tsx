@@ -2,6 +2,7 @@ import { getPost } from '@/actions/get-post';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import FallbackImage from '@/components/FallbackImage';
 import ApplyButton from './ApplyButton';
 import ReviewList from '@/components/ReviewList';
 import ScrapButton from '@/components/ScrapButton';
@@ -78,9 +79,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
             priority
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
-            No Image
-          </div>
+          <FallbackImage category={post.category ?? undefined} iconSize={48} />
         )}
       </div>
 
