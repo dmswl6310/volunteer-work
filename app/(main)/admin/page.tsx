@@ -88,7 +88,7 @@ export default function AdminPage() {
                       <p>이메일: {u.email}</p>
                       <p>연락처: {u.contact}</p>
                       <p>주소: {u.address}</p>
-                      <p>직업: {u.job}</p>
+                      <p>직업/소속기관: {u.job}</p>
                       <p>가입신청: {new Date(u.createdAt).toLocaleDateString()}</p>
                     </div>
                   </div>

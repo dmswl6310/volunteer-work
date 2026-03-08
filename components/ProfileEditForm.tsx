@@ -74,7 +74,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                         <span className="font-medium">{user.contact || '-'}</span>
                     </div>
                     <div>
-                        <span className="block text-gray-500 text-xs">직업</span>
+                        <span className="block text-gray-500 text-xs">직업 / 소속기관</span>
                         <span className="font-medium">{user.job || '-'}</span>
                     </div>
                     <div className="col-span-2">
@@ -116,7 +116,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-xs text-gray-500 mb-1">직업</label>
+                        <label className="block text-xs text-gray-500 mb-1">직업 / 소속기관</label>
                         <input
                             type="text"
                             value={editForm.job}

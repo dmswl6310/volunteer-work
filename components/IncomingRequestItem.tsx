@@ -32,7 +32,7 @@ export default function IncomingRequestItem({ application }: { application: any 
         <div className="text-sm text-gray-600 mb-2 space-y-0.5">
           {application.users?.contact && <p>📞 연락처: {application.users.contact}</p>}
           {application.users?.email && <p>📧 이메일: {application.users.email}</p>}
-          {application.users?.job && <p>💼 직업: {application.users.job}</p>}
+          {application.users?.job && <p>💼 직업/소속기관: {application.users.job}</p>}
           {application.users?.address && <p>🏠 거주지: {application.users.address}</p>}
         </div>
         <p className="text-xs text-gray-400">

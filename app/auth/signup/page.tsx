@@ -291,7 +291,7 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label htmlFor="job" className="block text-sm font-medium text-gray-700">직업</label>
+            <label htmlFor="job" className="block text-sm font-medium text-gray-700">직업 / 소속기관</label>
             <input
               id="job"
               name="job"
