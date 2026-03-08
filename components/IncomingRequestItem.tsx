@@ -25,31 +25,37 @@ export default function IncomingRequestItem({ application }: { application: any 
   return (
     <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-lg shadow-sm">
       <div>
-        <p className="font-bold text-gray-900">
+        <p className="font-bold text-gray-900 text-base mb-1">
           {application.users?.name && application.users.name !== 'User' ? application.users.name : application.users?.username}
           <span className="text-gray-500 font-normal text-sm ml-1">(@{application.users?.username})</span>
         </p>
-        <p className="text-sm text-gray-500">
-          신청일: {new Date(application.created_at).toLocaleDateString()}
+        <div className="text-sm text-gray-600 mb-2 space-y-0.5">
+          {application.users?.contact && <p>📞 연락처: {application.users.contact}</p>}
+          {application.users?.email && <p>📧 이메일: {application.users.email}</p>}
+          {application.users?.job && <p>💼 직업: {application.users.job}</p>}
+          {application.users?.address && <p>🏠 거주지: {application.users.address}</p>}
+        </div>
+        <p className="text-xs text-gray-400">
+          신청일: {new Date(application.created_at).toLocaleString()}
         </p>
         <p className="text-xs text-gray-400 mt-1">
-          게시글: {application.post.title}
+          지원 공고: <span className="font-medium text-gray-600">{application.post.title}</span>
         </p>
       </div>
-      <div className="flex space-x-2">
+      <div className="flex flex-col space-y-2 ml-4">
         <button
           onClick={() => handleStatus('approved')}
           disabled={loading}
-          className="px-3 py-1 bg-green-100 text-green-700 text-sm font-bold rounded hover:bg-green-200"
+          className="px-4 py-2 bg-green-100 text-green-700 text-sm font-bold rounded-lg hover:bg-green-200 transition-colors"
         >
-          승인
+          승인하기
         </button>
         <button
           onClick={() => handleStatus('rejected')}
           disabled={loading}
-          className="px-3 py-1 bg-red-100 text-red-700 text-sm font-bold rounded hover:bg-red-200"
+          className="px-4 py-2 bg-red-100 text-red-700 text-sm font-bold rounded-lg hover:bg-red-200 transition-colors"
         >
-          거절
+          거절하기
         </button>
       </div>
     </div>
