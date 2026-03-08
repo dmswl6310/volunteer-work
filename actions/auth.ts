@@ -70,3 +70,50 @@ export async function createUserRecord(data: CreateUserParams) {
     return { success: false, error: '계정 정보 저장 중 오류가 발생했습니다.' };
   }
 }
+
+/**
+ * 이메일(아이디) 중복 및 가입대기 상태를 확인합니다.
+ */
+export async function checkEmailExists(email: string) {
+  try {
+    const supabase = await createServerSupabaseClient();
+    const { data: existingEmail } = await supabase
+      .from('users')
+      .select('id, is_approved')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (existingEmail) {
+      if (!existingEmail.is_approved) {
+        return { exists: true, message: '관리자 승인 대기 중인 이메일입니다.' };
+      }
+      return { exists: true, message: '이미 가입된 이메일입니다.' };
+    }
+    return { exists: false, message: '사용 가능한 이메일입니다.' };
+  } catch (error) {
+    console.error('Error checking email:', error);
+    return { exists: true, message: '중복 확인 중 오류가 발생했습니다.' }; // 안전을 위해 exists true
+  }
+}
+
+/**
+ * 닉네임 중복을 확인합니다.
+ */
+export async function checkNicknameExists(nickname: string) {
+  try {
+    const supabase = await createServerSupabaseClient();
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', nickname)
+      .maybeSingle();
+
+    if (existingUser) {
+      return { exists: true, message: '이미 사용 중인 닉네임입니다.' };
+    }
+    return { exists: false, message: '사용 가능한 닉네임입니다.' };
+  } catch (error) {
+    console.error('Error checking nickname:', error);
+    return { exists: true, message: '중복 확인 중 오류가 발생했습니다.' }; 
+  }
+}
