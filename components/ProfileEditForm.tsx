@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { updateUserProfile } from '@/actions/user-update';
 import { useToast } from './ToastProvider';
+import type { Address } from 'react-daum-postcode';
+import DaumPostcode from 'react-daum-postcode';
 
 interface ProfileEditFormProps {
     user: {
@@ -24,8 +26,10 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
         name: user.name || '',
         contact: user.contact || '',
         address: user.address || '',
+        detailAddress: '', // 프로필 수정에서는 기본적으로 빈 칸 제공, 나중에 합쳐서 address로 저장
         job: user.job || ''
     });
+    const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,7 +37,11 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
 
         setLoading(true);
         try {
-            await updateUserProfile(user.id, editForm);
+            const finalAddress = editForm.detailAddress 
+              ? `${editForm.address} ${editForm.detailAddress}`.trim() 
+              : editForm.address;
+              
+            await updateUserProfile(user.id, { ...editForm, address: finalAddress });
             showToast('프로필 정보가 성공적으로 수정되었습니다.', 'success');
             setIsEditing(false);
         } catch (error: any) {
@@ -124,13 +132,30 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                             className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         />
                     </div>
-                    <div>
+                    <div className="col-span-2">
                         <label className="block text-xs text-gray-500 mb-1">주소</label>
+                        <div className="mt-1 flex gap-2">
+                            <input
+                                type="text"
+                                readOnly
+                                value={editForm.address}
+                                className="block w-full border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 focus:outline-none sm:text-sm cursor-not-allowed"
+                                placeholder="기본 주소"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setIsPostcodeOpen(true)}
+                                className="whitespace-nowrap px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none transition-colors"
+                            >
+                                주소 검색
+                            </button>
+                        </div>
                         <input
                             type="text"
-                            value={editForm.address}
-                            onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
-                            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            value={editForm.detailAddress}
+                            onChange={(e) => setEditForm({ ...editForm, detailAddress: e.target.value })}
+                            className="mt-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            placeholder="상세 주소 (예: 101동 202호)"
                         />
                     </div>
                 </div>
@@ -143,6 +168,48 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                     </button>
                 </div>
             </form>
+
+            {/* 우편번호 검색 팝업 (모달) */}
+            {isPostcodeOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+                        <div className="flex justify-between items-center p-4 border-b">
+                            <h3 className="text-lg font-bold">주소 검색</h3>
+                            <button 
+                                type="button"
+                                onClick={() => setIsPostcodeOpen(false)}
+                                className="text-gray-500 hover:text-gray-800"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="p-0">
+                            <DaumPostcode
+                                onComplete={(data: Address) => {
+                                    let fullAddress = data.address;
+                                    let extraAddress = '';
+
+                                    if (data.addressType === 'R') {
+                                        if (data.bname !== '') {
+                                            extraAddress += data.bname;
+                                        }
+                                        if (data.buildingName !== '') {
+                                            extraAddress += extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
+                                        }
+                                        fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
+                                    }
+
+                                    setEditForm({ ...editForm, address: fullAddress, detailAddress: '' });
+                                    setIsPostcodeOpen(false);
+                                }}
+                                autoClose={false}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

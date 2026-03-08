@@ -5,6 +5,8 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { checkEmailExists, checkNicknameExists } from '@/actions/auth';
+import type { Address } from 'react-daum-postcode';
+import DaumPostcode from 'react-daum-postcode';
 
 // 간단한 useDebounce 훅 내부 구현
 function useDebounce<T>(value: T, delay: number): T {
@@ -29,9 +31,12 @@ export default function SignupPage() {
     passwordConfirm: '',
     nickname: '',
     contact: '',
-    address: '',
+    address: '', // 기본 주소
+    detailAddress: '', // 상세 주소
     job: '',
   });
+
+  const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
 
   // 유효성 검사 상태
   const [emailStatus, setEmailStatus] = useState<{ message: string; isValid: boolean | null }>({ message: '', isValid: null });
@@ -143,9 +148,9 @@ export default function SignupPage() {
           id: authData.user.id,
           email: formData.email,
           username: formData.nickname,
-          name: formData.nickname, // 이름은 닉네임과 동일하게 임시 설정
+          name: formData.nickname,
           contact: formData.contact,
-          address: formData.address,
+          address: `${formData.address} ${formData.detailAddress}`.trim(),
           job: formData.job
         });
 
@@ -278,14 +283,30 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700">주소</label>
+            <label className="block text-sm font-medium text-gray-700">주소</label>
+            <div className="mt-1 flex gap-2">
+              <input
+                type="text"
+                readOnly
+                placeholder="기본 주소"
+                required
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 focus:outline-none sm:text-sm cursor-not-allowed"
+                value={formData.address}
+              />
+              <button
+                type="button"
+                onClick={() => setIsPostcodeOpen(true)}
+                className="whitespace-nowrap px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+              >
+                주소 검색
+              </button>
+            </div>
             <input
-              id="address"
-              name="address"
+              name="detailAddress"
               type="text"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              value={formData.address}
+              placeholder="상세 주소 (예: 101동 202호)"
+              className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              value={formData.detailAddress}
               onChange={handleChange}
             />
           </div>
@@ -329,6 +350,48 @@ export default function SignupPage() {
           </div>
         </form>
       </div>
+
+      {/* 우편번호 검색 팝업 (모달) */}
+      {isPostcodeOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="text-lg font-bold">주소 검색</h3>
+              <button 
+                type="button"
+                onClick={() => setIsPostcodeOpen(false)}
+                className="text-gray-500 hover:text-gray-800"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-0">
+              <DaumPostcode
+                onComplete={(data: Address) => {
+                  let fullAddress = data.address;
+                  let extraAddress = '';
+
+                  if (data.addressType === 'R') {
+                    if (data.bname !== '') {
+                      extraAddress += data.bname;
+                    }
+                    if (data.buildingName !== '') {
+                      extraAddress += extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
+                    }
+                    fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
+                  }
+
+                  setFormData({ ...formData, address: fullAddress });
+                  setIsPostcodeOpen(false); // 선택 시 팝업 닫기
+                }}
+                autoClose={false}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
