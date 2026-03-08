@@ -10,15 +10,15 @@ interface ApplyButtonProps {
   postId: string;
   isRecruiting: boolean;
   isAuthor: boolean;
-  hasApplied: boolean;
+  userApplicationStatus: string | null;
   isFull?: boolean;
 }
 
-export default function ApplyButton({ postId, isRecruiting, isAuthor, hasApplied, isFull }: ApplyButtonProps) {
+export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplicationStatus, isFull }: ApplyButtonProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [applied, setApplied] = useState(hasApplied);
+  const [applicationStatus, setApplicationStatus] = useState<string | null>(userApplicationStatus);
 
   // 작성자에게는 수정하기 버튼 표시
   if (isAuthor) {
@@ -32,15 +32,46 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, hasApplied
     );
   }
 
-  // 이미 신청한 경우
-  if (applied) {
+  // 이미 신청한 경우 상태별 버튼 표시
+  if (applicationStatus) {
+    if (applicationStatus === 'pending') {
+      return (
+        <button
+          disabled
+          className="w-full bg-gray-100 text-gray-500 font-bold py-3 rounded-xl cursor-not-allowed border border-gray-200"
+        >
+          승인 대기 중
+        </button>
+      );
+    }
+    if (applicationStatus === 'approved') {
+      return (
+        <button
+          disabled
+          className="w-full bg-green-100 text-green-700 font-bold py-3 rounded-xl cursor-not-allowed border border-green-200"
+        >
+          ✓ 참여 확정
+        </button>
+      );
+    }
+    if (applicationStatus === 'rejected') {
+      return (
+        <button
+          disabled
+          className="w-full bg-red-50 text-red-500 font-bold py-3 rounded-xl cursor-not-allowed border border-red-100"
+        >
+          ✕ 신청이 반려되었습니다
+        </button>
+      );
+    }
+    // 기타 상태 (cancelled 등)일 경우 다시 신청할 수 있게 하거나, 기본 신청완료 처리
     return (
-      <button
-        disabled
-        className="w-full bg-green-100 text-green-700 font-bold py-3 rounded-xl cursor-not-allowed border border-green-200"
-      >
-        ✓ 신청 완료 (마이페이지에서 확인)
-      </button>
+        <button
+          disabled
+          className="w-full bg-gray-100 text-gray-700 font-bold py-3 rounded-xl cursor-not-allowed border border-gray-200"
+        >
+          참여 신청 내역 확인
+        </button>
     );
   }
 
@@ -65,12 +96,12 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, hasApplied
       }
 
       await applyForPost(postId, user.id, user.email || undefined);
-      setApplied(true); // 성공 시 버튼 상태 변경
+      setApplicationStatus('pending'); // 성공 시 상태를 대기중으로 변경
       showToast('봉사활동 참여 신청이 완료되었습니다.\n관리자 승인 후 최종 확정됩니다.', 'success');
     } catch (error: any) {
       if (error.message?.includes('이미 신청')) {
         showToast('이미 참여 신청한 봉사활동입니다.', 'warning');
-        setApplied(true); // 중복 신청이면 버튼도 막기
+        setApplicationStatus('pending'); // 중복 신청이면 버튼도 막기
       } else {
         showToast(error.message || '신청 중 오류가 발생했습니다.', 'error');
       }

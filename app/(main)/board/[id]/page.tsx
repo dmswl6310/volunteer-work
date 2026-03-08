@@ -28,16 +28,16 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
   // 현재 유저의 스크랩 여부 확인
   const { data: { user } } = await supabase.auth.getUser();
   let isScraped = false;
-  let hasApplied = false;
+  let userApplicationStatus: string | null = null;
   const isAuthor = !!user && user.id === (post as any).author_id;
 
   if (user) {
     const [scrapRes, applyRes] = await Promise.all([
       supabase.from('post_scraps').select('id').eq('post_id', post.id).eq('user_id', user.id).maybeSingle(),
-      supabase.from('applications').select('id').eq('post_id', post.id).eq('user_id', user.id).maybeSingle(),
+      supabase.from('applications').select('id, status').eq('post_id', post.id).eq('user_id', user.id).maybeSingle(),
     ]);
     isScraped = !!scrapRes.data;
-    hasApplied = !!applyRes.data;
+    userApplicationStatus = applyRes.data?.status || null;
   }
 
   // 마감일 확인
@@ -189,7 +189,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
             postId={post.id}
             isRecruiting={post.is_recruiting && !isExpired && !isFull}
             isAuthor={isAuthor}
-            hasApplied={hasApplied}
+            userApplicationStatus={userApplicationStatus}
             isFull={isFull}
           />
         </div>
