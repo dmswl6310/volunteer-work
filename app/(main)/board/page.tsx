@@ -43,7 +43,7 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
 
       <div className="p-4 space-y-6">
         {/* Urgent Section Always Visible */}
-        <UrgentSection />
+        <UrgentSection status={status} />
 
         <InfiniteScrollBoard
           initialPosts={initialData.posts}

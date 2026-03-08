@@ -3,8 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 /** 긴급 봉사활동 가로 스크롤 섹션 (서버 컴포넌트) */
-export default async function UrgentSection() {
-  const urgentPosts = await getUrgentPosts();
+export default async function UrgentSection({ status = 'recruiting' }: { status?: 'recruiting' | 'closed' | 'all' }) {
+  const urgentPosts = await getUrgentPosts(status);
 
   if (urgentPosts.length === 0) return null;
 

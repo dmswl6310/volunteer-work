@@ -98,19 +98,28 @@ export async function getPosts({
 
 /**
  * 긴급 봉사활동 게시글을 조회합니다. (최대 10건)
+ * @param status - 모집 상태 필터 ('recruiting' | 'closed' | 'all')
  * @returns 긴급 게시글 배열
  */
-export async function getUrgentPosts() {
+export async function getUrgentPosts(status: 'recruiting' | 'closed' | 'all' = 'recruiting') {
   try {
     const supabase = await createServerSupabaseClient();
-    const { data, error } = await supabase
+    const now = new Date().toISOString();
+    
+    let query = supabase
       .from('posts')
       .select('*, author:users(name, username)')
       .eq('is_urgent', true)
-      .eq('is_recruiting', true)
       .order('created_at', { ascending: false })
       .limit(10);
 
+    if (status === 'recruiting') {
+      query = query.eq('is_recruiting', true).or(`due_date.is.null,due_date.gte.${now}`);
+    } else if (status === 'closed') {
+      query = query.or(`is_recruiting.eq.false,due_date.lt.${now}`);
+    }
+
+    const { data, error } = await query;
     if (error) throw error;
     return data ?? [];
   } catch (error) {
