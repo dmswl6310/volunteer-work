@@ -337,9 +337,9 @@ export default function SignupPage() {
               {loading ? '가입 처리 중...' : '가입하기'}
             </button>
             {!isFormValid && !loading && (
-              <p className="text-center text-xs text-gray-500 mt-2">
+              <div className="text-center text-xs text-gray-500 mt-2">
                 모든 항목을 올바르게 입력해야 가입이 가능합니다.
-              </p>
+              </div>
             )}
           </div>
 
