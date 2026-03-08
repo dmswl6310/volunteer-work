@@ -78,16 +78,16 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
 
                 <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-4 rounded-xl mb-4">
                     <div>
-                        <span className="block text-gray-500 text-xs">연락처</span>
-                        <span className="font-medium">{user.contact || '-'}</span>
+                        <span className="block text-gray-500 text-xs mb-1">연락처</span>
+                        <span className="font-bold text-gray-900">{user.contact || '-'}</span>
                     </div>
                     <div>
-                        <span className="block text-gray-500 text-xs">직업 / 소속기관</span>
-                        <span className="font-medium">{user.job || '-'}</span>
+                        <span className="block text-gray-500 text-xs mb-1">직업 / 소속기관</span>
+                        <span className="font-bold text-gray-900">{user.job || '-'}</span>
                     </div>
                     <div className="col-span-2">
-                        <span className="block text-gray-500 text-xs">주소</span>
-                        <span className="font-medium truncate block">{user.address || '-'}</span>
+                        <span className="block text-gray-500 text-xs mb-1">주소</span>
+                        <span className="font-bold text-gray-900 truncate block">{user.address || '-'}</span>
                     </div>
                 </div>
             </>
@@ -139,7 +139,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                                 type="text"
                                 readOnly
                                 value={editForm.address}
-                                className="block w-full border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 focus:outline-none sm:text-sm cursor-not-allowed"
+                                className="block w-full border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-900 font-medium focus:outline-none sm:text-sm cursor-not-allowed"
                                 placeholder="기본 주소"
                             />
                             <button

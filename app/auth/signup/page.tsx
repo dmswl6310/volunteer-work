@@ -290,7 +290,7 @@ export default function SignupPage() {
                 readOnly
                 placeholder="기본 주소"
                 required
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 focus:outline-none sm:text-sm cursor-not-allowed"
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-900 font-medium focus:outline-none sm:text-sm cursor-not-allowed"
                 value={formData.address}
               />
               <button

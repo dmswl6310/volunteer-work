@@ -97,7 +97,9 @@ export default async function MyPage() {
               {user.applications.map((app: any) => (
                 <div key={app.id} className="p-4">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-gray-800">{app.posts?.title || '알 수 없는 게시글'}</h3>
+                    <Link href={`/board/${app.post_id || app.postId}`} className="font-bold text-gray-800 hover:text-indigo-600 transition-colors">
+                      {app.posts?.title || '알 수 없는 게시글'}
+                    </Link>
                     <StatusBadge status={app.status} />
                   </div>
                   <div className="flex justify-between items-center mt-2">
