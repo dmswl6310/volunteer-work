@@ -6,7 +6,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { checkEmailExists, checkNicknameExists } from '@/actions/auth';
 import type { Address } from 'react-daum-postcode';
-import DaumPostcode from 'react-daum-postcode';
+import dynamic from 'next/dynamic';
+
+const DaumPostcode = dynamic(() => import('react-daum-postcode'), { 
+  ssr: false,
+  loading: () => <div className="p-10 text-center text-sm text-gray-500">주소 검색 화면을 불러오는 중입니다...</div>
+});
 
 // 간단한 useDebounce 훅 내부 구현
 function useDebounce<T>(value: T, delay: number): T {

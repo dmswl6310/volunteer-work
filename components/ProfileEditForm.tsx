@@ -4,7 +4,12 @@ import { useState } from 'react';
 import { updateUserProfile } from '@/actions/user-update';
 import { useToast } from './ToastProvider';
 import type { Address } from 'react-daum-postcode';
-import DaumPostcode from 'react-daum-postcode';
+import dynamic from 'next/dynamic';
+
+const DaumPostcode = dynamic(() => import('react-daum-postcode'), { 
+  ssr: false,
+  loading: () => <div className="p-10 text-center text-sm text-gray-500">주소 검색 화면을 불러오는 중입니다...</div>
+});
 
 interface ProfileEditFormProps {
     user: {
