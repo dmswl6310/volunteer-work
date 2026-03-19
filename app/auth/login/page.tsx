@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import PromoCarousel from '@/components/PromoCarousel';
 
 
 export default function LoginPage() {
@@ -64,13 +65,16 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-lg">
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">로그인</h2>
+          <div className="mb-6">
+            <PromoCarousel />
+          </div>
+          <h2 className="mt-2 text-3xl font-extrabold text-gray-900">로그인</h2>
           <p className="mt-2 text-sm text-gray-600">
             서비스 이용을 위해 로그인해주세요.
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-          <div className="rounded-md shadow-sm space-y-4">
+          <div className="space-y-4">
             <div>
               <label htmlFor="email" className="sr-only">이메일</label>
               <input
@@ -78,7 +82,7 @@ export default function LoginPage() {
                 name="email"
                 type="email"
                 required
-                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 placeholder="이메일 주소"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -91,7 +95,7 @@ export default function LoginPage() {
                 name="password"
                 type="password"
                 required
-                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 placeholder="비밀번호"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
