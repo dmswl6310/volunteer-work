@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { checkEmailExists, checkNicknameExists } from '@/actions/auth';
+import { Check, X } from 'lucide-react';
 import type { Address } from 'react-daum-postcode';
 import dynamic from 'next/dynamic';
 
@@ -251,9 +252,7 @@ export default function SignupPage() {
                     : 'bg-gray-200 text-gray-500'
                 }`}>
                   {step > s.number ? (
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                    </svg>
+                    <Check className="w-5 h-5" strokeWidth={3} />
                   ) : (
                     s.number
                   )}
@@ -482,9 +481,7 @@ export default function SignupPage() {
                 onClick={() => setIsPostcodeOpen(false)}
                 className="text-gray-500 hover:text-gray-800"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-6 h-6" />
               </button>
             </div>
             <div className="p-0">

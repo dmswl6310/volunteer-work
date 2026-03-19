@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
+import { Search, X, ArrowLeft } from 'lucide-react';
 
 /** 검색 입력 컴포넌트 (확장/접기 애니메이션 지원) */
 export default function SearchInput() {
@@ -68,9 +69,7 @@ export default function SearchInput() {
                                 className="ml-1.5 p-0.5 text-indigo-400 hover:text-indigo-600 rounded-full hover:bg-indigo-200 transition-colors"
                                 aria-label="검색어 초기화"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                </svg>
+                                <X className="h-3.5 w-3.5" />
                             </button>
                         </div>
                     )}
@@ -79,9 +78,7 @@ export default function SearchInput() {
                         className="p-2 text-gray-500 hover:text-indigo-600 transition-colors rounded-full hover:bg-gray-100"
                         aria-label="검색 열기"
                     >
-                        <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+                        <Search className="h-5 w-5" />
                     </button>
                 </div>
             ) : (
@@ -93,9 +90,7 @@ export default function SearchInput() {
                             className="p-2 -ml-2 mr-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors"
                             aria-label="검색 닫기"
                         >
-                            <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
+                            <ArrowLeft className="h-5 w-5" />
                         </button>
                         <input
                             // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -113,9 +108,7 @@ export default function SearchInput() {
                                 className="absolute right-3 p-1 text-gray-400 hover:text-gray-600"
                                 aria-label="검색어 지우기"
                             >
-                                <svg className="h-4 w-4 bg-gray-200 rounded-full p-0.5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                </svg>
+                                <X className="h-4 w-4 bg-gray-200 rounded-full p-0.5 text-white" />
                             </button>
                         )}
                     </div>

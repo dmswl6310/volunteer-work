@@ -7,6 +7,7 @@ import ApplyButton from './ApplyButton';
 import ReviewList from '@/components/ReviewList';
 import ScrapButton from '@/components/ScrapButton';
 import { createServerSupabaseClient } from '@/lib/supabase';
+import { ChevronLeft } from 'lucide-react';
 
 export default async function PostDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -59,9 +60,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
       {/* 상단 네비게이션 (뒤로가기 버튼) */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-gray-100">
         <Link href="/board" className="p-2 -ml-2 rounded-full hover:bg-gray-100">
-          <svg className="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronLeft className="w-6 h-6 text-gray-700" />
         </Link>
         <h2 className="text-sm font-bold text-gray-900 truncate max-w-[200px]">{post.title}</h2>
         <div className="w-8"></div> {/* 레이아웃 여백 */}

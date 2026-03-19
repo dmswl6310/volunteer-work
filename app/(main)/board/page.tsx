@@ -6,6 +6,7 @@ import SearchInput from '@/components/SearchInput';
 import Link from 'next/link';
 import CategoryFilter from '@/components/CategoryFilter';
 import SortFilter from '@/components/SortFilter';
+import { Plus } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,9 +62,7 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
         className="fixed bottom-20 right-6 p-4 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition-transform active:scale-95 z-40 flex items-center justify-center transform hover:-translate-y-1"
         aria-label="글쓰기"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
+        <Plus className="w-6 h-6" strokeWidth={3} />
       </Link>
     </div>
   );
