@@ -240,9 +240,9 @@ export default function SignupPage() {
 
         {/* Progress Indicator */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-center mb-2">
             {STEPS.map((s, i) => (
-              <div key={s.number} className="flex items-center flex-1">
+              <div key={s.number} className={`flex items-center ${i < STEPS.length - 1 ? 'flex-1' : ''}`}>
                 {/* 원형 번호 */}
                 <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold shrink-0 transition-all duration-300 ${
                   step > s.number 
