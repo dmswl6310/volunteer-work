@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ClipboardList, PenLine, Settings, Bell, ClipboardCheck } from 'lucide-react';
+import { ClipboardList, PenLine, Settings, Bell, ClipboardCheck, CheckCircle2 } from 'lucide-react';
 import IncomingRequestItem from '@/components/IncomingRequestItem';
 import CancelApplicationButton from '@/components/CancelApplicationButton';
 import ProfileEditForm from '@/components/ProfileEditForm';
@@ -37,7 +37,22 @@ interface MyPageTabsProps {
 export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) {
   const [activeTab, setActiveTab] = useState<Tab>('requests');
 
-  const pendingApplications = user.applications.filter((app: any) => app.status === 'pending');
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // 완료된 활동: 승인됨 + 마감일 지남
+  const completedActivities = user.applications.filter((app: any) => {
+    if (app.status !== 'approved') return false;
+    const dueDate = app.posts?.due_date ? new Date(app.posts.due_date) : null;
+    if (!dueDate) return false;
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate < today;
+  });
+
+  // 진행중 신청: 완료된 활동 제외
+  const completedIds = new Set(completedActivities.map((a: any) => a.id));
+  const activeApplications = user.applications.filter((app: any) => !completedIds.has(app.id));
+  const pendingApplications = activeApplications.filter((app: any) => app.status === 'pending');
 
   return (
     <>
@@ -119,14 +134,14 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
               </section>
             )}
 
-            {/* 참여 신청 내역 */}
+            {/* 참여 신청 내역 (진행중만) */}
             <section>
               <h2 className="text-base font-bold text-gray-900 mb-3 px-1">참여 신청 내역</h2>
-              {user.applications.length === 0 ? (
-                <div className="bg-white rounded-xl p-6 text-center text-gray-400 text-sm shadow-sm">신청한 활동이 없습니다.</div>
+              {activeApplications.length === 0 ? (
+                <div className="bg-white rounded-xl p-6 text-center text-gray-400 text-sm shadow-sm">진행중인 신청이 없습니다.</div>
               ) : (
                 <div className="bg-white rounded-xl shadow-sm divide-y divide-gray-100">
-                  {user.applications.map((app: any) => (
+                  {activeApplications.map((app: any) => (
                     <div key={app.id} className="p-4">
                       <div className="flex justify-between items-start mb-2">
                         <Link href={`/board/${app.post_id || app.postId}`} className="font-bold text-gray-800 hover:text-indigo-600 transition-colors">
@@ -137,9 +152,6 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
                       <div className="flex justify-between items-center mt-2">
                         <span className="text-xs text-gray-500">{new Date(app.created_at || app.createdAt).toLocaleDateString()} 신청</span>
                         {app.status === 'pending' && <CancelApplicationButton applicationId={app.id} />}
-                        {app.status === 'approved' && (
-                          <Link href={`/reviews/write/${app.post_id || app.postId}`} className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded font-bold">후기작성</Link>
-                        )}
                       </div>
                     </div>
                   ))}
@@ -152,6 +164,37 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
         {/* ========== 활동기록 탭 ========== */}
         {activeTab === 'activity' && (
           <div className="space-y-6">
+            {/* 완료된 활동 */}
+            <section>
+              <h2 className="text-base font-bold text-gray-900 mb-3 px-1">완료된 활동</h2>
+              {completedActivities.length === 0 ? (
+                <div className="bg-white rounded-xl p-6 text-center text-gray-400 text-sm shadow-sm">완료된 활동이 없습니다.</div>
+              ) : (
+                <div className="bg-white rounded-xl shadow-sm divide-y divide-gray-100">
+                  {completedActivities.map((app: any) => (
+                    <div key={app.id} className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
+                          <Link href={`/board/${app.post_id || app.postId}`} className="font-bold text-gray-800 hover:text-indigo-600 transition-colors">
+                            {app.posts?.title || '알 수 없는 게시글'}
+                          </Link>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">
+                          마감일: {new Date(app.posts?.due_date).toLocaleDateString()}
+                        </span>
+                        <Link href={`/reviews/write/${app.post_id || app.postId}`} className="text-xs bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-100 transition-colors">
+                          후기 작성
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
             {/* 내가 올린 글 */}
             <section>
               <h2 className="text-base font-bold text-gray-900 mb-3 px-1">내가 올린 글</h2>
