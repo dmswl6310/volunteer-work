@@ -60,14 +60,6 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
     if (!isEditing) {
         return (
             <>
-                <button
-                    onClick={() => setIsEditing(true)}
-                    className="absolute top-6 right-6 text-gray-400 hover:text-indigo-600 transition-colors"
-                    title="프로필 수정"
-                >
-                    <Pencil className="w-5 h-5" />
-                </button>
-
                 <div className="flex items-center space-x-4 mb-6">
                     <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-2xl">
                         {user.name?.[0] || 'U'}
@@ -78,6 +70,13 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                         </h2>
                         <p className="text-gray-500 text-sm">@{user.username}</p>
                     </div>
+                    <button
+                        onClick={() => setIsEditing(true)}
+                        className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                        title="프로필 수정"
+                    >
+                        <Pencil className="w-5 h-5" />
+                    </button>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-4 rounded-xl mb-4">
