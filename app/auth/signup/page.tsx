@@ -27,17 +27,25 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
+const STEPS = [
+  { number: 1, title: '계정 정보', description: '로그인에 사용할 이메일과 비밀번호를 입력해주세요.' },
+  { number: 2, title: '개인 정보', description: '활동에 사용할 닉네임과 연락처를 입력해주세요.' },
+  { number: 3, title: '추가 정보', description: '주소와 직업/소속기관 정보를 입력해주세요.' },
+];
+
 export default function SignupPage() {
   const router = useRouter();
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [fadeIn, setFadeIn] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     passwordConfirm: '',
     nickname: '',
     contact: '',
-    address: '', // 기본 주소
-    detailAddress: '', // 상세 주소
+    address: '',
+    detailAddress: '',
     job: '',
   });
 
@@ -59,7 +67,6 @@ export default function SignupPage() {
         setEmailStatus({ message: '', isValid: null });
         return;
       }
-      // 간단한 이메일 형식 검사
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(debouncedEmail)) {
         setEmailStatus({ message: '올바른 이메일 형식이 아닙니다.', isValid: false });
@@ -115,24 +122,51 @@ export default function SignupPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const isFormValid = 
+  // 단계별 유효성 검사
+  const isStep1Valid =
     emailStatus.isValid === true &&
-    nicknameStatus.isValid === true &&
-    passwordMatch.isValid === true &&
     formData.password.length >= 6 &&
-    formData.contact &&
-    formData.address &&
-    formData.job;
+    passwordMatch.isValid === true;
+
+  const isStep2Valid =
+    nicknameStatus.isValid === true &&
+    formData.contact.length > 0;
+
+  const isStep3Valid =
+    formData.address.length > 0 &&
+    formData.job.length > 0;
+
+  const isCurrentStepValid = step === 1 ? isStep1Valid : step === 2 ? isStep2Valid : isStep3Valid;
+
+  // 단계 전환 핸들러
+  const goToStep = (nextStep: number) => {
+    setFadeIn(false);
+    setTimeout(() => {
+      setStep(nextStep);
+      setFadeIn(true);
+    }, 200);
+  };
+
+  const handleNext = () => {
+    if (step < 3 && isCurrentStepValid) {
+      goToStep(step + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (step > 1) {
+      goToStep(step - 1);
+    }
+  };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isFormValid) return; // 버튼이 비활성화되지만 만약을 위해 방어
+    if (!isStep1Valid || !isStep2Valid || !isStep3Valid) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      // Supabase Auth SignUp
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -146,7 +180,6 @@ export default function SignupPage() {
       if (authError) throw authError;
 
       if (authData.user) {
-        // 서버 액션을 통한 유저 레코드 생성
         const { createUserRecord } = await import('@/actions/auth');
 
         const result = await createUserRecord({
@@ -166,7 +199,6 @@ export default function SignupPage() {
           return;
         }
 
-        // 승인 대기 상태이므로 로그아웃 처리
         await supabase.auth.signOut();
 
         alert('회원가입 요청이 접수되었습니다!\n관리자 승인 완료 후 로그인할 수 있습니다.');
@@ -184,174 +216,257 @@ export default function SignupPage() {
     }
   };
 
+  // 인풋 공통 스타일
+  const inputBase = 'mt-1 block w-full px-3 py-2.5 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors';
+  const inputNormal = `${inputBase} border-gray-300`;
+
+  const getValidationInputClass = (status: { isValid: boolean | null }) => {
+    if (status.isValid === false) return `${inputBase} border-red-300 focus:ring-red-500 focus:border-red-500`;
+    if (status.isValid === true) return `${inputBase} border-green-300 focus:ring-green-500 focus:border-green-500`;
+    return inputNormal;
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12 pb-20">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-lg">
-        <div className="text-center">
-          <h2 className="mt-2 text-3xl font-extrabold text-gray-900">회원가입</h2>
-          <p className="mt-2 text-sm text-gray-600">
+      <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg">
+        {/* 헤더 */}
+        <div className="text-center mb-6">
+          <h2 className="text-3xl font-extrabold text-gray-900">회원가입</h2>
+          <p className="mt-1 text-sm text-gray-500">
             관리자 승인 후 이용 가능합니다.
           </p>
         </div>
-        <form className="mt-8 space-y-4" onSubmit={handleSignup}>
-          
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">이메일 (아이디)</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                emailStatus.isValid === false ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 
-                emailStatus.isValid === true ? 'border-green-300 focus:ring-green-500 focus:border-green-500' : 'border-gray-300'
-              }`}
-              value={formData.email}
-              onChange={handleChange}
-            />
-            {emailStatus.message && (
-              <p className={`mt-1 text-xs ${emailStatus.isValid ? 'text-green-600' : 'text-red-500'}`}>
-                {emailStatus.message}
-              </p>
+
+        {/* Progress Indicator */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            {STEPS.map((s, i) => (
+              <div key={s.number} className="flex items-center flex-1">
+                {/* 원형 번호 */}
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold shrink-0 transition-all duration-300 ${
+                  step > s.number 
+                    ? 'bg-indigo-600 text-white'
+                    : step === s.number
+                    ? 'bg-indigo-600 text-white ring-4 ring-indigo-100' 
+                    : 'bg-gray-200 text-gray-500'
+                }`}>
+                  {step > s.number ? (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  ) : (
+                    s.number
+                  )}
+                </div>
+                {/* 연결선 */}
+                {i < STEPS.length - 1 && (
+                  <div className={`flex-1 h-0.5 mx-2 transition-colors duration-300 ${
+                    step > s.number ? 'bg-indigo-600' : 'bg-gray-200'
+                  }`} />
+                )}
+              </div>
+            ))}
+          </div>
+          {/* 현재 단계 설명 */}
+          <div className="text-center mt-3">
+            <p className="text-sm font-semibold text-indigo-600">{STEPS[step - 1].title}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{STEPS[step - 1].description}</p>
+          </div>
+        </div>
+
+        <form onSubmit={handleSignup}>
+          {/* 스텝 컨텐츠 영역 */}
+          <div className={`transition-all duration-200 ${fadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+            
+            {/* ========== STEP 1: 계정 정보 ========== */}
+            {step === 1 && (
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">이메일 (아이디)</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    className={getValidationInputClass(emailStatus)}
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="example@email.com"
+                  />
+                  {emailStatus.message && (
+                    <p className={`mt-1 text-xs ${emailStatus.isValid ? 'text-green-600' : 'text-red-500'}`}>
+                      {emailStatus.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">비밀번호</label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    className={inputNormal}
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="6자 이상 입력해주세요"
+                  />
+                  {formData.password.length > 0 && formData.password.length < 6 && (
+                    <p className="mt-1 text-xs text-red-500">비밀번호는 최소 6자 이상이어야 합니다.</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="passwordConfirm" className="block text-sm font-medium text-gray-700">비밀번호 확인</label>
+                  <input
+                    id="passwordConfirm"
+                    name="passwordConfirm"
+                    type="password"
+                    required
+                    className={getValidationInputClass(passwordMatch)}
+                    value={formData.passwordConfirm}
+                    onChange={handleChange}
+                    placeholder="비밀번호를 한번 더 입력해주세요"
+                  />
+                  {passwordMatch.message && (
+                    <p className={`mt-1 text-xs ${passwordMatch.isValid ? 'text-green-600' : 'text-red-500'}`}>
+                      {passwordMatch.message}
+                    </p>
+                  )}
+                </div>
+              </div>
             )}
-          </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">비밀번호</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              value={formData.password}
-              onChange={handleChange}
-            />
-            {formData.password.length > 0 && formData.password.length < 6 && (
-              <p className="mt-1 text-xs text-red-500">비밀번호는 최소 6자 이상이어야 합니다.</p>
+            {/* ========== STEP 2: 개인 정보 ========== */}
+            {step === 2 && (
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="nickname" className="block text-sm font-medium text-gray-700">닉네임</label>
+                  <input
+                    id="nickname"
+                    name="nickname"
+                    type="text"
+                    required
+                    className={getValidationInputClass(nicknameStatus)}
+                    value={formData.nickname}
+                    onChange={handleChange}
+                    placeholder="2자 이상의 닉네임을 입력해주세요"
+                  />
+                  {nicknameStatus.message && (
+                    <p className={`mt-1 text-xs ${nicknameStatus.isValid ? 'text-green-600' : 'text-red-500'}`}>
+                      {nicknameStatus.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="contact" className="block text-sm font-medium text-gray-700">연락처</label>
+                  <input
+                    id="contact"
+                    name="contact"
+                    type="text"
+                    required
+                    className={inputNormal}
+                    value={formData.contact}
+                    onChange={handleChange}
+                    placeholder="010-0000-0000"
+                  />
+                </div>
+              </div>
             )}
-          </div>
 
-          <div>
-            <label htmlFor="passwordConfirm" className="block text-sm font-medium text-gray-700">비밀번호 확인</label>
-            <input
-              id="passwordConfirm"
-              name="passwordConfirm"
-              type="password"
-              required
-              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                passwordMatch.isValid === false ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 
-                passwordMatch.isValid === true ? 'border-green-300 focus:ring-green-500 focus:border-green-500' : 'border-gray-300'
-              }`}
-              value={formData.passwordConfirm}
-              onChange={handleChange}
-            />
-            {passwordMatch.message && (
-              <p className={`mt-1 text-xs ${passwordMatch.isValid ? 'text-green-600' : 'text-red-500'}`}>
-                {passwordMatch.message}
-              </p>
-            )}
-          </div>
+            {/* ========== STEP 3: 추가 정보 ========== */}
+            {step === 3 && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">주소</label>
+                  <div className="mt-1 flex gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      placeholder="주소 검색을 눌러주세요"
+                      required
+                      className="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-gray-50 text-gray-900 font-medium focus:outline-none sm:text-sm cursor-not-allowed"
+                      value={formData.address}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setIsPostcodeOpen(true)}
+                      className="whitespace-nowrap px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                    >
+                      주소 검색
+                    </button>
+                  </div>
+                  <input
+                    name="detailAddress"
+                    type="text"
+                    placeholder="상세 주소 (예: 101동 202호)"
+                    className={`mt-2 ${inputNormal}`}
+                    value={formData.detailAddress}
+                    onChange={handleChange}
+                  />
+                </div>
 
-          <div>
-            <label htmlFor="nickname" className="block text-sm font-medium text-gray-700">닉네임</label>
-            <input
-              id="nickname"
-              name="nickname"
-              type="text"
-              required
-              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                nicknameStatus.isValid === false ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 
-                nicknameStatus.isValid === true ? 'border-green-300 focus:ring-green-500 focus:border-green-500' : 'border-gray-300'
-              }`}
-              value={formData.nickname}
-              onChange={handleChange}
-            />
-            {nicknameStatus.message && (
-              <p className={`mt-1 text-xs ${nicknameStatus.isValid ? 'text-green-600' : 'text-red-500'}`}>
-                {nicknameStatus.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="contact" className="block text-sm font-medium text-gray-700">연락처</label>
-            <input
-              id="contact"
-              name="contact"
-              type="text"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              value={formData.contact}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">주소</label>
-            <div className="mt-1 flex gap-2">
-              <input
-                type="text"
-                readOnly
-                placeholder="기본 주소"
-                required
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-900 font-medium focus:outline-none sm:text-sm cursor-not-allowed"
-                value={formData.address}
-              />
-              <button
-                type="button"
-                onClick={() => setIsPostcodeOpen(true)}
-                className="whitespace-nowrap px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-              >
-                주소 검색
-              </button>
-            </div>
-            <input
-              name="detailAddress"
-              type="text"
-              placeholder="상세 주소 (예: 101동 202호)"
-              className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              value={formData.detailAddress}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="job" className="block text-sm font-medium text-gray-700">직업 / 소속기관</label>
-            <input
-              id="job"
-              name="job"
-              type="text"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              value={formData.job}
-              onChange={handleChange}
-            />
-          </div>
-
-          {error && (
-            <div className="text-red-500 text-sm text-center font-medium bg-red-50 p-2 rounded-lg">{error}</div>
-          )}
-
-          <div className="pt-4">
-            <button
-              type="submit"
-              disabled={loading || !isFormValid}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              {loading ? '가입 처리 중...' : '가입하기'}
-            </button>
-            {!isFormValid && !loading && (
-              <div className="text-center text-xs text-gray-500 mt-2">
-                모든 항목을 올바르게 입력해야 가입이 가능합니다.
+                <div>
+                  <label htmlFor="job" className="block text-sm font-medium text-gray-700">직업 / 소속기관</label>
+                  <input
+                    id="job"
+                    name="job"
+                    type="text"
+                    required
+                    className={inputNormal}
+                    value={formData.job}
+                    onChange={handleChange}
+                    placeholder="예: 학생, 직장인, OO대학교"
+                  />
+                </div>
               </div>
             )}
           </div>
 
-          <div className="text-center text-sm pt-2">
-            <Link href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
-              이미 계정이 있으신가요? 로그인
-            </Link>
+          {/* 에러 메시지 */}
+          {error && (
+            <div className="text-red-500 text-sm text-center font-medium bg-red-50 p-2 rounded-lg mt-4">{error}</div>
+          )}
+
+          {/* 네비게이션 버튼 */}
+          <div className="mt-8 space-y-3">
+            <div className="flex gap-3">
+              {step > 1 && (
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  className="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
+                >
+                  이전
+                </button>
+              )}
+              {step < 3 ? (
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  disabled={!isCurrentStepValid}
+                  className="flex-1 py-3 px-4 border border-transparent rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  다음
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={loading || !isStep3Valid}
+                  className="flex-1 py-3 px-4 border border-transparent rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  {loading ? '가입 처리 중...' : '가입하기'}
+                </button>
+              )}
+            </div>
+
+            <div className="text-center text-sm pt-1">
+              <Link href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
+                이미 계정이 있으신가요? 로그인
+              </Link>
+            </div>
           </div>
         </form>
       </div>
@@ -389,7 +504,7 @@ export default function SignupPage() {
                   }
 
                   setFormData({ ...formData, address: fullAddress });
-                  setIsPostcodeOpen(false); // 선택 시 팝업 닫기
+                  setIsPostcodeOpen(false);
                 }}
                 autoClose={false}
               />
