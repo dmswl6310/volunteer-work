@@ -72,36 +72,126 @@ export async function createReview(postId: string, userId: string, content: stri
 }
 
 /**
- * 특정 게시글의 후기 목록을 조회합니다.
- * @param postId - 게시글 ID
- * @returns 후기 배열
+ * 후기 좋아요를 토글합니다. (좋아요/좋아요 취소)
+ * @param reviewId - 후기 ID
+ * @param userId - 유저 ID
  */
-export async function getReviews(postId: string) {
-  const supabase = await createServerSupabaseClient();
-  const { data } = await supabase
-    .from('reviews')
-    .select('*, author:users(name, email, username)')
-    .eq('post_id', postId)
-    .order('created_at', { ascending: false });
+export async function toggleReviewLike(reviewId: string, userId: string) {
+  try {
+    const supabase = await createServerSupabaseClient();
 
-  return data ?? [];
+    const { data: existing } = await supabase
+      .from('review_likes')
+      .select('id')
+      .eq('review_id', reviewId)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (existing) {
+      const { error } = await supabase.from('review_likes').delete().eq('id', existing.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from('review_likes').insert({
+        id: crypto.randomUUID(),
+        review_id: reviewId,
+        user_id: userId,
+      });
+      if (error) throw error;
+    }
+
+    // 후기가 속한 게시글 페이지도 함께 캐시 갱신
+    const { data: review } = await supabase
+      .from('reviews')
+      .select('post_id')
+      .eq('id', reviewId)
+      .single();
+
+    if (review) {
+      revalidatePath(`/board/${review.post_id}`);
+    }
+    revalidatePath('/reviews');
+  } catch (error) {
+    console.error('Error toggling review like:', error);
+    throw new Error('좋아요 처리 중 오류가 발생했습니다.');
+  }
 }
 
 /**
- * 전체 후기 목록을 최신순으로 조회합니다. (최대 20건)
+ * 특정 게시글의 후기 목록을 조회합니다. (좋아요 수 포함)
+ * @param postId - 게시글 ID
+ * @param userId - 현재 로그인한 유저 ID (좋아요 여부 확인용, 선택)
  * @returns 후기 배열
  */
-export async function getAllReviews() {
+export async function getReviews(postId: string, userId?: string) {
+  const supabase = await createServerSupabaseClient();
+  const { data } = await supabase
+    .from('reviews')
+    .select('*, author:users(name, email, username), review_likes(count)')
+    .eq('post_id', postId)
+    .order('created_at', { ascending: false });
+
+  const reviews = data ?? [];
+
+  // 현재 유저의 좋아요 여부를 각 후기에 추가
+  if (userId && reviews.length > 0) {
+    const { data: myLikes } = await supabase
+      .from('review_likes')
+      .select('review_id')
+      .eq('user_id', userId)
+      .in('review_id', reviews.map((r: any) => r.id));
+
+    const likedSet = new Set((myLikes ?? []).map((l: any) => l.review_id));
+    return reviews.map((review: any) => ({
+      ...review,
+      like_count: review.review_likes?.[0]?.count ?? 0,
+      is_liked: likedSet.has(review.id),
+    }));
+  }
+
+  return reviews.map((review: any) => ({
+    ...review,
+    like_count: review.review_likes?.[0]?.count ?? 0,
+    is_liked: false,
+  }));
+}
+
+/**
+ * 전체 후기 목록을 최신순으로 조회합니다. (최대 20건, 좋아요 수 포함)
+ * @param userId - 현재 로그인한 유저 ID (좋아요 여부 확인용, 선택)
+ * @returns 후기 배열
+ */
+export async function getAllReviews(userId?: string) {
   try {
     const supabase = await createServerSupabaseClient();
     const { data, error } = await supabase
       .from('reviews')
-      .select('*, author:users(name), posts(title, id)')
+      .select('*, author:users(name), posts(title, id), review_likes(count)')
       .order('created_at', { ascending: false })
       .limit(20);
 
     if (error) throw error;
-    return data ?? [];
+    const reviews = data ?? [];
+
+    if (userId && reviews.length > 0) {
+      const { data: myLikes } = await supabase
+        .from('review_likes')
+        .select('review_id')
+        .eq('user_id', userId)
+        .in('review_id', reviews.map((r: any) => r.id));
+
+      const likedSet = new Set((myLikes ?? []).map((l: any) => l.review_id));
+      return reviews.map((review: any) => ({
+        ...review,
+        like_count: review.review_likes?.[0]?.count ?? 0,
+        is_liked: likedSet.has(review.id),
+      }));
+    }
+
+    return reviews.map((review: any) => ({
+      ...review,
+      like_count: review.review_likes?.[0]?.count ?? 0,
+      is_liked: false,
+    }));
   } catch (error) {
     console.error('Error fetching all reviews:', error);
     return [];
