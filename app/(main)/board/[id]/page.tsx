@@ -170,7 +170,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
 
         {/* 후기 섹션 */}
         <div className="mb-8">
-          <ReviewList postId={post.id} />
+          <ReviewList postId={post.id} userId={user?.id} />
         </div>
       </div>
 

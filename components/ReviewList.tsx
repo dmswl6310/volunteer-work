@@ -1,9 +1,12 @@
 import { getReviews } from '@/actions/review';
+import ReviewLikeButton from './ReviewLikeButton';
 
 interface ReviewWithAuthor {
   id: string;
   content: string;
   created_at: string;
+  like_count: number;
+  is_liked: boolean;
   author: {
     name: string | null;
     email: string;
@@ -12,8 +15,8 @@ interface ReviewWithAuthor {
 }
 
 /** 게시글 후기 목록 컴포넌트 (서버 컴포넌트) */
-export default async function ReviewList({ postId }: { postId: string }) {
-  const reviews = await getReviews(postId);
+export default async function ReviewList({ postId, userId }: { postId: string; userId?: string }) {
+  const reviews = await getReviews(postId, userId);
 
   if (reviews.length === 0) {
     return (
@@ -38,9 +41,16 @@ export default async function ReviewList({ postId }: { postId: string }) {
                 {new Date(review.created_at).toLocaleDateString()}
               </span>
             </div>
-            <p className="text-gray-700 whitespace-pre-wrap text-sm leading-relaxed">
+            <p className="text-gray-700 whitespace-pre-wrap text-sm leading-relaxed mb-3">
               {review.content}
             </p>
+            <div className="flex justify-end">
+              <ReviewLikeButton
+                reviewId={review.id}
+                initialIsLiked={review.is_liked}
+                initialLikeCount={review.like_count}
+              />
+            </div>
           </li>
         ))}
       </ul>

@@ -1,10 +1,14 @@
 import { getAllReviews } from '@/actions/review';
+import { createServerSupabaseClient } from '@/lib/supabase';
 import Link from 'next/link';
+import ReviewLikeButton from '@/components/ReviewLikeButton';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ReviewPage() {
-    const reviews = await getAllReviews();
+    const supabase = await createServerSupabaseClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    const reviews = await getAllReviews(user?.id);
 
     return (
         <div className="pb-24 bg-gray-50 min-h-screen">
@@ -19,7 +23,7 @@ export default async function ReviewPage() {
                         등록된 후기가 없습니다.
                     </div>
                 ) : (
-                    reviews.map((review) => (
+                    reviews.map((review: any) => (
                         <div key={review.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                             <Link href={`/board/${review.post_id}`} className="block mb-3">
                                 <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded mb-2 inline-block">
@@ -36,7 +40,14 @@ export default async function ReviewPage() {
                                     </div>
                                     <span>{review.author?.name || '익명'}</span>
                                 </div>
-                                <span>{new Date(review.created_at).toLocaleDateString()}</span>
+                                <div className="flex items-center space-x-3">
+                                    <ReviewLikeButton
+                                        reviewId={review.id}
+                                        initialIsLiked={review.is_liked}
+                                        initialLikeCount={review.like_count}
+                                    />
+                                    <span>{new Date(review.created_at).toLocaleDateString()}</span>
+                                </div>
                             </div>
                         </div>
                     ))
