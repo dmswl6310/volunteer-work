@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { createReview } from '@/actions/review';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ToastProvider';
+import { Loader2 } from 'lucide-react';
 
 export default function WriteReviewPage() {
   const router = useRouter();
@@ -66,9 +67,16 @@ export default function WriteReviewPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
+          className="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          {isSubmitting ? '등록 중...' : '후기 등록하기'}
+          {isSubmitting ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>등록 중...</span>
+            </>
+          ) : (
+            '후기 등록하기'
+          )}
         </button>
       </form>
     </div>

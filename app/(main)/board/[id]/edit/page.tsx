@@ -6,7 +6,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { updatePost } from '@/actions/update-post';
 import { CATEGORIES } from '@/lib/constants';
 import { useToast } from '@/components/ToastProvider';
-import { ChevronLeft, ImagePlus } from 'lucide-react';
+import { ChevronLeft, ImagePlus, Loader2 } from 'lucide-react';
 
 export default function EditPage() {
   const router = useRouter();
@@ -289,9 +289,16 @@ export default function EditPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 disabled:opacity-50"
+          className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          {loading ? '수정 중...' : '수정 완료'}
+          {loading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>수정 중...</span>
+            </>
+          ) : (
+            '수정 완료'
+          )}
         </button>
       </form>
     </div>

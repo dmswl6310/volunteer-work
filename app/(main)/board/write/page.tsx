@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createPost } from '@/actions/create-post';
 import { CATEGORIES } from '@/lib/constants';
 import { useToast } from '@/components/ToastProvider';
-import { ImagePlus } from 'lucide-react';
+import { ImagePlus, Loader2 } from 'lucide-react';
 
 export default function WritePage() {
   const router = useRouter();
@@ -192,8 +192,15 @@ export default function WritePage() {
         </div>
 
         {/* Submit */}
-        <button type="submit" disabled={loading} className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 disabled:opacity-50">
-          {loading ? '등록 중...' : '봉사활동 모집하기'}
+        <button type="submit" disabled={loading} className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 disabled:opacity-50 flex items-center justify-center gap-2">
+          {loading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>등록 중...</span>
+            </>
+          ) : (
+            '봉사활동 모집하기'
+          )}
         </button>
       </form>
     </div>
