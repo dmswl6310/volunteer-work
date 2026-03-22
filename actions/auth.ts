@@ -1,6 +1,12 @@
 'use server';
 
 import { createServerSupabaseClient } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export type CreateUserParams = {
   id: string;
@@ -26,7 +32,7 @@ export async function createUserRecord(data: CreateUserParams) {
     const supabase = await createServerSupabaseClient();
 
     // 닉네임 중복 체크
-    const { data: existingUser } = await supabase
+    const { data: existingUser } = await supabaseAdmin
       .from('users')
       .select('id')
       .eq('username', data.username)
@@ -37,7 +43,7 @@ export async function createUserRecord(data: CreateUserParams) {
     }
 
     // 이메일 중복 및 승인 상태 체크
-    const { data: existingEmail } = await supabase
+    const { data: existingEmail } = await supabaseAdmin
       .from('users')
       .select('id, is_approved')
       .eq('email', data.email)
@@ -76,8 +82,7 @@ export async function createUserRecord(data: CreateUserParams) {
  */
 export async function checkEmailExists(email: string) {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data: existingEmail } = await supabase
+    const { data: existingEmail } = await supabaseAdmin
       .from('users')
       .select('id, is_approved')
       .eq('email', email)
@@ -101,8 +106,7 @@ export async function checkEmailExists(email: string) {
  */
 export async function checkNicknameExists(nickname: string) {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data: existingUser } = await supabase
+    const { data: existingUser } = await supabaseAdmin
       .from('users')
       .select('id')
       .eq('username', nickname)
