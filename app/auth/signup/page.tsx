@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { checkEmailExists, checkNicknameExists } from '@/actions/auth';
+import { checkProfanity } from '@/lib/profanity';
 import { Check, X } from 'lucide-react';
 import type { Address } from 'react-daum-postcode';
 import dynamic from 'next/dynamic';
@@ -50,6 +51,11 @@ export default function SignupPage() {
     job: '',
   });
 
+  const [agreements, setAgreements] = useState({
+    terms: false,
+    privacy: false,
+  });
+
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
 
   // 유효성 검사 상태
@@ -84,6 +90,9 @@ export default function SignupPage() {
     validateEmail();
   }, [debouncedEmail]);
 
+  // 비밀번호 정규식 (8자 이상, 영문/숫자/특수문자 포함)
+  const isPasswordValid = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/.test(formData.password);
+
   // 닉네임 실시간 검사
   useEffect(() => {
     const validateNickname = async () => {
@@ -91,8 +100,16 @@ export default function SignupPage() {
         setNicknameStatus({ message: '', isValid: null });
         return;
       }
-      if (debouncedNickname.length < 2) {
-        setNicknameStatus({ message: '닉네임은 2자 이상이어야 합니다.', isValid: false });
+      if (debouncedNickname.length < 2 || debouncedNickname.length > 10) {
+        setNicknameStatus({ message: '닉네임은 2자 이상 10자 이하여야 합니다.', isValid: false });
+        return;
+      }
+      if (!/^[가-힣a-zA-Z0-9]+$/.test(debouncedNickname)) {
+        setNicknameStatus({ message: '닉네임에는 특수문자나 기호를 사용할 수 없습니다.', isValid: false });
+        return;
+      }
+      if (checkProfanity(debouncedNickname)) {
+        setNicknameStatus({ message: '사용할 수 없는 단어가 포함되어 있습니다.', isValid: false });
         return;
       }
       
@@ -123,19 +140,34 @@ export default function SignupPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // 연락처 자동 하이픈
+  const handleContactChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/[^0-9]/g, '');
+    if (value.length > 3 && value.length <= 7) {
+      value = value.replace(/(\d{3})(\d{1,4})/, '$1-$2');
+    } else if (value.length > 7) {
+      value = value.replace(/(\d{3})(\d{3,4})(\d{0,4})/, '$1-$2-$3');
+    }
+    setFormData({ ...formData, contact: value });
+  };
+
   // 단계별 유효성 검사
   const isStep1Valid =
     emailStatus.isValid === true &&
-    formData.password.length >= 6 &&
+    isPasswordValid &&
     passwordMatch.isValid === true;
+
+  const isContactValid = /^01([0|1|6|7|8|9]?)-?([0-9]{3,4})-?([0-9]{4})$/.test(formData.contact);
 
   const isStep2Valid =
     nicknameStatus.isValid === true &&
-    formData.contact.length > 0;
+    isContactValid;
 
   const isStep3Valid =
     formData.address.length > 0 &&
-    formData.job.length > 0;
+    formData.job.length > 0 &&
+    agreements.terms &&
+    agreements.privacy;
 
   const isCurrentStepValid = step === 1 ? isStep1Valid : step === 2 ? isStep2Valid : isStep3Valid;
 
@@ -311,8 +343,8 @@ export default function SignupPage() {
                     onChange={handleChange}
                     placeholder="6자 이상 입력해주세요"
                   />
-                  {formData.password.length > 0 && formData.password.length < 6 && (
-                    <p className="mt-1 text-xs text-red-500">비밀번호는 최소 6자 이상이어야 합니다.</p>
+                  {formData.password.length > 0 && !isPasswordValid && (
+                    <p className="mt-1 text-xs text-red-500">8자 이상, 영문/숫자/특수문자를 포함해야 합니다.</p>
                   )}
                 </div>
 
@@ -366,11 +398,15 @@ export default function SignupPage() {
                     name="contact"
                     type="text"
                     required
-                    className={inputNormal}
+                    maxLength={13}
+                    className={formData.contact.length > 0 && !isContactValid ? getValidationInputClass({ isValid: false }) : inputNormal}
                     value={formData.contact}
-                    onChange={handleChange}
+                    onChange={handleContactChange}
                     placeholder="010-0000-0000"
                   />
+                  {formData.contact.length > 0 && !isContactValid && (
+                    <p className="mt-1 text-xs text-red-500">올바른 연락처 형식이 아닙니다.</p>
+                  )}
                 </div>
               </div>
             )}
@@ -419,6 +455,35 @@ export default function SignupPage() {
                     onChange={handleChange}
                     placeholder="예: 학생, 직장인, OO대학교"
                   />
+                </div>
+
+                {/* 약관 동의 */}
+                <div className="pt-4 border-t border-gray-100">
+                  <div className="space-y-3">
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={agreements.terms}
+                        onChange={(e) => setAgreements({ ...agreements, terms: e.target.checked })}
+                        className="w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 transition-colors"
+                        required
+                      />
+                      <span className="text-sm font-medium text-gray-700">[필수] 서비스 이용약관 동의</span>
+                    </label>
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={agreements.privacy}
+                        onChange={(e) => setAgreements({ ...agreements, privacy: e.target.checked })}
+                        className="w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 transition-colors"
+                        required
+                      />
+                      <span className="text-sm font-medium text-gray-700">[필수] 개인정보 수집 및 이용 동의</span>
+                    </label>
+                  </div>
+                  {(!agreements.terms || !agreements.privacy) && (
+                    <p className="mt-3 text-xs text-red-500 font-medium">모든 필수 약관에 동의해야 가입할 수 있습니다.</p>
+                  )}
                 </div>
               </div>
             )}
