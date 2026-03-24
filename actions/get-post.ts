@@ -14,7 +14,7 @@ export async function getPost(id: string) {
       .from('posts')
       .select(`
         *,
-        author:users(name, username),
+        author:users(name, username, contact),
         reviews(count)
       `)
       .eq('id', id)

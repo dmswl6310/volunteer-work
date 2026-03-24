@@ -21,6 +21,7 @@ export type PostWithAuthor = {
   author: {
     name: string;
     username: string;
+    contact?: string | null;
   } | null;
 };
 

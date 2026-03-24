@@ -7,7 +7,7 @@ import ApplyButton from './ApplyButton';
 import ReviewList from '@/components/ReviewList';
 import ScrapButton from '@/components/ScrapButton';
 import { createServerSupabaseClient } from '@/lib/supabase';
-import { ChevronLeft, Clock3 } from 'lucide-react';
+import { ChevronLeft, Clock3, Phone } from 'lucide-react';
 
 export default async function PostDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -122,6 +122,10 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
               {post.author.name && post.author.name !== 'User' ? post.author.name : post.author.username}
             </p>
             <p className="text-xs text-gray-500">@{post.author.username}</p>
+            <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-700">
+              <Phone className="h-4 w-4 text-indigo-500" />
+              <span>{post.author.contact || '연락처 미등록'}</span>
+            </div>
           </div>
         </div>
 

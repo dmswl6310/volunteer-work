@@ -8,6 +8,7 @@ import { CATEGORIES } from '@/lib/constants';
 import { useToast } from '@/components/ToastProvider';
 import { ImagePlus, Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const VOLUNTEER_HOUR_OPTIONS = Array.from({ length: 100 }, (_, index) => index + 1);
 
@@ -16,6 +17,7 @@ export default function WritePage() {
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
   const [userId, setUserId] = useState<string | null>(null);
+  const [authorContact, setAuthorContact] = useState<string>('');
   const [minimumDueDate] = useState(() => new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0]);
 
   // Image Upload State
@@ -35,6 +37,14 @@ export default function WritePage() {
         router.push('/auth/login');
       } else {
         setUserId(user.id);
+
+        const { data: profile } = await supabase
+          .from('users')
+          .select('contact')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        setAuthorContact(profile?.contact?.trim() ?? '');
       }
     };
     checkAuth();
@@ -54,6 +64,12 @@ export default function WritePage() {
 
     if (!selectedCategory) {
       setCategoryError('카테고리를 선택해주세요.');
+      return;
+    }
+
+    if (!authorContact) {
+      showToast('게시글에 표시할 전화번호를 먼저 프로필에 등록해 주세요.', 'warning');
+      router.push('/mypage');
       return;
     }
 
@@ -107,6 +123,20 @@ export default function WritePage() {
       <h1 className="text-2xl font-bold mb-6">봉사활동 모집하기</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        <div className={`rounded-xl border px-4 py-3 ${authorContact ? 'border-amber-200 bg-amber-50' : 'border-red-200 bg-red-50'}`}>
+          <p className={`text-sm font-semibold ${authorContact ? 'text-amber-800' : 'text-red-700'}`}>
+            게시글 등록 시 프로필에 저장된 전화번호가 게시글에 공개됩니다.
+          </p>
+          <p className={`mt-1 text-sm ${authorContact ? 'text-amber-700' : 'text-red-600'}`}>
+            현재 공개 예정 번호: {authorContact || '등록된 전화번호가 없습니다.'}
+          </p>
+          {!authorContact && (
+            <Link href="/mypage" className="mt-2 inline-flex text-sm font-semibold text-red-700 underline underline-offset-2">
+              마이페이지에서 전화번호 등록하기
+            </Link>
+          )}
+        </div>
+
         {/* Image Upload */}
         <div className="flex flex-col items-center">
           <label htmlFor="image-upload" className="w-full h-64 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-colors overflow-hidden relative">
@@ -205,7 +235,7 @@ export default function WritePage() {
         </div>
 
         {/* Submit */}
-        <button type="submit" disabled={loading} className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 disabled:opacity-50 flex items-center justify-center gap-2">
+        <button type="submit" disabled={loading || !authorContact} className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 disabled:opacity-50 flex items-center justify-center gap-2">
           {loading ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
