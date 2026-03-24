@@ -34,6 +34,7 @@ export async function updatePost(postId: string, formData: FormData) {
   const content = formData.get('content') as string;
   const category = formData.get('category') as string;
   const maxParticipants = parseInt(formData.get('maxParticipants') as string);
+  const volunteerHours = parseInt(formData.get('volunteerHours') as string);
   const isUrgent = formData.get('isUrgent') === 'true';
   const isRecruiting = formData.get('isRecruiting') !== 'false';
   const dueDateStr = formData.get('dueDate') as string;
@@ -57,6 +58,7 @@ export async function updatePost(postId: string, formData: FormData) {
       content,
       category,
       max_participants: maxParticipants,
+      volunteer_hours: Number.isFinite(volunteerHours) ? volunteerHours : 1,
       is_urgent: isUrgent,
       is_recruiting: isRecruiting,
       due_date: dueDate,

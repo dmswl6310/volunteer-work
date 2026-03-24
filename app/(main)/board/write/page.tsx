@@ -7,12 +7,16 @@ import { createPost } from '@/actions/create-post';
 import { CATEGORIES } from '@/lib/constants';
 import { useToast } from '@/components/ToastProvider';
 import { ImagePlus, Loader2 } from 'lucide-react';
+import Image from 'next/image';
+
+const VOLUNTEER_HOUR_OPTIONS = Array.from({ length: 100 }, (_, index) => index + 1);
 
 export default function WritePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
   const [userId, setUserId] = useState<string | null>(null);
+  const [minimumDueDate] = useState(() => new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0]);
 
   // Image Upload State
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -34,7 +38,7 @@ export default function WritePage() {
       }
     };
     checkAuth();
-  }, [router]);
+  }, [router, showToast]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -52,6 +56,7 @@ export default function WritePage() {
       setCategoryError('카테고리를 선택해주세요.');
       return;
     }
+
     setCategoryError(null);
     setLoading(true);
 
@@ -73,7 +78,7 @@ export default function WritePage() {
     if (selectedImage) {
       const ext = selectedImage.name.split('.').pop() || 'jpg';
       const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('posts')
         .upload(filename, selectedImage);
 
@@ -98,8 +103,8 @@ export default function WritePage() {
       if (result?.success) {
         router.push('/board');
       }
-    } catch (error: any) {
-      showToast(error.message || '게시글 등록 중 오류가 발생했습니다.', 'error');
+    } catch (error: unknown) {
+      showToast(error instanceof Error ? error.message : '게시글 등록 중 오류가 발생했습니다.', 'error');
       setLoading(false);
     }
   };
@@ -115,7 +120,7 @@ export default function WritePage() {
         <div className="flex flex-col items-center">
           <label htmlFor="image-upload" className="w-full h-64 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-colors overflow-hidden relative">
             {previewUrl ? (
-              <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+              <Image src={previewUrl} alt="Preview" fill unoptimized className="object-cover" sizes="(max-width: 768px) 100vw, 768px" />
             ) : (
               <>
                 <ImagePlus className="w-10 h-10 text-gray-400 mb-2" strokeWidth={1} />
@@ -140,7 +145,7 @@ export default function WritePage() {
               type="date"
               name="dueDate"
               required
-              min={new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0]}
+              min={minimumDueDate}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
             />
           </div>
@@ -189,6 +194,23 @@ export default function WritePage() {
             />
             <span className="text-lg font-bold text-indigo-600 min-w-[3rem]">10명</span>
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">봉사 시간</label>
+          <select
+            name="volunteerHours"
+            defaultValue="1"
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+          >
+            {VOLUNTEER_HOUR_OPTIONS.map((hour) => (
+              <option key={hour} value={hour}>
+                {hour}시간
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-gray-500">1시간 단위로 선택할 수 있습니다.</p>
         </div>
 
         {/* Submit */}

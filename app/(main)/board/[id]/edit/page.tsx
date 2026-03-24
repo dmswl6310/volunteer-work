@@ -7,6 +7,7 @@ import { updatePost } from '@/actions/update-post';
 import { CATEGORIES } from '@/lib/constants';
 import { useToast } from '@/components/ToastProvider';
 import { ChevronLeft, ImagePlus, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 
 export default function EditPage() {
   const router = useRouter();
@@ -16,12 +17,14 @@ export default function EditPage() {
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
   const [initialLoading, setInitialLoading] = useState(true);
+  const [minimumDueDate] = useState(() => new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0]);
 
   const [formData, setFormData] = useState({
     title: '',
     content: '',
     dueDate: '',
     maxParticipants: 10,
+    volunteerHours: 1,
     isUrgent: false,
     isRecruiting: true,
   });
@@ -69,6 +72,7 @@ export default function EditPage() {
         content: post.content,
         dueDate: post.due_date ? post.due_date.split('T')[0] : '',
         maxParticipants: post.max_participants ?? 10,
+        volunteerHours: post.volunteer_hours ?? 1,
         isUrgent: post.is_urgent ?? false,
         isRecruiting: post.is_recruiting ?? true,
       });
@@ -78,7 +82,7 @@ export default function EditPage() {
       setInitialLoading(false);
     };
     load();
-  }, [postId, router]);
+  }, [postId, router, showToast]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -103,6 +107,7 @@ export default function EditPage() {
     data.append('content', formData.content);
     data.append('category', selectedCategory);
     data.append('maxParticipants', String(formData.maxParticipants));
+    data.append('volunteerHours', String(formData.volunteerHours));
     data.append('isUrgent', String(formData.isUrgent));
     data.append('isRecruiting', String(formData.isRecruiting));
     data.append('dueDate', formData.dueDate);
@@ -112,7 +117,7 @@ export default function EditPage() {
     if (selectedImage) {
       const ext = selectedImage.name.split('.').pop() || 'jpg';
       const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { data: storageData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('posts')
         .upload(filename, selectedImage);
 
@@ -136,8 +141,8 @@ export default function EditPage() {
       if (result?.success) {
         router.push(`/board/${postId}`);
       }
-    } catch (error: any) {
-      showToast(error.message || '게시글 수정 중 오류가 발생했습니다.', 'error');
+    } catch (error: unknown) {
+      showToast(error instanceof Error ? error.message : '게시글 수정 중 오류가 발생했습니다.', 'error');
       setLoading(false);
     }
   };
@@ -165,7 +170,7 @@ export default function EditPage() {
         <div className="flex flex-col items-center">
           <label htmlFor="image-upload" className="w-full h-64 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-colors overflow-hidden relative">
             {previewUrl ? (
-              <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+              <Image src={previewUrl} alt="Preview" fill unoptimized className="object-cover" sizes="(max-width: 768px) 100vw, 768px" />
             ) : (
               <>
                 <ImagePlus className="w-10 h-10 text-gray-400 mb-2" strokeWidth={1} />
@@ -197,7 +202,7 @@ export default function EditPage() {
               value={formData.dueDate}
               onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
               required
-              min={new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0]}
+              min={minimumDueDate}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
             />
           </div>
@@ -260,6 +265,21 @@ export default function EditPage() {
             />
             <span className="text-lg font-bold text-indigo-600 min-w-[3rem]">{formData.maxParticipants}명</span>
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">봉사 시간</label>
+          <select
+            value={formData.volunteerHours}
+            onChange={(e) => setFormData({ ...formData, volunteerHours: parseInt(e.target.value) })}
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+          >
+            {Array.from({ length: 100 }, (_, index) => index + 1).map((hour) => (
+              <option key={hour} value={hour}>
+                {hour}시간
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* 모집 상태 */}

@@ -19,6 +19,7 @@ export async function createPost(formData: FormData) {
   const content = formData.get('content') as string;
   const category = formData.get('category') as string;
   const maxParticipants = parseInt(formData.get('maxParticipants') as string);
+  const volunteerHours = parseInt(formData.get('volunteerHours') as string);
   const userId = formData.get('userId') as string;
   const imageUrl = formData.get('imageUrl') as string;
   const isUrgent = formData.get('isUrgent') === 'true';
@@ -47,6 +48,7 @@ export async function createPost(formData: FormData) {
     content,
     category,
     max_participants: maxParticipants,
+    volunteer_hours: Number.isFinite(volunteerHours) ? volunteerHours : 1,
     author_id: userId,
     image_url: imageUrl || null,
     is_recruiting: true,
