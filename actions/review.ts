@@ -3,6 +3,29 @@
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 import { checkProfanity } from '@/lib/profanity';
+import { requireApprovedUser } from '@/lib/server-auth';
+
+type ReviewAuthor = {
+  name: string | null;
+  username?: string | null;
+};
+
+type ReviewLikeAggregate = {
+  count: number | null;
+};
+
+type ReviewRow = {
+  id: string;
+  content: string;
+  post_id: string;
+  created_at: string;
+  author: ReviewAuthor | null;
+  posts?: {
+    id: string;
+    title: string | null;
+  } | null;
+  review_likes?: ReviewLikeAggregate[] | null;
+};
 
 /**
  * 봉사활동 후기를 작성합니다.
@@ -12,23 +35,22 @@ import { checkProfanity } from '@/lib/profanity';
  * - 중복 후기 방지
  *
  * @param postId - 게시글 ID
- * @param userId - 작성자 ID
  * @param content - 후기 내용
  */
-export async function createReview(postId: string, userId: string, content: string) {
+export async function createReview(postId: string, content: string) {
   // 욕설 필터링 (DB 조회 전 사전 차단)
   if (checkProfanity(content)) {
     return { error: '후기 내용에 부적절한 표현이 포함되어 있습니다.' };
   }
 
-  const supabase = await createServerSupabaseClient();
+  const { supabase, user } = await requireApprovedUser();
 
   // 확정된 신청 확인
   const { data: application } = await supabase
     .from('applications')
     .select('*, posts(*)')
     .eq('post_id', postId)
-    .eq('user_id', userId)
+    .eq('user_id', user.id)
     .maybeSingle();
 
   if (!application) {
@@ -48,7 +70,7 @@ export async function createReview(postId: string, userId: string, content: stri
     .from('reviews')
     .select('id')
     .eq('post_id', postId)
-    .eq('author_id', userId)
+    .eq('author_id', user.id)
     .maybeSingle();
 
   if (existingReview) {
@@ -58,7 +80,7 @@ export async function createReview(postId: string, userId: string, content: stri
   const { error } = await supabase.from('reviews').insert({
     id: crypto.randomUUID(),
     post_id: postId,
-    author_id: userId,
+    author_id: user.id,
     content,
   });
 
@@ -74,28 +96,27 @@ export async function createReview(postId: string, userId: string, content: stri
 /**
  * 후기 좋아요를 토글합니다. (좋아요/좋아요 취소)
  * @param reviewId - 후기 ID
- * @param userId - 유저 ID
  */
-export async function toggleReviewLike(reviewId: string, userId: string) {
+export async function toggleReviewLike(reviewId: string) {
   try {
-    const supabase = await createServerSupabaseClient();
+    const { supabase, user } = await requireApprovedUser();
 
     const { data: existing } = await supabase
       .from('review_likes')
       .select('id')
       .eq('review_id', reviewId)
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .maybeSingle();
 
     if (existing) {
       const { error } = await supabase.from('review_likes').delete().eq('id', existing.id);
       if (error) throw error;
     } else {
-      const { error } = await supabase.from('review_likes').insert({
-        id: crypto.randomUUID(),
-        review_id: reviewId,
-        user_id: userId,
-      });
+        const { error } = await supabase.from('review_likes').insert({
+          id: crypto.randomUUID(),
+          review_id: reviewId,
+          user_id: user.id,
+        });
       if (error) throw error;
     }
 
@@ -126,11 +147,11 @@ export async function getReviews(postId: string, userId?: string) {
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase
     .from('reviews')
-    .select('*, author:users(name, email, username), review_likes(count)')
+    .select('*, author:users(name, username), review_likes(count)')
     .eq('post_id', postId)
     .order('created_at', { ascending: false });
 
-  const reviews = data ?? [];
+  const reviews = (data ?? []) as ReviewRow[];
 
   // 현재 유저의 좋아요 여부를 각 후기에 추가
   if (userId && reviews.length > 0) {
@@ -138,17 +159,17 @@ export async function getReviews(postId: string, userId?: string) {
       .from('review_likes')
       .select('review_id')
       .eq('user_id', userId)
-      .in('review_id', reviews.map((r: any) => r.id));
+      .in('review_id', reviews.map((review) => review.id));
 
-    const likedSet = new Set((myLikes ?? []).map((l: any) => l.review_id));
-    return reviews.map((review: any) => ({
+    const likedSet = new Set((myLikes ?? []).map((like) => like.review_id));
+    return reviews.map((review) => ({
       ...review,
       like_count: review.review_likes?.[0]?.count ?? 0,
       is_liked: likedSet.has(review.id),
     }));
   }
 
-  return reviews.map((review: any) => ({
+  return reviews.map((review) => ({
     ...review,
     like_count: review.review_likes?.[0]?.count ?? 0,
     is_liked: false,
@@ -170,24 +191,24 @@ export async function getAllReviews(userId?: string) {
       .limit(20);
 
     if (error) throw error;
-    const reviews = data ?? [];
+    const reviews = (data ?? []) as ReviewRow[];
 
     if (userId && reviews.length > 0) {
       const { data: myLikes } = await supabase
         .from('review_likes')
         .select('review_id')
         .eq('user_id', userId)
-        .in('review_id', reviews.map((r: any) => r.id));
+        .in('review_id', reviews.map((review) => review.id));
 
-      const likedSet = new Set((myLikes ?? []).map((l: any) => l.review_id));
-      return reviews.map((review: any) => ({
+      const likedSet = new Set((myLikes ?? []).map((like) => like.review_id));
+      return reviews.map((review) => ({
         ...review,
         like_count: review.review_likes?.[0]?.count ?? 0,
         is_liked: likedSet.has(review.id),
       }));
     }
 
-    return reviews.map((review: any) => ({
+    return reviews.map((review) => ({
       ...review,
       like_count: review.review_likes?.[0]?.count ?? 0,
       is_liked: false,

@@ -1,9 +1,7 @@
 'use server';
-
-import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 import { validateNoProfanity } from '@/lib/profanity';
-import { ensureUserExists } from '@/lib/auto-heal-user';
+import { requireApprovedUser } from '@/lib/server-auth';
 
 /**
  * 새로운 봉사활동 게시글을 작성합니다.
@@ -15,19 +13,16 @@ import { ensureUserExists } from '@/lib/auto-heal-user';
  * @returns 성공 시 { success: true }, 욕설 감지 시 { error: string }
  */
 export async function createPost(formData: FormData) {
+  const { supabase, user } = await requireApprovedUser();
   const title = formData.get('title') as string;
   const content = formData.get('content') as string;
   const category = formData.get('category') as string;
   const maxParticipants = parseInt(formData.get('maxParticipants') as string);
   const volunteerHours = parseInt(formData.get('volunteerHours') as string);
-  const userId = formData.get('userId') as string;
   const imageUrl = formData.get('imageUrl') as string;
   const isUrgent = formData.get('isUrgent') === 'true';
   const dueDateStr = formData.get('dueDate') as string;
-  const email = formData.get('email') as string;
-  const name = formData.get('name') as string;
 
-  if (!userId) throw new Error('Unauthorized');
   if (!title || !content || !category) throw new Error('필수 항목을 입력해주세요.');
 
   // 욕설 필터링
@@ -38,10 +33,6 @@ export async function createPost(formData: FormData) {
   if (profanityError) return { error: profanityError };
 
   const dueDate = dueDateStr ? `${dueDateStr}T23:59:59.999+09:00` : null;
-  const supabase = await createServerSupabaseClient();
-
-  // 유저 존재 확인 (없으면 자동 생성)
-  await ensureUserExists(supabase, userId, email, name);
 
   const { error } = await supabase.from('posts').insert({
     title,
@@ -49,7 +40,7 @@ export async function createPost(formData: FormData) {
     category,
     max_participants: maxParticipants,
     volunteer_hours: Number.isFinite(volunteerHours) ? volunteerHours : 1,
-    author_id: userId,
+    author_id: user.id,
     image_url: imageUrl || null,
     is_recruiting: true,
     is_urgent: isUrgent,

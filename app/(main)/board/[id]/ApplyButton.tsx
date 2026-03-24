@@ -95,15 +95,16 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplic
         return;
       }
 
-      await applyForPost(postId, user.id, user.email || undefined);
+      await applyForPost(postId);
       setApplicationStatus('pending'); // 성공 시 상태를 대기중으로 변경
       showToast('봉사활동 참여 신청이 완료되었습니다.\n관리자 승인 후 최종 확정됩니다.', 'success');
-    } catch (error: any) {
-      if (error.message?.includes('이미 신청')) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : '신청 중 오류가 발생했습니다.';
+      if (message.includes('이미 신청')) {
         showToast('이미 참여 신청한 봉사활동입니다.', 'warning');
         setApplicationStatus('pending'); // 중복 신청이면 버튼도 막기
       } else {
-        showToast(error.message || '신청 중 오류가 발생했습니다.', 'error');
+        showToast(message, 'error');
       }
     } finally {
       setLoading(false);

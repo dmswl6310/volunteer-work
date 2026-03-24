@@ -1,116 +1,95 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
-import { approveUser, getAdminDashboardData } from '@/actions/admin';
 import Link from 'next/link';
-import { useToast } from '@/components/ToastProvider';
+import { redirect } from 'next/navigation';
+import { approveUser, getAdminDashboardData } from '@/actions/admin';
+import IncomingRequestItem from '@/components/IncomingRequestItem';
+import { requireAdminUser } from '@/lib/server-auth';
 
-interface User {
-  id: string;
-  email: string;
-  username?: string;
-  name: string | null;
-  contact: string | null;
-  address?: string | null;
-  job?: string | null;
-  createdAt: Date;
-}
-
-export default function AdminPage() {
-  const router = useRouter();
-  const { showToast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [pendingUsers, setPendingUsers] = useState<User[]>([]);
-
-  useEffect(() => {
-    async function init() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.replace('/auth/login');
-        return;
-      }
-
-      try {
-        const data = await getAdminDashboardData();
-        setPendingUsers(data as User[]);
-        setIsAdmin(true);
-      } catch (e) {
-        console.error(e);
-        showToast('접근 권한이 없거나 오류가 발생했습니다.', 'error');
-        router.replace('/');
-      } finally {
-        setLoading(false);
-      }
-    }
-    init();
-  }, [router]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-      </div>
-    );
+export default async function AdminPage() {
+  try {
+    await requireAdminUser();
+  } catch {
+    redirect('/mypage');
   }
 
-  if (!isAdmin) return null;
+  const { pendingUsers, pendingApplications } = await getAdminDashboardData();
 
   return (
     <div className="container mx-auto px-4 py-8 pb-20">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">관리자 대시보드</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">관리자 대시보드</h1>
+          <p className="mt-1 text-sm text-gray-500">회원 승인과 봉사 신청 현황을 한 곳에서 관리합니다.</p>
+        </div>
         <Link href="/mypage" className="text-sm text-gray-500 hover:underline">
           &larr; 내 정보로 돌아가기
         </Link>
       </div>
 
-      {/* User Approval Section */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">가입 승인 대기 회원 ({pendingUsers.length})</h2>
-        {pendingUsers.length === 0 ? (
-          <div className="bg-white rounded-lg p-8 text-center text-gray-500 shadow-sm border border-gray-100">
-            대기 중인 회원이 없습니다.
+      <div className="space-y-8">
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">가입 승인 대기 회원</h2>
+            <span className="rounded-full bg-indigo-50 px-3 py-1 text-sm font-semibold text-indigo-600">
+              {pendingUsers.length}명
+            </span>
           </div>
-        ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <ul className="divide-y divide-gray-200">
-              {pendingUsers.map((u) => (
-                <li key={u.id} className="p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-lg">{u.name || '이름 없음'}</span>
-                      <span className="text-gray-500 text-sm">({u.username || 'ID 없음'})</span>
+
+          {pendingUsers.length === 0 ? (
+            <div className="bg-white rounded-lg p-8 text-center text-gray-500 shadow-sm border border-gray-100">
+              대기 중인 회원이 없습니다.
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-100">
+              <ul className="divide-y divide-gray-200">
+                {pendingUsers.map((user) => (
+                  <li key={user.id} className="p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-lg text-gray-900">{user.name || '이름 없음'}</span>
+                        <span className="text-gray-500 text-sm">({user.username || 'ID 없음'})</span>
+                      </div>
+                      <div className="text-sm text-gray-600 mt-1 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1">
+                        <p>이메일: {user.email}</p>
+                        <p>연락처: {user.contact || '-'}</p>
+                        <p>주소: {user.address || '-'}</p>
+                        <p>직업/소속기관: {user.job || '-'}</p>
+                        <p>가입신청: {new Date(user.created_at).toLocaleDateString()}</p>
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-600 mt-1 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1">
-                      <p>이메일: {u.email}</p>
-                      <p>연락처: {u.contact}</p>
-                      <p>주소: {u.address}</p>
-                      <p>직업/소속기관: {u.job}</p>
-                      <p>가입신청: {new Date(u.createdAt).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                  <form action={async () => {
-                    if (confirm(`${u.name}님의 가입을 승인하시겠습니까?`)) {
-                      await approveUser(u.id);
-                      showToast('승인되었습니다.', 'success');
-                      // Reload
-                      const newData = await getAdminDashboardData();
-                      setPendingUsers(newData as User[]);
-                    }
-                  }}>
-                    <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-bold shadow-sm transition-colors whitespace-nowrap">
-                      가입 승인
-                    </button>
-                  </form>
-                </li>
+
+                    <form action={approveUser.bind(null, user.id)}>
+                      <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-bold shadow-sm transition-colors whitespace-nowrap">
+                        가입 승인
+                      </button>
+                    </form>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
+
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">봉사 신청 승인 대기</h2>
+            <span className="rounded-full bg-red-50 px-3 py-1 text-sm font-semibold text-red-500">
+              {pendingApplications.length}건
+            </span>
+          </div>
+
+          {pendingApplications.length === 0 ? (
+            <div className="bg-white rounded-lg p-8 text-center text-gray-500 shadow-sm border border-gray-100">
+              대기 중인 봉사 신청이 없습니다.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {pendingApplications.map((application) => (
+                <IncomingRequestItem key={application.id} application={{ ...application, post: application.post ?? { title: '알 수 없는 게시글' } }} />
               ))}
-            </ul>
-          </div>
-        )}
-      </section>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

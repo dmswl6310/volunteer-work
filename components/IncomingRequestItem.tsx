@@ -4,8 +4,28 @@ import { updateApplicationStatus } from '@/actions/apply';
 import { useState } from 'react';
 import { useToast } from './ToastProvider';
 
+type RequestUser = {
+  name: string | null;
+  username: string | null;
+  contact: string | null;
+  email: string | null;
+  job: string | null;
+  address: string | null;
+};
+
+type RequestPost = {
+  title: string;
+};
+
+export type IncomingRequestApplication = {
+  id: string;
+  created_at: string;
+  users: RequestUser | null;
+  post: RequestPost;
+};
+
 /** 들어오는 신청 항목 컴포넌트 (승인/거절 버튼 포함) */
-export default function IncomingRequestItem({ application }: { application: any }) {
+export default function IncomingRequestItem({ application }: { application: IncomingRequestApplication }) {
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
 
@@ -16,8 +36,8 @@ export default function IncomingRequestItem({ application }: { application: any 
       await updateApplicationStatus(application.id, status);
       showToast(`${status === 'approved' ? '승인' : '거절'}되었습니다.`, 'success');
       window.location.reload();
-    } catch (error: any) {
-      showToast(error.message, 'error');
+    } catch (error: unknown) {
+      showToast(error instanceof Error ? error.message : '상태 변경 중 오류가 발생했습니다.', 'error');
       setLoading(false);
     }
   };

@@ -62,15 +62,6 @@ export default function WritePage() {
 
     const form = e.currentTarget;
     const formData = new FormData(form);
-    formData.append('userId', userId);
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user?.email) {
-      formData.append('email', user.email);
-    }
-    if (user?.user_metadata?.name) {
-      formData.append('name', user.user_metadata.name);
-    }
 
     // Upload Image to Supabase Storage if selected
     // Note: User needs to create a 'posts' bucket in Supabase Storage with public access policy

@@ -1,23 +1,21 @@
 'use server';
 
-import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
+import { requireApprovedUser } from '@/lib/server-auth';
 
 /**
  * 유저 프로필 정보를 수정합니다.
  *
- * @param userId - 수정할 유저 ID
  * @param data - 수정할 데이터 (이름, 연락처, 주소, 직업)
  */
-export async function updateUserProfile(userId: string, data: {
+export async function updateUserProfile(data: {
     name: string;
     contact: string;
     address: string;
     job: string;
 }) {
     try {
-        if (!userId) throw new Error('User ID is required');
-        const supabase = await createServerSupabaseClient();
+        const { supabase, user } = await requireApprovedUser();
 
         const { error } = await supabase
             .from('users')
@@ -27,7 +25,7 @@ export async function updateUserProfile(userId: string, data: {
                 address: data.address,
                 job: data.job,
             })
-            .eq('id', userId);
+            .eq('id', user.id);
 
         if (error) throw error;
 

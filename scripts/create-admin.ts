@@ -1,19 +1,32 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+function requireEnv(name: string, value: string | undefined) {
+    if (!value) {
+        throw new Error(`Missing required admin bootstrap env: ${name}`);
+    }
+
+    return value;
+}
 
 const ADMIN_CREDENTIALS = {
-    email: 'admin@volunteer.com',
-    password: 'admin-password-1234!',
-    username: 'admin_official',
-    name: '총관리자',
-    contact: '010-1234-5678',
-    address: '서울특별시 강남구',
-    job: '시스템 관리'
+    email: requireEnv('ADMIN_EMAIL', process.env.ADMIN_EMAIL),
+    password: requireEnv('ADMIN_PASSWORD', process.env.ADMIN_PASSWORD),
+    username: requireEnv('ADMIN_USERNAME', process.env.ADMIN_USERNAME),
+    name: requireEnv('ADMIN_NAME', process.env.ADMIN_NAME),
+    contact: requireEnv('ADMIN_CONTACT', process.env.ADMIN_CONTACT),
+    address: requireEnv('ADMIN_ADDRESS', process.env.ADMIN_ADDRESS),
+    job: requireEnv('ADMIN_JOB', process.env.ADMIN_JOB),
 };
+
+if (!supabaseUrl || !supabaseKey) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function main() {
     console.log('Creating Admin Account...');
@@ -67,10 +80,7 @@ async function main() {
     }
 
     console.log('Admin user configured in Database:', user);
-    console.log('==========================================');
-    console.log('ID:', ADMIN_CREDENTIALS.email);
-    console.log('PW:', ADMIN_CREDENTIALS.password);
-    console.log('==========================================');
+    console.log('Admin bootstrap completed using environment variables.');
 }
 
 main().catch(console.error);

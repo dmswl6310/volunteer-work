@@ -1,32 +1,22 @@
 'use server';
 
 import { createServerSupabaseClient } from '@/lib/supabase';
-import { ensureUserExists } from '@/lib/auto-heal-user';
+import { requireApprovedUser } from '@/lib/server-auth';
 
 /**
  * 마이페이지에 필요한 유저 데이터를 조회합니다.
  * - 프로필 정보
  * - 신청 내역, 스크랩, 작성 게시글, 작성 후기
- * - 유저가 DB에 없으면 자동 생성 (auto-heal)
- *
- * @param userId - 조회할 유저 ID
- * @param email - 유저 이메일 (auto-heal 시 필요)
- * @param name - 유저 이름 (auto-heal 시 사용)
  */
-export async function getMyPageData(userId: string, email?: string, name?: string) {
+export async function getMyPageData() {
     try {
-        const supabase = await createServerSupabaseClient();
+        const { supabase, user: authUser } = await requireApprovedUser();
 
         const { data: user } = await supabase
             .from('users')
             .select('*')
-            .eq('id', userId)
+            .eq('id', authUser.id)
             .maybeSingle();
-
-        // 유저가 없으면 자동 생성
-        if (!user && email) {
-            await ensureUserExists(supabase, userId, email, name);
-        }
 
         if (!user) return null;
 
@@ -35,22 +25,22 @@ export async function getMyPageData(userId: string, email?: string, name?: strin
             supabase
                 .from('applications')
                 .select('*, posts(*)')
-                .eq('user_id', userId)
+                .eq('user_id', authUser.id)
                 .order('created_at', { ascending: false }),
             supabase
                 .from('post_scraps')
                 .select('*, posts(*)')
-                .eq('user_id', userId)
+                .eq('user_id', authUser.id)
                 .order('created_at', { ascending: false }),
             supabase
                 .from('posts')
                 .select('*, applications(*, users(*))')
-                .eq('author_id', userId)
+                .eq('author_id', authUser.id)
                 .order('created_at', { ascending: false }),
             supabase
                 .from('reviews')
                 .select('*, posts(*)')
-                .eq('author_id', userId)
+                .eq('author_id', authUser.id)
                 .order('created_at', { ascending: false }),
         ]);
 

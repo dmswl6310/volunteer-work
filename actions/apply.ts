@@ -1,8 +1,7 @@
 'use server';
 
-import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
-import { ensureUserExists } from '@/lib/auto-heal-user';
+import { requireApprovedUser } from '@/lib/server-auth';
 
 /**
  * 봉사활동 게시글에 참여 신청을 합니다.
@@ -11,14 +10,9 @@ import { ensureUserExists } from '@/lib/auto-heal-user';
  * - 중복 신청 방지
  *
  * @param postId - 신청할 게시글 ID
- * @param userId - 신청하는 유저 ID
- * @param email - 유저 이메일 (auto-heal 시 필요)
  */
-export async function applyForPost(postId: string, userId: string, email?: string) {
-  const supabase = await createServerSupabaseClient();
-
-  // 유저 존재 확인 (없으면 자동 생성)
-  await ensureUserExists(supabase, userId, email);
+export async function applyForPost(postId: string) {
+  const { supabase, user } = await requireApprovedUser();
 
   // 1. 게시글 조회
   const { data: post } = await supabase
@@ -50,7 +44,7 @@ export async function applyForPost(postId: string, userId: string, email?: strin
     .from('applications')
     .select('id')
     .eq('post_id', postId)
-    .eq('user_id', userId)
+    .eq('user_id', user.id)
     .maybeSingle();
 
   if (existingApp) {
@@ -61,7 +55,7 @@ export async function applyForPost(postId: string, userId: string, email?: strin
   const { error } = await supabase.from('applications').insert({
     id: crypto.randomUUID(),
     post_id: postId,
-    user_id: userId,
+    user_id: user.id,
     status: 'pending',
   });
 
@@ -81,25 +75,35 @@ export async function applyForPost(postId: string, userId: string, email?: strin
  * @param newStatus - 변경할 상태 ('approved' | 'rejected')
  */
 export async function updateApplicationStatus(applicationId: string, newStatus: 'approved' | 'rejected') {
-  const supabase = await createServerSupabaseClient();
+  const { supabase, user, profile } = await requireApprovedUser();
 
   const { data: app } = await supabase
     .from('applications')
-    .select('*, posts(*)')
+    .select('id, status, post_id, user_id, posts(author_id, current_participants, max_participants)')
     .eq('id', applicationId)
     .single();
 
   if (!app) throw new Error('신청 내역을 찾을 수 없습니다.');
+  const post = Array.isArray(app.posts) ? app.posts[0] : app.posts;
+  if (!post) throw new Error('게시글 정보를 찾을 수 없습니다.');
+  if (profile.role !== 'admin' && post.author_id !== user.id) {
+    throw new Error('상태를 변경할 권한이 없습니다.');
+  }
   if (app.status === newStatus) return;
 
-  if (newStatus === 'approved' && app.status !== 'approved') {
-    const post = app.posts;
+  if (newStatus === 'approved') {
     if (post.current_participants >= post.max_participants) {
       throw new Error('모집 인원이 초과되어 승인할 수 없습니다.');
     }
     const { error: postError } = await supabase
       .from('posts')
       .update({ current_participants: post.current_participants + 1 })
+      .eq('id', app.post_id);
+    if (postError) throw new Error(postError.message);
+  } else if (app.status === 'approved') {
+    const { error: postError } = await supabase
+      .from('posts')
+      .update({ current_participants: Math.max(0, post.current_participants - 1) })
       .eq('id', app.post_id);
     if (postError) throw new Error(postError.message);
   }
@@ -121,22 +125,22 @@ export async function updateApplicationStatus(applicationId: string, newStatus: 
  * @param applicationId - 취소할 신청 ID
  */
 export async function cancelApplication(applicationId: string) {
-  const supabase = await createServerSupabaseClient();
+  const { supabase, user } = await requireApprovedUser();
 
   const { data: app } = await supabase
     .from('applications')
-    .select('*, posts(*)')
+    .select('id, status, post_id, user_id')
     .eq('id', applicationId)
     .single();
 
   if (!app) throw new Error('신청 내역을 찾을 수 없습니다.');
 
-  if (app.status === 'approved' || app.status === 'confirmed') {
-    const post = app.posts;
-    await supabase
-      .from('posts')
-      .update({ current_participants: Math.max(0, post.current_participants - 1) })
-      .eq('id', app.post_id);
+  if (app.user_id !== user.id) {
+    throw new Error('본인 신청만 취소할 수 있습니다.');
+  }
+
+  if (app.status !== 'pending') {
+    throw new Error('승인 대기 상태의 신청만 취소할 수 있습니다.');
   }
 
   const { error } = await supabase

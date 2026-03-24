@@ -1,7 +1,36 @@
 'use server';
 
-import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
+import { requireAdminUser } from '@/lib/server-auth';
+
+export type PendingAdminUser = {
+  id: string;
+  email: string;
+  username: string | null;
+  name: string | null;
+  contact: string | null;
+  address: string | null;
+  job: string | null;
+  created_at: string;
+};
+
+export type PendingAdminApplication = {
+  id: string;
+  created_at: string;
+  status: string;
+  users: {
+    name: string | null;
+    username: string | null;
+    contact: string | null;
+    email: string | null;
+    job: string | null;
+    address: string | null;
+  } | null;
+  post: {
+    id: string;
+    title: string;
+  } | null;
+};
 
 /**
  * 신규 가입 유저를 승인합니다.
@@ -9,7 +38,7 @@ import { revalidatePath } from 'next/cache';
  */
 export async function approveUser(userId: string) {
   try {
-    const supabase = await createServerSupabaseClient();
+    const { supabase } = await requireAdminUser();
     const { error } = await supabase
       .from('users')
       .update({ is_approved: true })
@@ -30,7 +59,7 @@ export async function approveUser(userId: string) {
  */
 export async function approveApplication(applicationId: string) {
   try {
-    const supabase = await createServerSupabaseClient();
+    const { supabase } = await requireAdminUser();
 
     // 신청 정보 조회
     const { data: app, error: fetchError } = await supabase
@@ -61,9 +90,9 @@ export async function approveApplication(applicationId: string) {
     if (postError) throw postError;
 
     revalidatePath('/admin');
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error approving application:', error);
-    throw new Error(error.message || '신청 승인 중 오류가 발생했습니다.');
+    throw new Error(error instanceof Error ? error.message : '신청 승인 중 오류가 발생했습니다.');
   }
 }
 
@@ -73,7 +102,7 @@ export async function approveApplication(applicationId: string) {
  */
 export async function rejectApplication(applicationId: string) {
   try {
-    const supabase = await createServerSupabaseClient();
+    const { supabase } = await requireAdminUser();
     const { error } = await supabase
       .from('applications')
       .update({ status: 'rejected' })
@@ -93,17 +122,35 @@ export async function rejectApplication(applicationId: string) {
  */
 export async function getAdminDashboardData() {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('is_approved', false)
-      .order('created_at', { ascending: false });
+    const { supabase } = await requireAdminUser();
+    const [pendingUsersRes, pendingApplicationsRes] = await Promise.all([
+      supabase
+        .from('users')
+        .select('id, email, username, name, contact, address, job, created_at')
+        .eq('is_approved', false)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('applications')
+        .select('id, created_at, status, users(name, username, contact, email, job, address), post:posts(id, title)')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false }),
+    ]);
 
-    if (error) throw error;
-    return data ?? [];
+    if (pendingUsersRes.error) throw pendingUsersRes.error;
+    if (pendingApplicationsRes.error) throw pendingApplicationsRes.error;
+
+    return {
+      pendingUsers: (pendingUsersRes.data ?? []) as PendingAdminUser[],
+      pendingApplications: (pendingApplicationsRes.data ?? []).map((application) => ({
+        id: application.id,
+        created_at: application.created_at,
+        status: application.status,
+        users: Array.isArray(application.users) ? (application.users[0] ?? null) : application.users,
+        post: Array.isArray(application.post) ? (application.post[0] ?? null) : application.post,
+      })) as PendingAdminApplication[],
+    };
   } catch (error) {
     console.error('Error fetching admin data:', error);
-    return [];
+    return { pendingUsers: [], pendingApplications: [] };
   }
 }

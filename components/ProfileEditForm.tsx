@@ -47,11 +47,11 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
               ? `${editForm.address} ${editForm.detailAddress}`.trim() 
               : editForm.address;
               
-            await updateUserProfile(user.id, { ...editForm, address: finalAddress });
+            await updateUserProfile({ ...editForm, address: finalAddress });
             showToast('프로필 정보가 성공적으로 수정되었습니다.', 'success');
             setIsEditing(false);
-        } catch (error: any) {
-            showToast(error.message, 'error');
+        } catch (error: unknown) {
+            showToast(error instanceof Error ? error.message : '프로필 수정 중 오류가 발생했습니다.', 'error');
         } finally {
             setLoading(false);
         }

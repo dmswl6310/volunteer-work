@@ -28,7 +28,7 @@ export default function WriteReviewPage() {
         return;
       }
 
-      const result = await createReview(postId, user.id, content);
+      const result = await createReview(postId, content);
 
       if (result?.error) {
         showToast(result.error, 'warning');
@@ -37,8 +37,8 @@ export default function WriteReviewPage() {
 
       showToast('소중한 활동 후기가 성공적으로 등록되었습니다.', 'success');
       router.push(`/board/${postId}`);
-    } catch (error: any) {
-      showToast(error.message || '후기 등록 중 오류가 발생했습니다.', 'error');
+    } catch (error: unknown) {
+      showToast(error instanceof Error ? error.message : '후기 등록 중 오류가 발생했습니다.', 'error');
     } finally {
       setIsSubmitting(false);
     }

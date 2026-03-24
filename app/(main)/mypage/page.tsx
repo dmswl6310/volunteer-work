@@ -4,6 +4,30 @@ import Link from 'next/link';
 import { getMyPageData } from '@/actions/user';
 import MyPageTabs from '@/components/MyPageTabs';
 
+type IncomingRequest = {
+  id: string;
+  status: string;
+  created_at: string;
+  users?: {
+    name?: string | null;
+    username?: string | null;
+    contact?: string | null;
+    email?: string | null;
+    job?: string | null;
+    address?: string | null;
+  } | null;
+  post: {
+    id: string;
+    title: string;
+  };
+};
+
+type UserPost = {
+  id: string;
+  title: string;
+  applications: Array<IncomingRequest>;
+};
+
 export default async function MyPage() {
   const supabase = await createServerSupabaseClient();
   const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -14,11 +38,7 @@ export default async function MyPage() {
 
   let user;
   try {
-    user = await getMyPageData(
-      authUser.id,
-      authUser.email,
-      authUser.user_metadata?.name
-    );
+    user = await getMyPageData();
   } catch (error) {
     console.error('Failed to load user data:', error);
     return (
@@ -32,10 +52,23 @@ export default async function MyPage() {
   if (!user) return null;
 
   // 들어온 신청 목록 (대기 중인 것만 표시)
-  const incomingRequests = user.posts.flatMap((p: any) =>
+  const incomingRequests = ((user.posts ?? []) as UserPost[]).flatMap((p) =>
     p.applications
-      .filter((app: any) => app.status === 'pending')
-      .map((app: any) => ({ ...app, post: p }))
+      .filter((app) => app.status === 'pending')
+      .map((app) => ({
+        ...app,
+        users: app.users
+          ? {
+              name: app.users.name ?? null,
+              username: app.users.username ?? null,
+              contact: app.users.contact ?? null,
+              email: app.users.email ?? null,
+              job: app.users.job ?? null,
+              address: app.users.address ?? null,
+            }
+          : null,
+        post: { id: p.id, title: p.title },
+      }))
   );
 
   return (

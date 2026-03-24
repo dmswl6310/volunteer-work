@@ -43,7 +43,7 @@ export default function ReviewLikeButton({ reviewId, initialIsLiked, initialLike
         return;
       }
 
-      await toggleReviewLike(reviewId, user.id);
+      await toggleReviewLike(reviewId);
       router.refresh();
     } catch (error) {
       console.error('Failed to toggle review like', error);

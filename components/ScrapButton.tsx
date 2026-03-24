@@ -41,7 +41,7 @@ export default function ScrapButton({ postId, initialIsScraped, initialScrapCoun
         return;
       }
 
-      await toggleScrap(postId, user.id);
+      await toggleScrap(postId);
     } catch (error) {
       console.error('Failed to toggle scrap', error);
       // 에러 시 원래 상태로 복구
