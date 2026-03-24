@@ -9,6 +9,7 @@ export type PostWithAuthor = {
   image_url: string | null;
   category: string | null;
   max_participants: number;
+  volunteer_hours: number | null;
   current_participants: number;
   is_urgent: boolean;
   is_recruiting: boolean;
@@ -19,7 +20,6 @@ export type PostWithAuthor = {
   author_id: string;
   author: {
     name: string;
-    email: string;
     username: string;
   } | null;
 };
@@ -59,7 +59,7 @@ export async function getPosts({
     const supabase = await createServerSupabaseClient();
     let query = supabase
       .from('posts')
-      .select('*, author:users(name, email, username)')
+      .select('*, author:users(name, username)')
       .range(from, to);
 
     if (category) {

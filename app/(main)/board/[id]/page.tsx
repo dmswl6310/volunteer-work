@@ -7,7 +7,7 @@ import ApplyButton from './ApplyButton';
 import ReviewList from '@/components/ReviewList';
 import ScrapButton from '@/components/ScrapButton';
 import { createServerSupabaseClient } from '@/lib/supabase';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Clock3 } from 'lucide-react';
 
 export default async function PostDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -22,15 +22,16 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
   // 승인된 참여자 목록 조회
   const { data: approvedApps } = await supabase
     .from('applications')
-    .select('*, users(id, name, username)')
+    .select('id')
     .eq('post_id', post.id)
     .eq('status', 'approved');
+  const approvedCount = approvedApps?.length ?? 0;
 
   // 현재 유저의 스크랩 여부 확인
   const { data: { user } } = await supabase.auth.getUser();
   let isScraped = false;
   let userApplicationStatus: string | null = null;
-  const isAuthor = !!user && user.id === (post as any).author_id;
+  const isAuthor = !!user && user.id === post.author_id;
 
   if (user) {
     const [scrapRes, applyRes] = await Promise.all([
@@ -130,11 +131,18 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
         </div>
 
         {/* 정보 그리드 */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-3">
           <div className="bg-gray-50 p-4 rounded-xl text-center">
             <p className="text-xs text-gray-500 mb-1">참여 인원</p>
             <p className="text-lg font-bold text-indigo-600">
               {post.current_participants} / {post.max_participants}명
+            </p>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-xl text-center">
+            <p className="text-xs text-gray-500 mb-1">봉사 시간</p>
+            <p className="inline-flex items-center gap-1 text-lg font-bold text-indigo-600">
+              <Clock3 className="h-4 w-4" />
+              <span>{post.volunteer_hours ?? 1}시간</span>
             </p>
           </div>
           <div className="bg-gray-50 p-4 rounded-xl text-center">
@@ -147,23 +155,15 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
 
         {/* 참여 확정 명단 */}
         <div className="mb-10">
-          <h3 className="font-bold text-gray-900 mb-3">참여 확정 명단 ({approvedApps?.length ?? 0}명)</h3>
-          {!approvedApps || approvedApps.length === 0 ? (
+          <h3 className="font-bold text-gray-900 mb-3">참여 확정 현황</h3>
+          {approvedCount === 0 ? (
             <div className="p-4 bg-gray-50 rounded-xl text-sm text-gray-500 text-center">
               아직 승인된 참여자가 없습니다.
             </div>
           ) : (
-            <div className="grid grid-cols-4 gap-3">
-              {approvedApps.map((app: any) => (
-                <div key={app.id} className="flex flex-col items-center">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold text-xs mb-1">
-                    {app.users?.name?.[0] || 'U'}
-                  </div>
-                  <span className="text-xs text-gray-700 truncate w-full text-center">
-                    {app.users?.name && app.users.name !== 'User' ? app.users.name : app.users?.username}
-                  </span>
-                </div>
-              ))}
+            <div className="p-4 bg-green-50 rounded-xl text-center">
+              <p className="text-sm text-green-700">현재 승인된 참여자</p>
+              <p className="mt-1 text-2xl font-bold text-green-600">{approvedCount}명</p>
             </div>
           )}
         </div>
