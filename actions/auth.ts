@@ -71,7 +71,7 @@ export async function createUserRecord(data: CreateUserParams) {
     if (error) throw error;
 
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating user record:', error);
     return { success: false, error: '계정 정보 저장 중 오류가 발생했습니다.' };
   }

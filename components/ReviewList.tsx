@@ -1,19 +1,6 @@
 import { getReviews } from '@/actions/review';
 import ReviewLikeButton from './ReviewLikeButton';
 
-interface ReviewWithAuthor {
-  id: string;
-  content: string;
-  created_at: string;
-  like_count: number;
-  is_liked: boolean;
-  author: {
-    name: string | null;
-    email: string;
-    username: string;
-  };
-}
-
 /** 게시글 후기 목록 컴포넌트 (서버 컴포넌트) */
 export default async function ReviewList({ postId, userId }: { postId: string; userId?: string }) {
   const reviews = await getReviews(postId, userId);
@@ -31,11 +18,11 @@ export default async function ReviewList({ postId, userId }: { postId: string; u
     <div className="space-y-4">
       <h3 className="font-bold text-lg text-gray-900">활동 후기 ({reviews.length})</h3>
       <ul className="space-y-4">
-        {reviews.map((review: ReviewWithAuthor) => (
+        {reviews.map((review) => (
           <li key={review.id} className="bg-gray-50 p-4 rounded-xl">
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium text-gray-900">
-                {review.author.name && review.author.name !== 'User' ? review.author.name : review.author.username}
+                {review.author?.name && review.author.name !== 'User' ? review.author.name : review.author?.username || '익명'}
               </span>
               <span className="text-xs text-gray-400">
                 {new Date(review.created_at).toLocaleDateString()}

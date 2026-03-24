@@ -9,7 +9,7 @@ export default function SortFilter() {
   const currentSort = searchParams.get('sort') || 'latest';
   
   const [activeSort, setActiveSort] = useState(currentSort);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   useEffect(() => {
     setActiveSort(currentSort);

@@ -47,6 +47,7 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
         <UrgentSection status={status} />
 
         <InfiniteScrollBoard
+          key={`${sort}-${category ?? 'all'}-${status}-${q ?? ''}`}
           initialPosts={initialData.posts}
           initialNextId={initialData.nextId}
           sort={sort}

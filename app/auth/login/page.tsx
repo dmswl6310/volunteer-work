@@ -53,7 +53,7 @@ export default function LoginPage() {
         // Success
         router.push('/board');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setError('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     } finally {

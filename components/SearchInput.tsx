@@ -93,7 +93,6 @@ export default function SearchInput() {
                             <ArrowLeft className="h-5 w-5" />
                         </button>
                         <input
-                            // eslint-disable-next-line jsx-a11y/no-autofocus
                             autoFocus
                             type="text"
                             className="flex-1 bg-gray-100 border-none rounded-lg py-2 pl-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"

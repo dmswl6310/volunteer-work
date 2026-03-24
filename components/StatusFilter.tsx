@@ -11,7 +11,7 @@ export default function StatusFilter() {
   const currentStatus = searchParams.get('status') || 'recruiting';
 
   const [activeStatus, setActiveStatus] = useState(currentStatus);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   useEffect(() => {
     setActiveStatus(currentStatus);

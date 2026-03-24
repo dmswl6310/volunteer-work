@@ -23,7 +23,7 @@ export default async function ReviewPage() {
                         등록된 후기가 없습니다.
                     </div>
                 ) : (
-                    reviews.map((review: any) => (
+                    reviews.map((review) => (
                         <div key={review.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                             <Link href={`/board/${review.post_id}`} className="block mb-3">
                                 <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded mb-2 inline-block">

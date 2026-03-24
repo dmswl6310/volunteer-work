@@ -20,7 +20,7 @@ export default function CategoryFilter() {
   
   // 사용자가 클릭한 상태를 즉각 반영하기 위한 로컬 상태
   const [activeId, setActiveId] = useState(currentCategory);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   // URL이 외부에서 변경된 경우 (예: 뒤로가기) 동기화
   useEffect(() => {

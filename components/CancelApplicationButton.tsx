@@ -15,8 +15,8 @@ export default function CancelApplicationButton({ applicationId }: { application
     try {
       await cancelApplication(applicationId);
       showToast('취소되었습니다.', 'success');
-    } catch (error: any) {
-      showToast(error.message, 'error');
+    } catch (error: unknown) {
+      showToast(error instanceof Error ? error.message : '취소 처리 중 오류가 발생했습니다.', 'error');
     } finally {
       setLoading(false);
     }

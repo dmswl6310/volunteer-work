@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ClipboardList, PenLine, Settings, Bell, ClipboardCheck, CheckCircle2 } from 'lucide-react';
 import IncomingRequestItem from '@/components/IncomingRequestItem';
+import type { IncomingRequestApplication } from '@/components/IncomingRequestItem';
 import CancelApplicationButton from '@/components/CancelApplicationButton';
 import ProfileEditForm from '@/components/ProfileEditForm';
 import LogoutButton from '@/components/LogoutButton';
@@ -30,8 +31,70 @@ const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
 ];
 
 interface MyPageTabsProps {
-  user: any;
-  incomingRequests: any[];
+  user: MyPageUser;
+  incomingRequests: IncomingRequestApplication[];
+}
+
+type ApplicationPost = {
+  id?: string;
+  title?: string | null;
+  due_date?: string | null;
+};
+
+type UserApplication = {
+  id: string;
+  status: string;
+  post_id?: string;
+  postId?: string;
+  created_at?: string;
+  createdAt?: string;
+  posts?: ApplicationPost | null;
+};
+
+type UserPostCard = {
+  id: string;
+  title: string;
+  current_participants: number;
+  max_participants: number;
+  is_recruiting: boolean;
+};
+
+type UserScrap = {
+  id: string;
+  post_id?: string;
+  created_at?: string;
+  createdAt?: string;
+  posts?: {
+    id?: string;
+    title?: string | null;
+  } | null;
+};
+
+type UserReview = {
+  id: string;
+  content: string;
+  created_at?: string;
+  createdAt?: string;
+  posts?: {
+    title?: string | null;
+  } | null;
+};
+
+type MyPageUser = {
+  id: string;
+  name: string | null;
+  username: string;
+  applications: UserApplication[];
+  posts: UserPostCard[];
+  postScraps: UserScrap[];
+  reviews: UserReview[];
+  contact: string | null;
+  address: string | null;
+  job: string | null;
+};
+
+function formatDate(dateValue?: string | null) {
+  return dateValue ? new Date(dateValue).toLocaleDateString() : '-';
 }
 
 export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) {
@@ -41,7 +104,7 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
   today.setHours(0, 0, 0, 0);
 
   // 완료된 활동: 승인됨 + 마감일 지남
-  const completedActivities = user.applications.filter((app: any) => {
+  const completedActivities = user.applications.filter((app) => {
     if (app.status !== 'approved') return false;
     const dueDate = app.posts?.due_date ? new Date(app.posts.due_date) : null;
     if (!dueDate) return false;
@@ -50,9 +113,9 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
   });
 
   // 진행중 신청: 완료된 활동 제외
-  const completedIds = new Set(completedActivities.map((a: any) => a.id));
-  const activeApplications = user.applications.filter((app: any) => !completedIds.has(app.id));
-  const pendingApplications = activeApplications.filter((app: any) => app.status === 'pending');
+  const completedIds = new Set(completedActivities.map((application) => application.id));
+  const activeApplications = user.applications.filter((app) => !completedIds.has(app.id));
+  const pendingApplications = activeApplications.filter((app) => app.status === 'pending');
 
   return (
     <>
@@ -127,7 +190,7 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
                   </h2>
                 </div>
                 <div className="space-y-3">
-                  {incomingRequests.map((app: any) => (
+                  {incomingRequests.map((app) => (
                     <IncomingRequestItem key={app.id} application={app} />
                   ))}
                 </div>
@@ -141,7 +204,7 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
                 <div className="bg-white rounded-xl p-6 text-center text-gray-400 text-sm shadow-sm">진행중인 신청이 없습니다.</div>
               ) : (
                 <div className="bg-white rounded-xl shadow-sm divide-y divide-gray-100">
-                  {activeApplications.map((app: any) => (
+                  {activeApplications.map((app) => (
                     <div key={app.id} className="p-4">
                       <div className="flex justify-between items-start mb-2">
                         <Link href={`/board/${app.post_id || app.postId}`} className="font-bold text-gray-800 hover:text-indigo-600 transition-colors">
@@ -150,7 +213,7 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
                         <StatusBadge status={app.status} />
                       </div>
                       <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-gray-500">{new Date(app.created_at || app.createdAt).toLocaleDateString()} 신청</span>
+                        <span className="text-xs text-gray-500">{formatDate(app.created_at || app.createdAt)} 신청</span>
                         {app.status === 'pending' && <CancelApplicationButton applicationId={app.id} />}
                       </div>
                     </div>
@@ -171,7 +234,7 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
                 <div className="bg-white rounded-xl p-6 text-center text-gray-400 text-sm shadow-sm">완료된 활동이 없습니다.</div>
               ) : (
                 <div className="bg-white rounded-xl shadow-sm divide-y divide-gray-100">
-                  {completedActivities.map((app: any) => (
+                  {completedActivities.map((app) => (
                     <div key={app.id} className="p-4">
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex items-center gap-2">
@@ -183,7 +246,7 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
                       </div>
                       <div className="flex justify-between items-center mt-2">
                         <span className="text-xs text-gray-500">
-                          마감일: {new Date(app.posts?.due_date).toLocaleDateString()}
+                          마감일: {formatDate(app.posts?.due_date)}
                         </span>
                         <Link href={`/reviews/write/${app.post_id || app.postId}`} className="text-xs bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-100 transition-colors">
                           후기 작성
@@ -202,7 +265,7 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
                 <div className="bg-white rounded-xl p-6 text-center text-gray-400 text-sm shadow-sm">작성한 게시글이 없습니다.</div>
               ) : (
                 <div className="flex space-x-3 overflow-x-auto pb-2 scrollbar-hide">
-                  {user.posts.map((post: any) => (
+                  {user.posts.map((post) => (
                     <Link key={post.id} href={`/board/${post.id}`} className="min-w-[200px] bg-white p-4 rounded-xl shadow-sm border border-gray-100 block">
                       <h3 className="font-bold text-sm truncate mb-1">{post.title}</h3>
                       <div className="flex justify-between text-xs text-gray-500">
@@ -222,10 +285,10 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
                 <div className="bg-white rounded-xl p-6 text-center text-gray-400 text-sm shadow-sm">찜한 활동이 없습니다.</div>
               ) : (
                 <div className="bg-white rounded-xl shadow-sm divide-y divide-gray-100">
-                  {user.postScraps.map((scrap: any) => (
+                  {user.postScraps.map((scrap) => (
                     <Link key={scrap.id} href={`/board/${scrap.post_id || scrap.posts?.id}`} className="block p-4 hover:bg-gray-50">
                       <h3 className="font-bold text-gray-800">{scrap.posts?.title || '알 수 없는 게시글'}</h3>
-                      <p className="text-xs text-gray-400 mt-1">{new Date(scrap.created_at || scrap.createdAt).toLocaleDateString()} 찜함</p>
+                      <p className="text-xs text-gray-400 mt-1">{formatDate(scrap.created_at || scrap.createdAt)} 찜함</p>
                     </Link>
                   ))}
                 </div>
@@ -239,11 +302,11 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
                 <div className="bg-white rounded-xl p-6 text-center text-gray-400 text-sm shadow-sm">작성한 후기가 없습니다.</div>
               ) : (
                 <div className="bg-white rounded-xl shadow-sm divide-y divide-gray-100">
-                  {user.reviews.map((review: any) => (
+                  {user.reviews.map((review) => (
                     <div key={review.id} className="p-4">
                       <h3 className="font-bold text-sm mb-1">{review.posts?.title || '삭제된 게시글'}</h3>
                       <p className="text-sm text-gray-600 line-clamp-2">{review.content}</p>
-                      <span className="text-xs text-gray-400 mt-2 block">{new Date(review.created_at || review.createdAt).toLocaleDateString()}</span>
+                      <span className="text-xs text-gray-400 mt-2 block">{formatDate(review.created_at || review.createdAt)}</span>
                     </div>
                   ))}
                 </div>

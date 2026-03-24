@@ -237,8 +237,9 @@ export default function SignupPage() {
         alert('회원가입 요청이 접수되었습니다!\n관리자 승인 완료 후 로그인할 수 있습니다.');
         router.push('/');
       }
-    } catch (err: any) {
-      if (err.message?.includes('User already registered') || err.message?.includes('already registered')) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '';
+      if (message.includes('User already registered') || message.includes('already registered')) {
         setError('이미 존재하는 계정입니다.');
       } else {
         console.error(err);
