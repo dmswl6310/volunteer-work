@@ -41,6 +41,8 @@ export async function updatePost(postId: string, formData: FormData) {
   const imageUrl = formData.get('imageUrl') as string;
 
   if (!title || !content || !category) throw new Error('필수 항목을 입력해주세요.');
+  if (!Number.isFinite(maxParticipants) || maxParticipants < 1) throw new Error('모집 인원은 1명 이상이어야 합니다.');
+  if (!Number.isFinite(volunteerHours) || volunteerHours < 1) throw new Error('봉사 시간은 1시간 이상이어야 합니다.');
 
   // 욕설 필터링
   const profanityError = validateNoProfanity(
@@ -58,7 +60,7 @@ export async function updatePost(postId: string, formData: FormData) {
       content,
       category,
       max_participants: maxParticipants,
-      volunteer_hours: Number.isFinite(volunteerHours) ? volunteerHours : 1,
+      volunteer_hours: volunteerHours,
       is_urgent: isUrgent,
       is_recruiting: isRecruiting,
       due_date: dueDate,

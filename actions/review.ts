@@ -30,7 +30,7 @@ type ReviewRow = {
 /**
  * 봉사활동 후기를 작성합니다.
  * - 욕설 필터링 적용
- * - 승인된 신청자만 작성 가능
+ * - 실제 참여 확인된 신청자만 작성 가능
  * - 활동 종료 후에만 작성 가능
  * - 중복 후기 방지
  *
@@ -56,8 +56,8 @@ export async function createReview(postId: string, content: string) {
   if (!application) {
     return { error: '해당 봉사활동 신청 내역이 없습니다.' };
   }
-  if (application.status !== 'approved' && application.status !== 'confirmed') {
-    return { error: '주최자에게 참여 승인을 받은 사용자만 후기를 작성할 수 있습니다.' };
+  if (!application.attended_at) {
+    return { error: '주최자가 실제 참여를 확인한 사용자만 후기를 작성할 수 있습니다.' };
   }
 
   const dueDate = application.posts?.due_date ? new Date(application.posts.due_date) : null;

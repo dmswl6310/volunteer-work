@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { ClipboardList, PenLine, Settings, Bell, ClipboardCheck, CheckCircle2 } from 'lucide-react';
 import IncomingRequestItem from '@/components/IncomingRequestItem';
 import type { IncomingRequestApplication } from '@/components/IncomingRequestItem';
+import AttendanceConfirmationCard from '@/components/AttendanceConfirmationCard';
+import type { AttendanceApplication } from '@/components/AttendanceConfirmationCard';
 import CancelApplicationButton from '@/components/CancelApplicationButton';
 import ProfileEditForm from '@/components/ProfileEditForm';
 import LogoutButton from '@/components/LogoutButton';
@@ -39,6 +41,7 @@ type ApplicationPost = {
   id?: string;
   title?: string | null;
   due_date?: string | null;
+  volunteer_hours?: number | null;
 };
 
 type UserApplication = {
@@ -48,15 +51,22 @@ type UserApplication = {
   postId?: string;
   created_at?: string;
   createdAt?: string;
+  attended_at?: string | null;
+  points_awarded_at?: string | null;
   posts?: ApplicationPost | null;
 };
+
+type HostPostApplication = AttendanceApplication;
 
 type UserPostCard = {
   id: string;
   title: string;
+  due_date?: string | null;
+  volunteer_hours?: number | null;
   current_participants: number;
   max_participants: number;
   is_recruiting: boolean;
+  applications: HostPostApplication[];
 };
 
 type UserScrap = {
@@ -84,6 +94,7 @@ type MyPageUser = {
   id: string;
   name: string | null;
   username: string;
+  points: number;
   applications: UserApplication[];
   posts: UserPostCard[];
   postScraps: UserScrap[];
@@ -105,7 +116,7 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
 
   // 완료된 활동: 승인됨 + 마감일 지남
   const completedActivities = user.applications.filter((app) => {
-    if (app.status !== 'approved') return false;
+    if (!app.attended_at) return false;
     const dueDate = app.posts?.due_date ? new Date(app.posts.due_date) : null;
     if (!dueDate) return false;
     dueDate.setHours(0, 0, 0, 0);
@@ -116,6 +127,12 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
   const completedIds = new Set(completedActivities.map((application) => application.id));
   const activeApplications = user.applications.filter((app) => !completedIds.has(app.id));
   const pendingApplications = activeApplications.filter((app) => app.status === 'pending');
+  const attendanceManageablePosts = user.posts.filter((post) => {
+    const dueDate = post.due_date ? new Date(post.due_date) : null;
+    if (!dueDate) return false;
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate <= today && post.applications.some((application) => application.status === 'approved');
+  });
 
   return (
     <>
@@ -193,6 +210,31 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
                   {incomingRequests.map((app) => (
                     <IncomingRequestItem key={app.id} application={app} />
                   ))}
+                </div>
+              </section>
+            )}
+
+            {attendanceManageablePosts.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h2 className="text-base font-bold text-gray-900">참여 확인 및 포인트 지급</h2>
+                  <span className="text-xs text-indigo-500 font-semibold">당일 이후 처리 가능</span>
+                </div>
+                <div className="space-y-3">
+                  {attendanceManageablePosts.map((post) => {
+                    const approvedApplications = post.applications.filter((application) => application.status === 'approved');
+
+                    return (
+                      <AttendanceConfirmationCard
+                        key={post.id}
+                        postId={post.id}
+                        title={post.title}
+                        dueDate={post.due_date}
+                        volunteerHours={post.volunteer_hours ?? 1}
+                        approvedApplications={approvedApplications}
+                      />
+                    );
+                  })}
                 </div>
               </section>
             )}

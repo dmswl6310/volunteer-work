@@ -24,6 +24,8 @@ export async function createPost(formData: FormData) {
   const dueDateStr = formData.get('dueDate') as string;
 
   if (!title || !content || !category) throw new Error('필수 항목을 입력해주세요.');
+  if (!Number.isFinite(maxParticipants) || maxParticipants < 1) throw new Error('모집 인원은 1명 이상이어야 합니다.');
+  if (!Number.isFinite(volunteerHours) || volunteerHours < 1) throw new Error('봉사 시간은 1시간 이상이어야 합니다.');
 
   // 욕설 필터링
   const profanityError = validateNoProfanity(
@@ -39,7 +41,7 @@ export async function createPost(formData: FormData) {
     content,
     category,
     max_participants: maxParticipants,
-    volunteer_hours: Number.isFinite(volunteerHours) ? volunteerHours : 1,
+    volunteer_hours: volunteerHours,
     author_id: user.id,
     image_url: imageUrl || null,
     is_recruiting: true,
