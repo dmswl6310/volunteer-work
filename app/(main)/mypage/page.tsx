@@ -94,12 +94,11 @@ export default async function MyPage() {
             <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-xl">
               {user.name?.[0] || 'U'}
             </div>
-            <div className="flex-1">
-              <h2 className="text-lg font-bold text-gray-900">
-                {user.name && user.name !== 'User' ? user.name : user.username}
-              </h2>
-              <p className="text-gray-500 text-sm">@{user.username}</p>
-            </div>
+          <div className="flex-1">
+            <h2 className="text-lg font-bold text-gray-900">
+              {user.name && user.name !== 'User' ? user.name : user.username}
+            </h2>
+          </div>
           </div>
 
           {/* 포인트 */}

@@ -72,7 +72,6 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                         <h2 className="text-xl font-bold text-gray-900">
                             {user.name && user.name !== 'User' ? user.name : user.username}
                         </h2>
-                        <p className="text-gray-500 text-sm">@{user.username}</p>
                     </div>
                     <button
                         onClick={() => setIsEditing(true)}
@@ -115,7 +114,6 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                         className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mb-2"
                         placeholder="이름"
                     />
-                    <p className="text-gray-500 text-sm">@{user.username}</p>
                 </div>
             </div>
 

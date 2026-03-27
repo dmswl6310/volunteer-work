@@ -130,7 +130,6 @@ export default function AttendanceConfirmationCard({
                     {isCompleted ? '참여 확인 완료' : '확인 대기'}
                   </span>
                 </div>
-                <p className="text-sm text-gray-500">@{application.users?.username || 'unknown'}</p>
                 {application.users?.contact && <p className="text-sm text-gray-600 mt-1">연락처: {application.users.contact}</p>}
                 {isCompleted && (
                   <p className="text-xs text-gray-500 mt-1">처리 시각: {formatDateTime(application.attended_at || application.points_awarded_at)}</p>

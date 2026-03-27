@@ -120,7 +120,7 @@ export default function MyPageTabs({ user, incomingRequests }: MyPageTabsProps) 
     const dueDate = app.posts?.due_date ? new Date(app.posts.due_date) : null;
     if (!dueDate) return false;
     dueDate.setHours(0, 0, 0, 0);
-    return dueDate < today;
+    return dueDate <= today;
   });
 
   // 진행중 신청: 완료된 활동 제외

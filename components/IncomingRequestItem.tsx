@@ -64,7 +64,6 @@ export default function IncomingRequestItem({ application }: { application: Inco
       <div>
         <p className="font-bold text-gray-900 text-base mb-1">
           {application.users?.name && application.users.name !== 'User' ? application.users.name : application.users?.username}
-          <span className="text-gray-500 font-normal text-sm ml-1">(@{application.users?.username})</span>
         </p>
         <div className="text-sm text-gray-600 mb-2 space-y-0.5">
           {application.users?.contact && <p>📞 연락처: {application.users.contact}</p>}

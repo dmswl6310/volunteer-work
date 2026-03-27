@@ -121,7 +121,6 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
             <p className="font-bold text-gray-900">
               {post.author.name && post.author.name !== 'User' ? post.author.name : post.author.username}
             </p>
-            <p className="text-xs text-gray-500">@{post.author.username}</p>
             <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-700">
               <Phone className="h-4 w-4 text-indigo-500" />
               <span>{post.author.contact || '연락처 미등록'}</span>
