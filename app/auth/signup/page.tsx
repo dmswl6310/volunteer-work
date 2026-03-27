@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { checkEmailExists, checkNicknameExists } from '@/actions/auth';
 import { checkProfanity } from '@/lib/profanity';
+import { useToast } from '@/components/ToastProvider';
 import { Check, X } from 'lucide-react';
 import type { Address } from 'react-daum-postcode';
 import dynamic from 'next/dynamic';
@@ -37,6 +38,7 @@ const STEPS = [
 
 export default function SignupPage() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [fadeIn, setFadeIn] = useState(true);
@@ -62,65 +64,84 @@ export default function SignupPage() {
   const [emailStatus, setEmailStatus] = useState<{ message: string; isValid: boolean | null }>({ message: '', isValid: null });
   const [nicknameStatus, setNicknameStatus] = useState<{ message: string; isValid: boolean | null }>({ message: '', isValid: null });
   const [passwordMatch, setPasswordMatch] = useState<{ message: string; isValid: boolean | null }>({ message: '', isValid: null });
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+  const [isCheckingNickname, setIsCheckingNickname] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const debouncedEmail = useDebounce(formData.email, 500);
   const debouncedNickname = useDebounce(formData.nickname, 500);
 
+  const validateEmailValue = async (email: string) => {
+    if (!email) {
+      setEmailStatus({ message: '', isValid: null });
+      return false;
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      setEmailStatus({ message: '올바른 이메일 형식이 아닙니다.', isValid: false });
+      return false;
+    }
+
+    setIsCheckingEmail(true);
+    setEmailStatus({ message: '이메일 중복 여부를 확인하고 있습니다...', isValid: null });
+
+    const res = await checkEmailExists(normalizedEmail);
+    setIsCheckingEmail(false);
+    if (res.exists) {
+      setEmailStatus({ message: res.message, isValid: false });
+      return false;
+    }
+
+    setEmailStatus({ message: res.message, isValid: true });
+    return true;
+  };
+
   // 이메일 실시간 검사
   useEffect(() => {
-    const validateEmail = async () => {
-      if (!debouncedEmail) {
-        setEmailStatus({ message: '', isValid: null });
-        return;
-      }
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(debouncedEmail)) {
-        setEmailStatus({ message: '올바른 이메일 형식이 아닙니다.', isValid: false });
-        return;
-      }
-      
-      const res = await checkEmailExists(debouncedEmail);
-      if (res.exists) {
-        setEmailStatus({ message: res.message, isValid: false });
-      } else {
-        setEmailStatus({ message: res.message, isValid: true });
-      }
-    };
-    validateEmail();
+    void validateEmailValue(debouncedEmail);
   }, [debouncedEmail]);
 
   // 비밀번호 정규식 (8자 이상, 영문/숫자/특수문자 포함)
   const isPasswordValid = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/.test(formData.password);
 
+  const validateNicknameValue = async (nickname: string) => {
+    if (!nickname) {
+      setNicknameStatus({ message: '', isValid: null });
+      return false;
+    }
+    const normalizedNickname = nickname.trim();
+    if (normalizedNickname.length < 2 || normalizedNickname.length > 10) {
+      setNicknameStatus({ message: '닉네임은 2자 이상 10자 이하여야 합니다.', isValid: false });
+      return false;
+    }
+    if (!/^[가-힣a-zA-Z0-9]+$/.test(normalizedNickname)) {
+      setNicknameStatus({ message: '닉네임에는 특수문자나 기호를 사용할 수 없습니다.', isValid: false });
+      return false;
+    }
+    if (checkProfanity(normalizedNickname)) {
+      setNicknameStatus({ message: '사용할 수 없는 단어가 포함되어 있습니다.', isValid: false });
+      return false;
+    }
+
+    setIsCheckingNickname(true);
+    setNicknameStatus({ message: '닉네임 중복 여부를 확인하고 있습니다...', isValid: null });
+
+    const res = await checkNicknameExists(normalizedNickname);
+    setIsCheckingNickname(false);
+    if (res.exists) {
+      setNicknameStatus({ message: res.message, isValid: false });
+      return false;
+    }
+
+    setNicknameStatus({ message: res.message, isValid: true });
+    return true;
+  };
+
   // 닉네임 실시간 검사
   useEffect(() => {
-    const validateNickname = async () => {
-      if (!debouncedNickname) {
-        setNicknameStatus({ message: '', isValid: null });
-        return;
-      }
-      if (debouncedNickname.length < 2 || debouncedNickname.length > 10) {
-        setNicknameStatus({ message: '닉네임은 2자 이상 10자 이하여야 합니다.', isValid: false });
-        return;
-      }
-      if (!/^[가-힣a-zA-Z0-9]+$/.test(debouncedNickname)) {
-        setNicknameStatus({ message: '닉네임에는 특수문자나 기호를 사용할 수 없습니다.', isValid: false });
-        return;
-      }
-      if (checkProfanity(debouncedNickname)) {
-        setNicknameStatus({ message: '사용할 수 없는 단어가 포함되어 있습니다.', isValid: false });
-        return;
-      }
-      
-      const res = await checkNicknameExists(debouncedNickname);
-      if (res.exists) {
-        setNicknameStatus({ message: res.message, isValid: false });
-      } else {
-        setNicknameStatus({ message: res.message, isValid: true });
-      }
-    };
-    validateNickname();
+    void validateNicknameValue(debouncedNickname);
   }, [debouncedNickname]);
 
   // 비밀번호 확인 실시간 검사
@@ -137,7 +158,8 @@ export default function SignupPage() {
   }, [formData.password, formData.passwordConfirm]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const nextValue = e.target.name === 'email' ? e.target.value.trim().toLowerCase() : e.target.value;
+    setFormData({ ...formData, [e.target.name]: nextValue });
   };
 
   // 연락처 자동 하이픈
@@ -153,6 +175,7 @@ export default function SignupPage() {
 
   // 단계별 유효성 검사
   const isStep1Valid =
+    !isCheckingEmail &&
     emailStatus.isValid === true &&
     isPasswordValid &&
     passwordMatch.isValid === true;
@@ -160,6 +183,7 @@ export default function SignupPage() {
   const isContactValid = /^01([0|1|6|7|8|9]?)-?([0-9]{3,4})-?([0-9]{4})$/.test(formData.contact);
 
   const isStep2Valid =
+    !isCheckingNickname &&
     nicknameStatus.isValid === true &&
     isContactValid;
 
@@ -180,8 +204,21 @@ export default function SignupPage() {
     }, 200);
   };
 
-  const handleNext = () => {
-    if (step < 3 && isCurrentStepValid) {
+  const handleNext = async () => {
+    setError(null);
+    let canProceed = isCurrentStepValid;
+
+    if (step === 1) {
+      const isEmailAvailable = await validateEmailValue(formData.email);
+      canProceed = isEmailAvailable && isPasswordValid && passwordMatch.isValid === true;
+    }
+
+    if (step === 2) {
+      const isNicknameAvailable = await validateNicknameValue(formData.nickname);
+      canProceed = isNicknameAvailable && isContactValid;
+    }
+
+    if (step < 3 && canProceed) {
       goToStep(step + 1);
     }
   };
@@ -200,6 +237,17 @@ export default function SignupPage() {
     setError(null);
 
     try {
+      const [isEmailAvailable, isNicknameAvailable] = await Promise.all([
+        validateEmailValue(formData.email),
+        validateNicknameValue(formData.nickname),
+      ]);
+
+      if (!isEmailAvailable || !isNicknameAvailable) {
+        setError('입력한 이메일 또는 닉네임을 다시 확인해 주세요.');
+        setLoading(false);
+        return;
+      }
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -234,8 +282,10 @@ export default function SignupPage() {
 
         await supabase.auth.signOut();
 
-        alert('회원가입 요청이 접수되었습니다!\n관리자 승인 완료 후 로그인할 수 있습니다.');
-        router.push('/');
+        showToast('회원가입 요청이 접수되었습니다. 관리자 승인 후 로그인할 수 있습니다.', 'success');
+        setTimeout(() => {
+          router.push('/');
+        }, 600);
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : '';
@@ -326,7 +376,7 @@ export default function SignupPage() {
                     placeholder="example@email.com"
                   />
                   {emailStatus.message && (
-                    <p className={`mt-1 text-xs ${emailStatus.isValid ? 'text-green-600' : 'text-red-500'}`}>
+                    <p className={`mt-1 text-xs ${emailStatus.isValid ? 'text-green-600' : isCheckingEmail ? 'text-gray-500' : 'text-red-500'}`}>
                       {emailStatus.message}
                     </p>
                   )}
@@ -386,7 +436,7 @@ export default function SignupPage() {
                     placeholder="2자 이상의 닉네임을 입력해주세요"
                   />
                   {nicknameStatus.message && (
-                    <p className={`mt-1 text-xs ${nicknameStatus.isValid ? 'text-green-600' : 'text-red-500'}`}>
+                    <p className={`mt-1 text-xs ${nicknameStatus.isValid ? 'text-green-600' : isCheckingNickname ? 'text-gray-500' : 'text-red-500'}`}>
                       {nicknameStatus.message}
                     </p>
                   )}
@@ -510,8 +560,8 @@ export default function SignupPage() {
               {step < 3 ? (
                 <button
                   type="button"
-                  onClick={handleNext}
                   disabled={!isCurrentStepValid}
+                  onClick={() => void handleNext()}
                   className="flex-1 py-3 px-4 border border-transparent rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 >
                   다음

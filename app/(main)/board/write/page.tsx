@@ -11,6 +11,19 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 const VOLUNTEER_HOUR_OPTIONS = Array.from({ length: 100 }, (_, index) => index + 1);
+const POST_CONTENT_TEMPLATE = `예상 활동 내용
+- 어떤 봉사활동인지 간단히 소개해주세요.
+
+세부 일정
+- 진행 시간:
+- 집합 장소:
+
+참여 대상 / 준비물
+- 참여 대상:
+- 준비물:
+
+참고 사항
+- 신청 전에 꼭 알아야 할 내용을 적어주세요.`;
 
 export default function WritePage() {
   const router = useRouter();
@@ -200,7 +213,8 @@ export default function WritePage() {
         {/* Content */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">내용</label>
-          <textarea name="content" required rows={8} placeholder="상세 활동 내용을 입력하세요" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none"></textarea>
+          <textarea name="content" required rows={10} placeholder={POST_CONTENT_TEMPLATE} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none whitespace-pre-wrap"></textarea>
+          <p className="mt-1 text-xs text-gray-500">템플릿을 참고해서 일정, 장소, 준비물, 참고사항을 채워주세요.</p>
         </div>
 
         {/* Max Participants */}
