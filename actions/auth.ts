@@ -13,7 +13,6 @@ export type CreateUserParams = {
   email: string;
   password?: string;
   username: string;
-  name: string;
   contact: string;
   address: string;
   job: string;
@@ -24,7 +23,7 @@ export type CreateUserParams = {
  * - 닉네임/이메일 중복 검사
  * - 관리자 승인 대기 상태로 생성
  *
- * @param data - 유저 정보 (id, email, username, name, contact, address, job)
+ * @param data - 유저 정보 (id, email, username, contact, address, job)
  * @returns 성공 시 { success: true }, 실패 시 { success: false, error: string }
  */
 export async function createUserRecord(data: CreateUserParams) {
@@ -60,7 +59,6 @@ export async function createUserRecord(data: CreateUserParams) {
       id: data.id,
       email: data.email,
       username: data.username,
-      name: data.name,
       contact: data.contact,
       address: data.address,
       job: data.job,

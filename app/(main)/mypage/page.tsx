@@ -8,11 +8,10 @@ type IncomingRequest = {
   id: string;
   status: string;
   created_at: string;
-  users?: {
-    name?: string | null;
-    username?: string | null;
-    contact?: string | null;
-    email?: string | null;
+    users?: {
+      username?: string | null;
+      contact?: string | null;
+      email?: string | null;
     job?: string | null;
     address?: string | null;
   } | null;
@@ -63,7 +62,6 @@ export default async function MyPage() {
         ...app,
         users: app.users
           ? {
-              name: app.users.name ?? null,
               username: app.users.username ?? null,
               contact: app.users.contact ?? null,
               email: app.users.email ?? null,
@@ -92,13 +90,13 @@ export default async function MyPage() {
         <section className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex items-center space-x-4 mb-4">
             <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-xl">
-              {user.name?.[0] || 'U'}
+              {user.username?.[0] || 'U'}
             </div>
-          <div className="flex-1">
-            <h2 className="text-lg font-bold text-gray-900">
-              {user.name && user.name !== 'User' ? user.name : user.username}
-            </h2>
-          </div>
+            <div className="flex-1">
+              <h2 className="text-lg font-bold text-gray-900">
+                {user.username}
+              </h2>
+            </div>
           </div>
 
           {/* 포인트 */}

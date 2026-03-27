@@ -6,10 +6,9 @@ import { requireApprovedUser } from '@/lib/server-auth';
 /**
  * 유저 프로필 정보를 수정합니다.
  *
- * @param data - 수정할 데이터 (이름, 연락처, 주소, 직업)
+ * @param data - 수정할 데이터 (연락처, 주소, 직업)
  */
 export async function updateUserProfile(data: {
-    name: string;
     contact: string;
     address: string;
     job: string;
@@ -20,7 +19,6 @@ export async function updateUserProfile(data: {
         const { error } = await supabase
             .from('users')
             .update({
-                name: data.name,
                 contact: data.contact,
                 address: data.address,
                 job: data.job,

@@ -6,7 +6,6 @@ type UserProfile = {
   is_approved: boolean | null;
   email?: string | null;
   username?: string | null;
-  name?: string | null;
 };
 
 export async function requireAuthenticatedUser() {
@@ -26,7 +25,7 @@ export async function requireApprovedUser() {
   const { supabase, user } = await requireAuthenticatedUser();
   const { data: profile, error } = await supabase
     .from('users')
-    .select('id, role, is_approved, email, username, name')
+    .select('id, role, is_approved, email, username')
     .eq('id', user.id)
     .maybeSingle<UserProfile>();
 

@@ -115,11 +115,11 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
         {/* 주최자 프로필 */}
         <div className="flex items-center p-4 bg-gray-50 rounded-xl mb-8">
           <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-lg mr-4">
-            {post.author.name?.[0] || 'A'}
+            {post.author.username?.[0] || 'A'}
           </div>
           <div>
             <p className="font-bold text-gray-900">
-              {post.author.name && post.author.name !== 'User' ? post.author.name : post.author.username}
+              {post.author.username || '익명'}
             </p>
             <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-700">
               <Phone className="h-4 w-4 text-indigo-500" />

@@ -92,7 +92,6 @@ type UserReview = {
 
 type MyPageUser = {
   id: string;
-  name: string | null;
   username: string;
   points: number;
   applications: UserApplication[];

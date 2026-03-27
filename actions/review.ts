@@ -6,7 +6,6 @@ import { checkProfanity } from '@/lib/profanity';
 import { requireApprovedUser } from '@/lib/server-auth';
 
 type ReviewAuthor = {
-  name: string | null;
   username?: string | null;
 };
 
@@ -31,7 +30,7 @@ type ReviewRow = {
  * 봉사활동 후기를 작성합니다.
  * - 욕설 필터링 적용
  * - 실제 참여 확인된 신청자만 작성 가능
- * - 활동 종료 후에만 작성 가능
+ * - 활동 당일부터 작성 가능
  * - 중복 후기 방지
  *
  * @param postId - 게시글 ID
@@ -147,7 +146,7 @@ export async function getReviews(postId: string, userId?: string) {
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase
     .from('reviews')
-    .select('*, author:users(name, username), review_likes(count)')
+    .select('*, author:users(username), review_likes(count)')
     .eq('post_id', postId)
     .order('created_at', { ascending: false });
 
@@ -186,7 +185,7 @@ export async function getAllReviews(userId?: string) {
     const supabase = await createServerSupabaseClient();
     const { data, error } = await supabase
       .from('reviews')
-      .select('*, author:users(name), posts(title, id), review_likes(count)')
+      .select('*, author:users(username), posts(title, id), review_likes(count)')
       .order('created_at', { ascending: false })
       .limit(20);
 

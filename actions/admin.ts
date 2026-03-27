@@ -7,7 +7,6 @@ export type PendingAdminUser = {
   id: string;
   email: string;
   username: string | null;
-  name: string | null;
   contact: string | null;
   address: string | null;
   job: string | null;
@@ -19,7 +18,6 @@ export type PendingAdminApplication = {
   created_at: string;
   status: string;
   users: {
-    name: string | null;
     username: string | null;
     contact: string | null;
     email: string | null;
@@ -128,12 +126,12 @@ export async function getAdminDashboardData() {
     const [pendingUsersRes, pendingApplicationsRes] = await Promise.all([
       supabase
         .from('users')
-        .select('id, email, username, name, contact, address, job, created_at')
+        .select('id, email, username, contact, address, job, created_at')
         .eq('is_approved', false)
         .order('created_at', { ascending: false }),
       supabase
         .from('applications')
-        .select('id, created_at, status, users(name, username, contact, email, job, address), post:posts(id, title, current_participants, max_participants)')
+        .select('id, created_at, status, users(username, contact, email, job, address), post:posts(id, title, current_participants, max_participants)')
         .eq('status', 'pending')
         .order('created_at', { ascending: false }),
     ]);

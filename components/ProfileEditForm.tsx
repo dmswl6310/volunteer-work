@@ -15,7 +15,6 @@ const DaumPostcode = dynamic(() => import('react-daum-postcode'), {
 interface ProfileEditFormProps {
     user: {
         id: string;
-        name: string | null;
         username: string;
         contact: string | null;
         address: string | null;
@@ -29,7 +28,6 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
     const [loading, setLoading] = useState(false);
     const { showToast, showConfirm } = useToast();
     const [editForm, setEditForm] = useState({
-        name: user.name || '',
         contact: user.contact || '',
         address: user.address || '',
         detailAddress: '', // 프로필 수정에서는 기본적으로 빈 칸 제공, 나중에 합쳐서 address로 저장
@@ -66,12 +64,13 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
             <>
                 <div className="flex items-center space-x-4 mb-6">
                     <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-2xl">
-                        {user.name?.[0] || 'U'}
+                        {user.username?.[0] || 'U'}
                     </div>
                     <div className="flex-1">
                         <h2 className="text-xl font-bold text-gray-900">
-                            {user.name && user.name !== 'User' ? user.name : user.username}
+                            {user.username || '이름 없음'}
                         </h2>
+                        <p className="text-xs text-gray-400 mt-1">닉네임은 가입 후 변경할 수 없습니다.</p>
                     </div>
                     <button
                         onClick={() => setIsEditing(true)}
@@ -104,16 +103,11 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
         <>
             <div className="flex items-center space-x-4 mb-6">
                 <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-2xl">
-                    {user.name?.[0] || 'U'}
+                    {user.username?.[0] || 'U'}
                 </div>
                 <div className="flex-1">
-                    <input
-                        type="text"
-                        value={editForm.name}
-                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mb-2"
-                        placeholder="이름"
-                    />
+                    <p className="text-lg font-bold text-gray-900">{user.username || '이름 없음'}</p>
+                    <p className="text-xs text-gray-400 mt-1">닉네임은 가입할 때 한 번만 설정할 수 있습니다.</p>
                 </div>
             </div>
 

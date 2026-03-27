@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { useToast } from './ToastProvider';
 
 type RequestUser = {
-  name: string | null;
   username: string | null;
   contact: string | null;
   email: string | null;
@@ -63,7 +62,7 @@ export default function IncomingRequestItem({ application }: { application: Inco
     <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-lg shadow-sm">
       <div>
         <p className="font-bold text-gray-900 text-base mb-1">
-          {application.users?.name && application.users.name !== 'User' ? application.users.name : application.users?.username}
+          {application.users?.username || '이름 없음'}
         </p>
         <div className="text-sm text-gray-600 mb-2 space-y-0.5">
           {application.users?.contact && <p>📞 연락처: {application.users.contact}</p>}

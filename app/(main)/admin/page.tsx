@@ -45,8 +45,7 @@ export default async function AdminPage() {
                   <li key={user.id} className="p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-lg text-gray-900">{user.name || '이름 없음'}</span>
-                        <span className="text-gray-500 text-sm">({user.username || 'ID 없음'})</span>
+                        <span className="font-bold text-lg text-gray-900">{user.username || '이름 없음'}</span>
                       </div>
                       <div className="text-sm text-gray-600 mt-1 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1">
                         <p>이메일: {user.email}</p>

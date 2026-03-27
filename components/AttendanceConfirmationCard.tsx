@@ -6,7 +6,6 @@ import { confirmAttendanceAndAwardPoints } from '@/actions/attendance';
 import { useToast } from './ToastProvider';
 
 type ParticipantUser = {
-  name: string | null;
   username: string | null;
   contact: string | null;
 };
@@ -118,9 +117,7 @@ export default function AttendanceConfirmationCard({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
                   <p className="font-semibold text-gray-900 truncate">
-                    {application.users?.name && application.users.name !== 'User'
-                      ? application.users.name
-                      : application.users?.username || '이름 없음'}
+                    {application.users?.username || '이름 없음'}
                   </p>
                   <span
                     className={`text-xs font-bold px-2 py-1 rounded-full ${

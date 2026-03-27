@@ -19,7 +19,6 @@ export type PostWithAuthor = {
   created_at: string;
   author_id: string;
   author: {
-    name: string;
     username: string;
     contact?: string | null;
   } | null;
@@ -60,7 +59,7 @@ export async function getPosts({
     const supabase = await createServerSupabaseClient();
     let query = supabase
       .from('posts')
-      .select('*, author:users(name, username)')
+      .select('*, author:users(username)')
       .range(from, to);
 
     if (category) {
@@ -109,7 +108,7 @@ export async function getUrgentPosts(status: 'recruiting' | 'closed' | 'all' = '
     
     let query = supabase
       .from('posts')
-      .select('*, author:users(name, username)')
+      .select('*, author:users(username)')
       .eq('is_urgent', true)
       .order('created_at', { ascending: false })
       .limit(10);

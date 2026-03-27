@@ -36,9 +36,9 @@ export default async function ReviewPage() {
                             <div className="flex justify-between items-center text-xs text-gray-500 border-t border-gray-100 pt-3">
                                 <div className="flex items-center space-x-2">
                                     <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold text-[10px]">
-                                        {review.author?.name?.[0] || 'U'}
+                                        {review.author?.username?.[0] || 'U'}
                                     </div>
-                                    <span>{review.author?.name || '익명'}</span>
+                                    <span>{review.author?.username || '익명'}</span>
                                 </div>
                                 <div className="flex items-center space-x-3">
                                     <ReviewLikeButton

@@ -21,7 +21,6 @@ async function main() {
       .insert({
         email: 'admin@example.com',
         username: 'admin',
-        name: '관리자',
         role: 'admin',
         is_approved: true,
         contact: '010-0000-0000',

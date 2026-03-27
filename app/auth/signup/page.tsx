@@ -267,7 +267,6 @@ export default function SignupPage() {
           id: authData.user.id,
           email: formData.email,
           username: formData.nickname,
-          name: formData.nickname,
           contact: formData.contact,
           address: `${formData.address} ${formData.detailAddress}`.trim(),
           job: formData.job

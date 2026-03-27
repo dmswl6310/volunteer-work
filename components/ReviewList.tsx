@@ -22,7 +22,7 @@ export default async function ReviewList({ postId, userId }: { postId: string; u
           <li key={review.id} className="bg-gray-50 p-4 rounded-xl">
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium text-gray-900">
-                {review.author?.name && review.author.name !== 'User' ? review.author.name : review.author?.username || '익명'}
+                {review.author?.username || '익명'}
               </span>
               <span className="text-xs text-gray-400">
                 {new Date(review.created_at).toLocaleDateString()}
