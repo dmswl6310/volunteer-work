@@ -19,7 +19,7 @@ export default function ReviewLikeButton({ reviewId, initialIsLiked, initialLike
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { showToast } = useToast();
+  const { showToast, showConfirm } = useToast();
 
   const handleToggle = async () => {
     if (isLoading) return;
@@ -37,7 +37,11 @@ export default function ReviewLikeButton({ reviewId, initialIsLiked, initialLike
       if (!user) {
         setIsLiked(previousIsLiked);
         setLikeCount(previousCount);
-        if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
+        const shouldMoveToLogin = await showConfirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?', {
+          title: '로그인 필요',
+          confirmLabel: '로그인하러 가기',
+        });
+        if (shouldMoveToLogin) {
           router.push('/auth/login');
         }
         return;

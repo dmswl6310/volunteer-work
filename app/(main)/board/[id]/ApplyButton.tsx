@@ -16,7 +16,7 @@ interface ApplyButtonProps {
 
 export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplicationStatus, isFull }: ApplyButtonProps) {
   const router = useRouter();
-  const { showToast } = useToast();
+  const { showToast, showConfirm } = useToast();
   const [loading, setLoading] = useState(false);
   const [applicationStatus, setApplicationStatus] = useState<string | null>(userApplicationStatus);
 
@@ -89,9 +89,14 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplic
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
+        const shouldMoveToLogin = await showConfirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?', {
+          title: '로그인 필요',
+          confirmLabel: '로그인하러 가기',
+        });
+        if (shouldMoveToLogin) {
           router.push('/auth/login');
         }
+        setLoading(false);
         return;
       }
 

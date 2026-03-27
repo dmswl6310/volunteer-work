@@ -27,7 +27,7 @@ interface ProfileEditFormProps {
 export default function ProfileEditForm({ user }: ProfileEditFormProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
-    const { showToast } = useToast();
+    const { showToast, showConfirm } = useToast();
     const [editForm, setEditForm] = useState({
         name: user.name || '',
         contact: user.contact || '',
@@ -39,7 +39,11 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!confirm('프로필을 수정하시겠습니까?')) return;
+        const confirmed = await showConfirm('프로필을 수정하시겠습니까?', {
+            title: '프로필 수정',
+            confirmLabel: '저장하기',
+        });
+        if (!confirmed) return;
 
         setLoading(true);
         try {

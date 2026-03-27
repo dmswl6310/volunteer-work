@@ -11,8 +11,23 @@ interface Toast {
   type: ToastType;
 }
 
+type ConfirmOptions = {
+  title?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+};
+
+type ConfirmState = {
+  title: string;
+  message: string;
+  confirmLabel: string;
+  cancelLabel: string;
+  resolve: (value: boolean) => void;
+};
+
 interface ToastContextType {
   showToast: (message: string, type?: ToastType) => void;
+  showConfirm: (message: string, options?: ConfirmOptions) => Promise<boolean>;
 }
 
 const ToastContext = createContext<ToastContextType | null>(null);
@@ -27,6 +42,7 @@ export function useToast() {
 /** Toast 알림 Provider 및 UI 컴포넌트 */
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [confirmState, setConfirmState] = useState<ConfirmState | null>(null);
 
   const showToast = useCallback((message: string, type: ToastType = 'info') => {
     const id = crypto.randomUUID();
@@ -38,8 +54,26 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     }, 3000);
   }, []);
 
+  const showConfirm = useCallback((message: string, options?: ConfirmOptions) => {
+    return new Promise<boolean>((resolve) => {
+      setConfirmState({
+        title: options?.title ?? '한 번 더 확인해 주세요',
+        message,
+        confirmLabel: options?.confirmLabel ?? '확인',
+        cancelLabel: options?.cancelLabel ?? '취소',
+        resolve,
+      });
+    });
+  }, []);
+
   const removeToast = (id: string) => {
     setToasts(prev => prev.filter(t => t.id !== id));
+  };
+
+  const handleConfirmClose = (confirmed: boolean) => {
+    if (!confirmState) return;
+    confirmState.resolve(confirmed);
+    setConfirmState(null);
   };
 
   const typeStyles: Record<ToastType, string> = {
@@ -57,8 +91,33 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ToastContext.Provider value={{ showToast }}>
+    <ToastContext.Provider value={{ showToast, showConfirm }}>
       {children}
+
+      {confirmState && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl">
+            <h3 className="text-lg font-bold text-gray-900">{confirmState.title}</h3>
+            <p className="mt-2 whitespace-pre-line text-sm text-gray-600">{confirmState.message}</p>
+            <div className="mt-5 flex gap-2">
+              <button
+                type="button"
+                onClick={() => handleConfirmClose(false)}
+                className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+              >
+                {confirmState.cancelLabel}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleConfirmClose(true)}
+                className="flex-1 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
+              >
+                {confirmState.confirmLabel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toast 컨테이너 */}
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 pointer-events-none">

@@ -7,10 +7,14 @@ import { useToast } from './ToastProvider';
 /** 신청 취소 버튼 컴포넌트 */
 export default function CancelApplicationButton({ applicationId }: { applicationId: string }) {
   const [loading, setLoading] = useState(false);
-  const { showToast } = useToast();
+  const { showToast, showConfirm } = useToast();
 
   const handleCancel = async () => {
-    if (!confirm('신청을 취소하시겠습니까?')) return;
+    const confirmed = await showConfirm('신청을 취소하시겠습니까?', {
+      title: '신청 취소',
+      confirmLabel: '취소하기',
+    });
+    if (!confirmed) return;
     setLoading(true);
     try {
       await cancelApplication(applicationId);

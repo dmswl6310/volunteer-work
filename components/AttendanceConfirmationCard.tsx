@@ -38,7 +38,7 @@ export default function AttendanceConfirmationCard({
   volunteerHours,
   approvedApplications,
 }: Props) {
-  const { showToast } = useToast();
+  const { showToast, showConfirm } = useToast();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const pointsPerParticipant = Math.max(volunteerHours, 1) * 2;
@@ -62,7 +62,11 @@ export default function AttendanceConfirmationCard({
       return;
     }
 
-    if (!confirm(`선택한 ${selectedIds.length}명에게 참여를 확정하고 포인트를 지급할까요?`)) {
+    const confirmed = await showConfirm(`선택한 ${selectedIds.length}명에게 참여를 확정하고 포인트를 지급할까요?`, {
+      title: '참여 확인 및 포인트 지급',
+      confirmLabel: '지급하기',
+    });
+    if (!confirmed) {
       return;
     }
 

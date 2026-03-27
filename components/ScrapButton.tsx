@@ -18,7 +18,7 @@ export default function ScrapButton({ postId, initialIsScraped, initialScrapCoun
   const [isScraped, setIsScraped] = useState(initialIsScraped);
   const [scrapCount, setScrapCount] = useState(initialScrapCount);
   const router = useRouter();
-  const { showToast } = useToast();
+  const { showToast, showConfirm } = useToast();
 
   const handleToggle = async () => {
     // 냙관적 UI 업데이트
@@ -31,7 +31,11 @@ export default function ScrapButton({ postId, initialIsScraped, initialScrapCoun
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
+        const shouldMoveToLogin = await showConfirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?', {
+          title: '로그인 필요',
+          confirmLabel: '로그인하러 가기',
+        });
+        if (shouldMoveToLogin) {
           router.push('/auth/login');
         } else {
             // Revert changes if user cancels login

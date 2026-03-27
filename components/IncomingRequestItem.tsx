@@ -27,10 +27,14 @@ export type IncomingRequestApplication = {
 /** 들어오는 신청 항목 컴포넌트 (승인/거절 버튼 포함) */
 export default function IncomingRequestItem({ application }: { application: IncomingRequestApplication }) {
   const [loading, setLoading] = useState(false);
-  const { showToast } = useToast();
+  const { showToast, showConfirm } = useToast();
 
   const handleStatus = async (status: 'approved' | 'rejected') => {
-    if (!confirm(`${status === 'approved' ? '승인' : '거절'}하시겠습니까?`)) return;
+    const confirmed = await showConfirm(`${status === 'approved' ? '승인' : '거절'}하시겠습니까?`, {
+      title: `신청 ${status === 'approved' ? '승인' : '거절'}`,
+      confirmLabel: status === 'approved' ? '승인하기' : '거절하기',
+    });
+    if (!confirmed) return;
     setLoading(true);
     try {
       await updateApplicationStatus(application.id, status);
