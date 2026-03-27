@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { confirmAttendanceAndAwardPoints } from '@/actions/attendance';
 import { useToast } from './ToastProvider';
@@ -88,7 +89,9 @@ export default function AttendanceConfirmationCard({
   return (
     <section className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
       <div className="flex flex-col gap-1 mb-4">
-        <h3 className="font-bold text-gray-900">{title}</h3>
+        <Link href={`/board/${postId}`} className="font-bold text-gray-900 hover:text-indigo-600 underline-offset-2 hover:underline">
+          {title}
+        </Link>
         <p className="text-xs text-gray-500">진행일: {dueDate ? new Date(dueDate).toLocaleDateString() : '-'}</p>
         <p className="text-xs font-semibold text-indigo-600">참여 확인 시 1인당 {pointsPerParticipant}P 지급</p>
       </div>

@@ -29,6 +29,8 @@ export type PendingAdminApplication = {
   post: {
     id: string;
     title: string;
+    current_participants: number | null;
+    max_participants: number | null;
   } | null;
 };
 
@@ -131,7 +133,7 @@ export async function getAdminDashboardData() {
         .order('created_at', { ascending: false }),
       supabase
         .from('applications')
-        .select('id, created_at, status, users(name, username, contact, email, job, address), post:posts(id, title)')
+        .select('id, created_at, status, users(name, username, contact, email, job, address), post:posts(id, title, current_participants, max_participants)')
         .eq('status', 'pending')
         .order('created_at', { ascending: false }),
     ]);

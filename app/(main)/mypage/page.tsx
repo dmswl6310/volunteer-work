@@ -19,12 +19,16 @@ type IncomingRequest = {
   post: {
     id: string;
     title: string;
+    current_participants?: number;
+    max_participants?: number;
   };
 };
 
 type UserPost = {
   id: string;
   title: string;
+  current_participants?: number;
+  max_participants?: number;
   applications: Array<IncomingRequest>;
 };
 
@@ -67,7 +71,12 @@ export default async function MyPage() {
               address: app.users.address ?? null,
             }
           : null,
-        post: { id: p.id, title: p.title },
+        post: {
+          id: p.id,
+          title: p.title,
+          current_participants: p.current_participants,
+          max_participants: p.max_participants,
+        },
       }))
   );
 

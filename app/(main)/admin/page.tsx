@@ -84,7 +84,7 @@ export default async function AdminPage() {
           ) : (
             <div className="space-y-3">
               {pendingApplications.map((application) => (
-                <IncomingRequestItem key={application.id} application={{ ...application, post: application.post ?? { title: '알 수 없는 게시글' } }} />
+                <IncomingRequestItem key={application.id} application={{ ...application, post: application.post ?? { id: '', title: '알 수 없는 게시글' } }} />
               ))}
             </div>
           )}
