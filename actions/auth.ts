@@ -1,6 +1,5 @@
 'use server';
 
-import { createServerSupabaseClient } from '@/lib/supabase';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseAdmin = createClient(
@@ -28,8 +27,6 @@ export type CreateUserParams = {
  */
 export async function createUserRecord(data: CreateUserParams) {
   try {
-    const supabase = await createServerSupabaseClient();
-
     // 닉네임 중복 체크
     const { data: existingUser } = await supabaseAdmin
       .from('users')
@@ -55,7 +52,7 @@ export async function createUserRecord(data: CreateUserParams) {
       return { success: false, error: '이미 존재하는 계정입니다.' };
     }
 
-    const { error } = await supabase.from('users').upsert({
+    const { error } = await supabaseAdmin.from('users').upsert({
       id: data.id,
       email: data.email,
       username: data.username,
@@ -66,7 +63,10 @@ export async function createUserRecord(data: CreateUserParams) {
       is_approved: false,
     }, { onConflict: 'id' });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error inserting pending user record:', error);
+      throw error;
+    }
 
     return { success: true };
   } catch (error: unknown) {

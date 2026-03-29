@@ -157,10 +157,10 @@ export default function SignupPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nextValue = e.target.name === 'email' ? e.target.value.trim().toLowerCase() : e.target.value;
     if (e.target.name === 'email') {
-      setEmailStatus({ message: nextValue ? '이메일 중복확인을 진행해 주세요.' : '', isValid: null });
+      setEmailStatus({ message: '', isValid: null });
     }
     if (e.target.name === 'nickname') {
-      setNicknameStatus({ message: nextValue ? '닉네임 중복확인을 진행해 주세요.' : '', isValid: null });
+      setNicknameStatus({ message: '', isValid: null });
     }
     setFormData({ ...formData, [e.target.name]: nextValue });
   };
