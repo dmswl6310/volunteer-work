@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { checkEmailExists, checkNicknameExists } from '@/actions/auth';
+import { checkEmailExists, checkNicknameExists, registerUser } from '@/actions/auth';
 import { checkProfanity } from '@/lib/profanity';
 import { useToast } from '@/components/ToastProvider';
 import { Check, X } from 'lucide-react';
@@ -241,8 +240,8 @@ export default function SignupPage() {
 
     try {
       const [isEmailAvailable, isNicknameAvailable] = await Promise.all([
-        emailStatus.isValid === true ? Promise.resolve(true) : validateEmailValue(formData.email),
-        nicknameStatus.isValid === true ? Promise.resolve(true) : validateNicknameValue(formData.nickname),
+        validateEmailValue(formData.email),
+        validateNicknameValue(formData.nickname),
       ]);
 
       if (!isEmailAvailable || !isNicknameAvailable) {
@@ -251,52 +250,33 @@ export default function SignupPage() {
         return;
       }
 
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const result = await registerUser({
         email: formData.email,
         password: formData.password,
-        options: {
-          data: {
-            username: formData.nickname,
-          }
-        }
+        username: formData.nickname,
+        contact: formData.contact,
+        address: `${formData.address} ${formData.detailAddress}`.trim(),
+        job: formData.job,
       });
 
-      if (authError) throw authError;
-
-      if (authData.user) {
-        const { createUserRecord } = await import('@/actions/auth');
-
-        const result = await createUserRecord({
-          id: authData.user.id,
-          email: formData.email,
-          username: formData.nickname,
-          contact: formData.contact,
-          address: `${formData.address} ${formData.detailAddress}`.trim(),
-          job: formData.job
-        });
-
-        if (!result.success) {
-          await supabase.auth.signOut();
-          setError(result.error || '회원가입 처리 중 문제가 발생했습니다.');
-          setLoading(false);
-          return;
+      if (!result.success) {
+        if (result.fieldErrors?.email) {
+          setEmailStatus({ message: result.fieldErrors.email, isValid: false });
         }
-
-        await supabase.auth.signOut();
-
-        showToast('회원가입 요청이 접수되었습니다. 관리자 승인 후 로그인할 수 있습니다.', 'success');
-        setTimeout(() => {
-          router.push('/');
-        }, 600);
+        if (result.fieldErrors?.username) {
+          setNicknameStatus({ message: result.fieldErrors.username, isValid: false });
+        }
+        setError(result.error || '회원가입 처리 중 문제가 발생했습니다.');
+        return;
       }
+
+      showToast('회원가입 요청이 접수되었습니다. 관리자 승인 후 로그인할 수 있습니다.', 'success');
+      setTimeout(() => {
+        router.push('/');
+      }, 600);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : '';
-      if (message.includes('User already registered') || message.includes('already registered')) {
-        setError('이미 존재하는 계정입니다.');
-      } else {
-        console.error(err);
-        setError('회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-      }
+      console.error(err);
+      setError('회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setLoading(false);
     }
