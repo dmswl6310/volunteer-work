@@ -16,20 +16,6 @@ const DaumPostcode = dynamic(() => import('react-daum-postcode'), {
   loading: () => <div className="p-10 text-center text-sm text-gray-500">주소 검색 화면을 불러오는 중입니다...</div>
 });
 
-// 간단한 useDebounce 훅 내부 구현
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-  return debouncedValue;
-}
-
 const STEPS = [
   { number: 1, title: '계정 정보', description: '로그인에 사용할 이메일과 비밀번호를 입력해주세요.' },
   { number: 2, title: '개인 정보', description: '활동에 사용할 닉네임과 연락처를 입력해주세요.' },
@@ -68,14 +54,38 @@ export default function SignupPage() {
   const [isCheckingNickname, setIsCheckingNickname] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const debouncedEmail = useDebounce(formData.email, 500);
-  const debouncedNickname = useDebounce(formData.nickname, 500);
+  const emailFormatMessage = (() => {
+    if (!formData.email) return '';
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim().toLowerCase())
+      ? '올바른 이메일 형식입니다. 중복확인을 진행해 주세요.'
+      : '올바른 이메일 형식이 아닙니다.';
+  })();
+
+  const isEmailFormatValid = formData.email ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim().toLowerCase()) : null;
+
+  const nicknameFormatMessage = (() => {
+    if (!formData.nickname) return '';
+    const normalizedNickname = formData.nickname.trim();
+    if (normalizedNickname.length < 2 || normalizedNickname.length > 10) {
+      return '닉네임은 2자 이상 10자 이하여야 합니다.';
+    }
+    if (!/^[가-힣a-zA-Z0-9]+$/.test(normalizedNickname)) {
+      return '닉네임에는 특수문자나 기호를 사용할 수 없습니다.';
+    }
+    if (checkProfanity(normalizedNickname)) {
+      return '사용할 수 없는 단어가 포함되어 있습니다.';
+    }
+    return '사용 가능한 형식입니다. 중복확인을 진행해 주세요.';
+  })();
+
+  const isNicknameFormatValid = (() => {
+    if (!formData.nickname) return null;
+    const normalizedNickname = formData.nickname.trim();
+    return normalizedNickname.length >= 2 && normalizedNickname.length <= 10 && /^[가-힣a-zA-Z0-9]+$/.test(normalizedNickname) && !checkProfanity(normalizedNickname);
+  })();
 
   const validateEmailValue = async (email: string) => {
-    if (!email) {
-      setEmailStatus({ message: '', isValid: null });
-      return false;
-    }
+    if (!email) return false;
 
     const normalizedEmail = email.trim().toLowerCase();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -98,19 +108,11 @@ export default function SignupPage() {
     return true;
   };
 
-  // 이메일 실시간 검사
-  useEffect(() => {
-    void validateEmailValue(debouncedEmail);
-  }, [debouncedEmail]);
-
   // 비밀번호 정규식 (8자 이상, 영문/숫자/특수문자 포함)
   const isPasswordValid = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/.test(formData.password);
 
   const validateNicknameValue = async (nickname: string) => {
-    if (!nickname) {
-      setNicknameStatus({ message: '', isValid: null });
-      return false;
-    }
+    if (!nickname) return false;
     const normalizedNickname = nickname.trim();
     if (normalizedNickname.length < 2 || normalizedNickname.length > 10) {
       setNicknameStatus({ message: '닉네임은 2자 이상 10자 이하여야 합니다.', isValid: false });
@@ -139,11 +141,6 @@ export default function SignupPage() {
     return true;
   };
 
-  // 닉네임 실시간 검사
-  useEffect(() => {
-    void validateNicknameValue(debouncedNickname);
-  }, [debouncedNickname]);
-
   // 비밀번호 확인 실시간 검사
   useEffect(() => {
     if (!formData.password || !formData.passwordConfirm) {
@@ -159,6 +156,12 @@ export default function SignupPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nextValue = e.target.name === 'email' ? e.target.value.trim().toLowerCase() : e.target.value;
+    if (e.target.name === 'email') {
+      setEmailStatus({ message: nextValue ? '이메일 중복확인을 진행해 주세요.' : '', isValid: null });
+    }
+    if (e.target.name === 'nickname') {
+      setNicknameStatus({ message: nextValue ? '닉네임 중복확인을 진행해 주세요.' : '', isValid: null });
+    }
     setFormData({ ...formData, [e.target.name]: nextValue });
   };
 
@@ -176,6 +179,7 @@ export default function SignupPage() {
   // 단계별 유효성 검사
   const isStep1Valid =
     !isCheckingEmail &&
+    isEmailFormatValid === true &&
     emailStatus.isValid === true &&
     isPasswordValid &&
     passwordMatch.isValid === true;
@@ -184,6 +188,7 @@ export default function SignupPage() {
 
   const isStep2Valid =
     !isCheckingNickname &&
+    isNicknameFormatValid === true &&
     nicknameStatus.isValid === true &&
     isContactValid;
 
@@ -209,13 +214,11 @@ export default function SignupPage() {
     let canProceed = isCurrentStepValid;
 
     if (step === 1) {
-      const isEmailAvailable = await validateEmailValue(formData.email);
-      canProceed = isEmailAvailable && isPasswordValid && passwordMatch.isValid === true;
+      canProceed = isEmailFormatValid === true && emailStatus.isValid === true && isPasswordValid && passwordMatch.isValid === true;
     }
 
     if (step === 2) {
-      const isNicknameAvailable = await validateNicknameValue(formData.nickname);
-      canProceed = isNicknameAvailable && isContactValid;
+      canProceed = isNicknameFormatValid === true && nicknameStatus.isValid === true && isContactValid;
     }
 
     if (step < 3 && canProceed) {
@@ -238,8 +241,8 @@ export default function SignupPage() {
 
     try {
       const [isEmailAvailable, isNicknameAvailable] = await Promise.all([
-        validateEmailValue(formData.email),
-        validateNicknameValue(formData.nickname),
+        emailStatus.isValid === true ? Promise.resolve(true) : validateEmailValue(formData.email),
+        nicknameStatus.isValid === true ? Promise.resolve(true) : validateNicknameValue(formData.nickname),
       ]);
 
       if (!isEmailAvailable || !isNicknameAvailable) {
@@ -364,19 +367,29 @@ export default function SignupPage() {
               <div className="space-y-4">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700">이메일 (아이디)</label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    className={getValidationInputClass(emailStatus)}
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="example@email.com"
-                  />
-                  {emailStatus.message && (
-                    <p className={`mt-1 text-xs ${emailStatus.isValid ? 'text-green-600' : isCheckingEmail ? 'text-gray-500' : 'text-red-500'}`}>
-                      {emailStatus.message}
+                  <div className="mt-1 flex gap-2">
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      className={`${getValidationInputClass(emailStatus)} mt-0 flex-1`}
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="example@email.com"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void validateEmailValue(formData.email)}
+                      disabled={isEmailFormatValid !== true || isCheckingEmail}
+                      className="shrink-0 rounded-lg border border-indigo-200 px-3 py-2 text-sm font-semibold text-indigo-600 transition-colors hover:bg-indigo-50 disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-300"
+                    >
+                      {isCheckingEmail ? '확인 중' : '중복확인'}
+                    </button>
+                  </div>
+                  {(emailStatus.message || emailFormatMessage) && (
+                    <p className={`mt-1 text-xs ${emailStatus.isValid ? 'text-green-600' : isCheckingEmail ? 'text-gray-500' : isEmailFormatValid === false ? 'text-red-500' : 'text-gray-500'}`}>
+                      {emailStatus.message || emailFormatMessage}
                     </p>
                   )}
                 </div>
@@ -424,19 +437,29 @@ export default function SignupPage() {
               <div className="space-y-4">
                 <div>
                   <label htmlFor="nickname" className="block text-sm font-medium text-gray-700">닉네임</label>
-                  <input
-                    id="nickname"
-                    name="nickname"
-                    type="text"
-                    required
-                    className={getValidationInputClass(nicknameStatus)}
-                    value={formData.nickname}
-                    onChange={handleChange}
-                    placeholder="2자 이상의 닉네임을 입력해주세요"
-                  />
-                  {nicknameStatus.message && (
-                    <p className={`mt-1 text-xs ${nicknameStatus.isValid ? 'text-green-600' : isCheckingNickname ? 'text-gray-500' : 'text-red-500'}`}>
-                      {nicknameStatus.message}
+                  <div className="mt-1 flex gap-2">
+                    <input
+                      id="nickname"
+                      name="nickname"
+                      type="text"
+                      required
+                      className={`${getValidationInputClass(nicknameStatus)} mt-0 flex-1`}
+                      value={formData.nickname}
+                      onChange={handleChange}
+                      placeholder="2자 이상의 닉네임을 입력해주세요"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void validateNicknameValue(formData.nickname)}
+                      disabled={isNicknameFormatValid !== true || isCheckingNickname}
+                      className="shrink-0 rounded-lg border border-indigo-200 px-3 py-2 text-sm font-semibold text-indigo-600 transition-colors hover:bg-indigo-50 disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-300"
+                    >
+                      {isCheckingNickname ? '확인 중' : '중복확인'}
+                    </button>
+                  </div>
+                  {(nicknameStatus.message || nicknameFormatMessage) && (
+                    <p className={`mt-1 text-xs ${nicknameStatus.isValid ? 'text-green-600' : isCheckingNickname ? 'text-gray-500' : isNicknameFormatValid === false ? 'text-red-500' : 'text-gray-500'}`}>
+                      {nicknameStatus.message || nicknameFormatMessage}
                     </p>
                   )}
                 </div>
