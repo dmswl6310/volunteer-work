@@ -14,7 +14,7 @@ function formatDate(dateValue?: string | null) {
 export default async function MyHistoryPage({ searchParams }: { searchParams?: Promise<{ limit?: string }> }) {
   const params = await searchParams;
   const limit = parseLimit(params?.limit);
-  const { completedActivities, scraps, reviews } = await getMyHistoryPageData(limit);
+  const { completedActivities, scraps, reviews, pointTransactions } = await getMyHistoryPageData(limit);
   const visibleCompletedActivities = completedActivities.slice(0, limit);
 
   return (
@@ -42,6 +42,39 @@ export default async function MyHistoryPage({ searchParams }: { searchParams?: P
           <div className="mt-3 text-center">
             <Link href={`/mypage/history?limit=${limit + 10}`} className="text-sm font-semibold text-indigo-600 hover:underline">
               완료된 활동 더보기
+            </Link>
+          </div>
+        )}
+      </section>
+
+      <section>
+        <h3 className="text-base font-bold text-gray-900 mb-3 px-1">포인트 내역</h3>
+        {pointTransactions.length === 0 ? (
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 text-center text-sm text-gray-400 shadow-sm">포인트 적립 내역이 없습니다.</div>
+        ) : (
+          <div className="rounded-2xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-100">
+            {pointTransactions.map((transaction) => (
+              <div key={transaction.id} className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-bold text-gray-900">{transaction.description}</p>
+                    <p className="mt-1 text-xs text-gray-500">적립일: {formatDate(transaction.created_at)}</p>
+                    {transaction.posts?.title && (
+                      <Link href={`/board/${transaction.post_id || transaction.posts.id}`} className="mt-2 inline-flex text-xs font-semibold text-indigo-600 hover:underline">
+                        {transaction.posts.title}
+                      </Link>
+                    )}
+                  </div>
+                  <span className="shrink-0 text-base font-extrabold text-indigo-600">+{transaction.points}P</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {pointTransactions.length >= limit && (
+          <div className="mt-3 text-center">
+            <Link href={`/mypage/history?limit=${limit + 10}`} className="text-sm font-semibold text-indigo-600 hover:underline">
+              포인트 내역 더보기
             </Link>
           </div>
         )}

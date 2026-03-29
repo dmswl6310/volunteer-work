@@ -6,6 +6,20 @@ add column if not exists attended_at timestamptz,
 add column if not exists attendance_marked_by text,
 add column if not exists points_awarded_at timestamptz;
 
+create table if not exists public.point_transactions (
+  id text primary key,
+  user_id text not null,
+  application_id text,
+  post_id text,
+  points integer not null,
+  transaction_type text not null default 'earned',
+  description text not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists point_transactions_user_created_idx
+  on public.point_transactions (user_id, created_at desc);
+
 create or replace function public.confirm_attendance_and_award_points(
   target_post_id text,
   target_application_ids text[]
@@ -75,7 +89,19 @@ begin
       and status = 'approved'
       and attended_at is null
       and points_awarded_at is null
-    returning id, user_id
+    returning id, user_id, post_id
+  ), inserted_transactions as (
+    insert into point_transactions (id, user_id, application_id, post_id, points, transaction_type, description)
+    select
+      gen_random_uuid()::text,
+      user_id,
+      id,
+      post_id,
+      award_points,
+      'earned',
+      format('봉사활동 참여 확인 (%s시간 × 2P)', post_record.volunteer_hours)
+    from updated_applications
+    returning id
   ), updated_users as (
     update users
     set points = coalesce(points, 0) + award_points

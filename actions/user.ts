@@ -95,6 +95,19 @@ export type MyPageReview = {
   } | null;
 };
 
+export type MyPointTransaction = {
+  id: string;
+  points: number;
+  transaction_type: string;
+  description: string;
+  created_at: string;
+  post_id?: string | null;
+  posts?: {
+    id?: string | null;
+    title?: string | null;
+  } | null;
+};
+
 export type MyPageOverviewData = {
   profile: MyPageProfile;
   counts: {
@@ -132,6 +145,7 @@ export type MyPageHistoryData = {
   completedActivities: MyPageApplication[];
   scraps: MyPageScrap[];
   reviews: MyPageReview[];
+  pointTransactions: MyPointTransaction[];
 };
 
 function normalizeDate(value?: string | null) {
@@ -334,7 +348,7 @@ export async function getMyHostingPageData(): Promise<MyPageHostingData> {
 export async function getMyHistoryPageData(limit = 12): Promise<MyPageHistoryData> {
   const { supabase, authUser, profile } = await getMyPageProfile();
 
-  const [applicationsRes, scrapsRes, reviewsRes] = await Promise.all([
+  const [applicationsRes, scrapsRes, reviewsRes, pointTransactionsRes] = await Promise.all([
     supabase
       .from('applications')
       .select('id, status, post_id, created_at, attended_at, points_awarded_at, posts(id, title, due_date, volunteer_hours)')
@@ -352,6 +366,12 @@ export async function getMyHistoryPageData(limit = 12): Promise<MyPageHistoryDat
       .eq('author_id', authUser.id)
       .order('created_at', { ascending: false })
       .range(0, limit - 1),
+    supabase
+      .from('point_transactions')
+      .select('id, points, transaction_type, description, created_at, post_id, posts(id, title)')
+      .eq('user_id', authUser.id)
+      .order('created_at', { ascending: false })
+      .range(0, limit - 1),
   ]);
 
   return {
@@ -359,6 +379,7 @@ export async function getMyHistoryPageData(limit = 12): Promise<MyPageHistoryDat
     completedActivities: deriveCompletedActivities((applicationsRes.data ?? []) as MyPageApplication[]),
     scraps: (scrapsRes.data ?? []) as MyPageScrap[],
     reviews: (reviewsRes.data ?? []) as MyPageReview[],
+    pointTransactions: (pointTransactionsRes.data ?? []) as MyPointTransaction[],
   };
 }
 
