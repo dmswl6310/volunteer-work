@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { updateApplicationStatus } from '@/actions/apply';
+import { rejectRemainingApplications, updateApplicationStatus } from '@/actions/apply';
 import { useState } from 'react';
 import { useToast } from './ToastProvider';
 
@@ -30,6 +30,7 @@ export type IncomingRequestApplication = {
 /** 들어오는 신청 항목 컴포넌트 (승인/거절 버튼 포함) */
 export default function IncomingRequestItem({ application }: { application: IncomingRequestApplication }) {
   const [loading, setLoading] = useState(false);
+  const [bulkRejectLoading, setBulkRejectLoading] = useState(false);
   const { showToast, showConfirm } = useToast();
   const isFull =
     typeof application.post.current_participants === 'number' &&
@@ -58,6 +59,28 @@ export default function IncomingRequestItem({ application }: { application: Inco
     }
   };
 
+  const handleBulkReject = async () => {
+    const confirmed = await showConfirm('이 게시글의 남은 승인 대기 신청을 모두 거절하시겠습니까?', {
+      title: '남은 신청 일괄 거절',
+      confirmLabel: '일괄 거절',
+    });
+    if (!confirmed) return;
+
+    setBulkRejectLoading(true);
+    try {
+      const result = await rejectRemainingApplications(application.post.id);
+      if (result.rejectedCount === 0) {
+        showToast('이미 처리할 승인 대기 신청이 없습니다.', 'warning');
+      } else {
+        showToast(`남은 신청 ${result.rejectedCount}건을 일괄 거절했습니다.`, 'success');
+      }
+      window.location.reload();
+    } catch (error: unknown) {
+      showToast(error instanceof Error ? error.message : '일괄 거절 처리 중 오류가 발생했습니다.', 'error');
+      setBulkRejectLoading(false);
+    }
+  };
+
   return (
     <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-lg shadow-sm">
       <div>
@@ -80,6 +103,16 @@ export default function IncomingRequestItem({ application }: { application: Inco
           </Link>
         </p>
         {isFull && <p className="mt-1 text-xs font-medium text-orange-600">모집 인원이 모두 차서 승인할 수 없습니다.</p>}
+        {isFull && (
+          <button
+            type="button"
+            onClick={handleBulkReject}
+            disabled={bulkRejectLoading || loading}
+            className="mt-2 text-xs font-semibold text-red-600 underline underline-offset-2 hover:text-red-700 disabled:opacity-50"
+          >
+            {bulkRejectLoading ? '처리 중...' : '남은 신청 일괄 거절'}
+          </button>
+        )}
       </div>
       <div className="flex flex-col space-y-2 ml-4">
         <button

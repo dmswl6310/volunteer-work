@@ -118,6 +118,44 @@ export async function updateApplicationStatus(applicationId: string, newStatus: 
   revalidatePath('/mypage');
 }
 
+export async function rejectRemainingApplications(postId: string) {
+  const { supabase, user, profile } = await requireApprovedUser();
+
+  const { data: post } = await supabase
+    .from('posts')
+    .select('id, author_id')
+    .eq('id', postId)
+    .single();
+
+  if (!post) {
+    throw new Error('게시글 정보를 찾을 수 없습니다.');
+  }
+
+  if (profile.role !== 'admin' && post.author_id !== user.id) {
+    throw new Error('남은 신청을 정리할 권한이 없습니다.');
+  }
+
+  const { data, error } = await supabase
+    .from('applications')
+    .update({ status: 'rejected' })
+    .eq('post_id', postId)
+    .eq('status', 'pending')
+    .select('id');
+
+  if (error) {
+    throw new Error(error.message || '남은 신청 거절 처리 중 오류가 발생했습니다.');
+  }
+
+  const rejectedCount = data?.length ?? 0;
+
+  revalidatePath('/mypage');
+  revalidatePath('/mypage/hosting');
+  revalidatePath('/admin');
+  revalidatePath(`/board/${postId}`);
+
+  return { rejectedCount };
+}
+
 /**
  * 봉사활동 신청을 취소합니다.
  * 이미 승인/확정된 신청이면 참여자 수를 감소시킵니다.
