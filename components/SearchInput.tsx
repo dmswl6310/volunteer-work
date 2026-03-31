@@ -52,7 +52,7 @@ export default function SearchInput() {
                 <div className="flex items-center space-x-2">
                     {displayedQuery && (
                         <div
-                            className="flex items-center bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-sm font-medium border border-indigo-100 cursor-pointer hover:bg-indigo-100 transition-colors"
+                            className="flex items-center rounded-full border border-teal-100 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-700 transition-colors cursor-pointer hover:bg-teal-100"
                             onClick={toggleSearch}
                         >
                             <span className="truncate max-w-[120px]">{displayedQuery}</span>
@@ -66,7 +66,7 @@ export default function SearchInput() {
                                     setQuery('');
                                     router.push(`/board?${params.toString()}`);
                                 }}
-                                className="ml-1.5 p-0.5 text-indigo-400 hover:text-indigo-600 rounded-full hover:bg-indigo-200 transition-colors"
+                                className="ml-1.5 rounded-full p-0.5 text-teal-400 transition-colors hover:bg-teal-200 hover:text-teal-600"
                                 aria-label="검색어 초기화"
                             >
                                 <X className="h-3.5 w-3.5" />
@@ -75,19 +75,19 @@ export default function SearchInput() {
                     )}
                     <button
                         onClick={toggleSearch}
-                        className="p-2 text-gray-500 hover:text-indigo-600 transition-colors rounded-full hover:bg-gray-100"
+                        className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-teal-600"
                         aria-label="검색 열기"
                     >
                         <Search className="h-5 w-5" />
                     </button>
                 </div>
             ) : (
-                <form onSubmit={handleSearch} className="absolute inset-0 bg-white z-20 flex items-center px-4 animate-fade-in">
+                <form onSubmit={handleSearch} className="absolute inset-0 z-20 flex items-center rounded-3xl border border-gray-100 bg-white px-4 shadow-sm animate-fade-in">
                     <div className="relative w-full flex items-center">
                         <button
                             type="button"
                             onClick={toggleSearch}
-                            className="p-2 -ml-2 mr-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors"
+                            className="-ml-2 mr-2 rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
                             aria-label="검색 닫기"
                         >
                             <ArrowLeft className="h-5 w-5" />
@@ -95,7 +95,7 @@ export default function SearchInput() {
                         <input
                             autoFocus
                             type="text"
-                            className="flex-1 bg-gray-100 border-none rounded-lg py-2 pl-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                            className="flex-1 rounded-2xl border-none bg-gray-100 py-2 pl-4 pr-10 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-teal-500"
                             placeholder="봉사활동 검색..."
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
