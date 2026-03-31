@@ -87,9 +87,9 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
         {/* 제목 및 카테고리 */}
         <div className="mb-6">
           <div className="flex items-center space-x-2 mb-2">
-            <span className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-full">
-              {post.category}
-            </span>
+              <span className="inline-block rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-600">
+                {post.category}
+              </span>
             {post.due_date && post.is_recruiting && !isExpired && !isFull && (
               <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full bg-red-50 text-red-500`}>
                 {diffDays === 0 ? 'D-Day' : `D-${diffDays}`}
@@ -113,8 +113,8 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
         </div>
 
         {/* 주최자 프로필 */}
-        <div className="flex items-center p-4 bg-gray-50 rounded-xl mb-8">
-          <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-lg mr-4">
+        <div className="mb-8 flex items-center rounded-2xl bg-gray-50 p-4">
+          <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-full bg-teal-50 text-lg font-bold text-teal-600">
             {post.author.username?.[0] || 'A'}
           </div>
           <div>
@@ -122,7 +122,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
               {post.author.username || '익명'}
             </p>
             <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-700">
-              <Phone className="h-4 w-4 text-indigo-500" />
+              <Phone className="h-4 w-4 text-teal-500" />
               <span>{post.author.contact || '연락처 미등록'}</span>
             </div>
           </div>
@@ -137,13 +137,13 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
         <div className="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-3">
           <div className="bg-gray-50 p-4 rounded-xl text-center">
             <p className="text-xs text-gray-500 mb-1">참여 인원</p>
-            <p className="text-lg font-bold text-indigo-600">
+            <p className="text-lg font-bold text-teal-600">
               {post.current_participants} / {post.max_participants}명
             </p>
           </div>
           <div className="bg-gray-50 p-4 rounded-xl text-center">
             <p className="text-xs text-gray-500 mb-1">봉사 시간</p>
-            <p className="inline-flex items-center gap-1 text-lg font-bold text-indigo-600">
+            <p className="inline-flex items-center gap-1 text-lg font-bold text-teal-600">
               <Clock3 className="h-4 w-4" />
               <span>{post.volunteer_hours ?? 1}시간</span>
             </p>
