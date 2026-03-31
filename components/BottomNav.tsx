@@ -38,8 +38,8 @@ export default function BottomNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-6 pb-safe z-50">
-      <div className="max-w-md mx-auto flex justify-between items-center">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#f6f7f8] px-4 py-3 pb-safe">
+      <div className="mx-auto flex max-w-md items-center justify-between rounded-3xl border border-gray-100 bg-white px-6 py-3 shadow-[0_8px_24px_rgba(15,23,42,0.08)]">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const active = tab.isActive;
@@ -47,8 +47,8 @@ export default function BottomNav() {
             <Link 
               key={tab.name} 
               href={tab.href}
-              className={`touch-feedback flex flex-col items-center space-y-1 ${
-                active ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-900'
+              className={`touch-feedback flex flex-col items-center space-y-1 rounded-2xl px-3 py-1 transition-colors ${
+                active ? 'bg-teal-50 text-teal-600' : 'text-gray-500 hover:text-gray-900'
               }`}
             >
               <Icon size={24} strokeWidth={active ? 2.5 : 2} />
