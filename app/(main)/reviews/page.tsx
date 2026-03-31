@@ -24,9 +24,9 @@ export default async function ReviewPage() {
                     </div>
                 ) : (
                     reviews.map((review) => (
-                        <div key={review.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <div key={review.id} className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
                             <Link href={`/board/${review.post_id}`} className="block mb-3">
-                                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded mb-2 inline-block">
+                                <span className="mb-2 inline-block rounded-full bg-teal-50 px-2.5 py-1 text-xs font-bold text-teal-600">
                                     {review.posts?.title || '삭제된 활동'}
                                 </span>
                             </Link>
