@@ -45,18 +45,19 @@ export default function WriteReviewPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <h1 className="text-2xl font-bold mb-6">봉사활동 후기 작성</h1>
+    <div className="container mx-auto max-w-2xl bg-slate-50/70 px-4 py-8 min-h-screen">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Write review</p>
+      <h1 className="mb-6 mt-1 text-2xl font-semibold tracking-[-0.02em] text-slate-900">봉사활동 후기 작성</h1>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
+      <form onSubmit={handleSubmit} className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
         <div className="mb-4">
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="content" className="mb-2 block text-sm font-medium text-slate-700">
             후기 내용
           </label>
           <textarea
             id="content"
             rows={6}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="봉사활동은 어떠셨나요? 솔직한 후기를 남겨주세요."
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -67,7 +68,7 @@ export default function WriteReviewPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
         >
           {isSubmitting ? (
             <>

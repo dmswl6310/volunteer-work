@@ -63,10 +63,10 @@ export default function ReviewLikeButton({ reviewId, initialIsLiked, initialLike
     <button
       onClick={handleToggle}
       disabled={isLoading}
-      className={`flex items-center space-x-1 text-sm transition-colors ${
+      className={`flex items-center space-x-1 rounded-full px-2 py-1 text-sm transition-colors ${
         isLiked
-          ? 'text-indigo-600'
-          : 'text-gray-400 hover:text-indigo-500'
+          ? 'bg-indigo-50 text-indigo-600'
+          : 'text-slate-400 hover:bg-slate-100 hover:text-indigo-500'
       } ${isLoading ? 'opacity-50' : ''}`}
     >
       <ThumbsUp

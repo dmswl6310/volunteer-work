@@ -11,31 +11,32 @@ export default async function ReviewPage() {
     const reviews = await getAllReviews(user?.id);
 
     return (
-        <div className="pb-24 bg-gray-50 min-h-screen">
+        <div className="min-h-screen bg-slate-50/70 pb-24">
             {/* Header */}
-            <div className="bg-white px-4 py-3 border-b border-gray-100 sticky top-0 z-30 shadow-sm">
-                <h1 className="text-xl font-bold text-gray-900 tracking-tight">봉사활동 후기</h1>
+            <div className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Reviews</p>
+                <h1 className="text-xl font-semibold tracking-[-0.02em] text-slate-900">봉사활동 후기</h1>
             </div>
 
             <div className="p-4 space-y-4">
                 {reviews.length === 0 ? (
-                    <div className="text-center py-20 text-gray-400">
+                    <div className="rounded-3xl border border-dashed border-slate-200 bg-white py-20 text-center text-slate-400">
                         등록된 후기가 없습니다.
                     </div>
                 ) : (
                     reviews.map((review) => (
-                        <div key={review.id} className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
+                        <div key={review.id} className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
                             <Link href={`/board/${review.post_id}`} className="block mb-3">
-                                <span className="mb-2 inline-block rounded-full bg-teal-50 px-2.5 py-1 text-xs font-bold text-teal-600">
+                                <span className="mb-2 inline-block rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
                                     {review.posts?.title || '삭제된 활동'}
                                 </span>
                             </Link>
-                            <p className="text-gray-800 leading-relaxed whitespace-pre-wrap mb-4">
+                            <p className="mb-4 whitespace-pre-wrap leading-relaxed text-slate-800">
                                 {review.content}
                             </p>
-                            <div className="flex justify-between items-center text-xs text-gray-500 border-t border-gray-100 pt-3">
+                            <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
                                 <div className="flex items-center space-x-2">
-                                    <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold text-[10px]">
+                                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 font-bold text-[10px] text-slate-600">
                                         {review.author?.username?.[0] || 'U'}
                                     </div>
                                     <span>{review.author?.username || '익명'}</span>
