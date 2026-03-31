@@ -14,29 +14,35 @@ export default async function MyPagePage() {
 
   return (
     <div className="space-y-4">
-      <section className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-bold text-gray-900">내 신청</h2>
-          <Link href="/mypage/applications" className="text-xs font-semibold text-teal-600 hover:underline">
+      <section className="rounded-3xl border border-slate-200/80 bg-white px-5 py-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
+        <div className="mb-5 flex items-end justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Overview</p>
+            <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">내 신청</h2>
+          </div>
+          <Link href="/mypage/applications" className="text-xs font-semibold text-indigo-600 transition-colors hover:text-indigo-700">
             전체보기
           </Link>
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <p className="mb-2 text-sm font-bold text-gray-800">[진행 중인 신청]</p>
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-slate-800">진행 중인 신청</p>
+              <span className="text-xs text-slate-400">{visibleActiveApplications.length}건</span>
+            </div>
             {visibleActiveApplications.length === 0 ? (
-              <div className="rounded-xl bg-gray-50 px-4 py-5 text-center text-sm text-gray-400">진행 중인 신청이 없습니다.</div>
+              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-6 text-center text-sm text-slate-400">진행 중인 신청이 없습니다.</div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {visibleActiveApplications.map((application) => (
-                  <div key={application.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+                  <div key={application.id} className="rounded-2xl border border-slate-200 bg-slate-50/40 p-4 transition-colors hover:border-slate-300 hover:bg-white">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <Link href={`/board/${application.post_id || application.postId}`} className="block truncate font-bold text-gray-900 hover:text-teal-600">
+                        <Link href={`/board/${application.post_id || application.postId}`} className="block truncate text-[15px] font-semibold text-slate-900 transition-colors hover:text-indigo-700">
                           {application.posts?.title || '알 수 없는 게시글'}
                         </Link>
-                        <p className="mt-1 text-xs text-gray-500">신청일: {formatDate(application.created_at || application.createdAt)}</p>
+                        <p className="mt-1 text-xs text-slate-500">신청일 · {formatDate(application.created_at || application.createdAt)}</p>
                       </div>
                       <StatusBadge status={application.status} />
                     </div>
@@ -51,20 +57,23 @@ export default async function MyPagePage() {
             )}
           </div>
 
-          <div>
-            <p className="mb-2 text-sm font-bold text-gray-800">[참여 완료]</p>
+          <div className="space-y-3 border-t border-slate-100 pt-1">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-slate-800">참여 완료</p>
+              <span className="text-xs text-slate-400">{visibleCompletedActivities.length}건</span>
+            </div>
             {visibleCompletedActivities.length === 0 ? (
-              <div className="rounded-xl bg-gray-50 px-4 py-5 text-center text-sm text-gray-400">참여 완료된 활동이 없습니다.</div>
+              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-6 text-center text-sm text-slate-400">참여 완료된 활동이 없습니다.</div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {visibleCompletedActivities.map((application) => (
-                  <Link key={application.id} href={`/board/${application.post_id || application.postId}`} className="block rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:border-teal-200">
+                  <Link key={application.id} href={`/board/${application.post_id || application.postId}`} className="block rounded-2xl border border-slate-200 bg-white p-4 transition-colors hover:border-indigo-200 hover:bg-slate-50/40">
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-bold text-gray-900">{application.posts?.title || '알 수 없는 게시글'}</p>
-                        <p className="mt-1 text-xs text-gray-500">진행일: {formatDate(application.posts?.due_date)}</p>
+                        <p className="truncate text-[15px] font-semibold text-slate-900">{application.posts?.title || '알 수 없는 게시글'}</p>
+                        <p className="mt-1 text-xs text-slate-500">진행일 · {formatDate(application.posts?.due_date)}</p>
                       </div>
-                      <span className="text-gray-400">›</span>
+                      <span className="text-slate-400">›</span>
                     </div>
                   </Link>
                 ))}

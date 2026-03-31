@@ -7,14 +7,15 @@ export default async function MyProfilePage() {
 
   return (
     <div className="space-y-4">
-      <section className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-bold text-gray-900">프로필</h2>
-        <p className="mt-1 text-sm text-gray-500">연락처, 주소, 직업을 수정하고 계정 정보를 관리할 수 있어요.</p>
+      <section className="rounded-3xl border border-slate-200/80 bg-white px-5 py-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Profile</p>
+        <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">내 정보</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-500">연락처, 주소, 직업을 수정하고 계정 정보를 관리할 수 있어요.</p>
       </section>
 
-      <section className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+      <section className="rounded-3xl border border-slate-200/80 bg-white px-5 py-6 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
         <ProfileEditForm user={profile} />
-        <div className="mt-6 border-t border-gray-100 pt-4">
+        <div className="mt-8 border-t border-slate-100 pt-5">
           <LogoutButton />
         </div>
       </section>

@@ -62,37 +62,38 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
     if (!isEditing) {
         return (
             <>
-                <div className="flex items-center space-x-4 mb-6">
-                    <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-2xl">
+                <div className="mb-7 flex items-start space-x-4">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-2xl font-semibold text-indigo-600">
                         {user.username?.[0] || 'U'}
                     </div>
                     <div className="flex-1">
-                        <h2 className="text-xl font-bold text-gray-900">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Account details</p>
+                        <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">
                             {user.username || '이름 없음'}
                         </h2>
-                        <p className="text-xs text-gray-400 mt-1">닉네임은 가입 후 변경할 수 없습니다.</p>
+                        <p className="mt-1 text-sm text-slate-500">닉네임은 가입 후 변경할 수 없습니다.</p>
                     </div>
                     <button
                         onClick={() => setIsEditing(true)}
-                        className="rounded-2xl p-2 text-gray-400 transition-colors hover:bg-teal-50 hover:text-teal-600"
+                        className="rounded-2xl border border-slate-200 p-2.5 text-slate-500 transition-colors hover:border-indigo-200 hover:bg-indigo-50/60 hover:text-indigo-700"
                         title="프로필 수정"
                     >
                         <Pencil className="w-5 h-5" />
                     </button>
                 </div>
 
-                <div className="mb-4 grid grid-cols-2 gap-4 rounded-2xl bg-gray-50 p-4 text-sm">
-                    <div>
-                        <span className="block text-gray-500 text-xs mb-1">연락처</span>
-                        <span className="font-bold text-gray-900">{user.contact || '-'}</span>
+                <div className="mb-2 grid grid-cols-2 gap-3 text-sm">
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
+                        <span className="mb-1 block text-[11px] font-medium uppercase tracking-[0.08em] text-slate-400">연락처</span>
+                        <span className="font-semibold text-slate-900">{user.contact || '-'}</span>
                     </div>
-                    <div>
-                        <span className="block text-gray-500 text-xs mb-1">직업 / 소속기관</span>
-                        <span className="font-bold text-gray-900">{user.job || '-'}</span>
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
+                        <span className="mb-1 block text-[11px] font-medium uppercase tracking-[0.08em] text-slate-400">직업 / 소속기관</span>
+                        <span className="font-semibold text-slate-900">{user.job || '-'}</span>
                     </div>
-                    <div className="col-span-2">
-                        <span className="block text-gray-500 text-xs mb-1">주소</span>
-                        <span className="font-bold text-gray-900 truncate block">{user.address || '-'}</span>
+                    <div className="col-span-2 rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
+                        <span className="mb-1 block text-[11px] font-medium uppercase tracking-[0.08em] text-slate-400">주소</span>
+                        <span className="block truncate font-semibold text-slate-900">{user.address || '-'}</span>
                     </div>
                 </div>
             </>
@@ -101,50 +102,51 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
 
     return (
         <>
-            <div className="flex items-center space-x-4 mb-6">
-                <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-2xl">
+            <div className="mb-7 flex items-start space-x-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-2xl font-semibold text-indigo-600">
                     {user.username?.[0] || 'U'}
                 </div>
                 <div className="flex-1">
-                    <p className="text-lg font-bold text-gray-900">{user.username || '이름 없음'}</p>
-                    <p className="text-xs text-gray-400 mt-1">닉네임은 가입할 때 한 번만 설정할 수 있습니다.</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Edit profile</p>
+                    <p className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">{user.username || '이름 없음'}</p>
+                    <p className="mt-1 text-sm text-slate-500">닉네임은 가입할 때 한 번만 설정할 수 있습니다.</p>
                 </div>
             </div>
 
-            <form onSubmit={handleUpdateProfile} className="space-y-4 mb-4">
+            <form onSubmit={handleUpdateProfile} className="mb-4 space-y-5">
                 <div>
-                    <label className="block text-xs text-gray-500 mb-1">연락처</label>
+                    <label className="mb-1.5 block text-xs font-medium text-slate-500">연락처</label>
                     <input
                         type="text"
                         value={editForm.contact}
                         onChange={(e) => setEditForm({ ...editForm, contact: e.target.value })}
-                        className="block w-full rounded-xl border-gray-200 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
+                        className="block w-full rounded-2xl border-slate-200 bg-white px-4 py-3 shadow-none focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-xs text-gray-500 mb-1">직업 / 소속기관</label>
+                        <label className="mb-1.5 block text-xs font-medium text-slate-500">직업 / 소속기관</label>
                         <input
                             type="text"
                             value={editForm.job}
                             onChange={(e) => setEditForm({ ...editForm, job: e.target.value })}
-                            className="block w-full rounded-xl border-gray-200 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
+                            className="block w-full rounded-2xl border-slate-200 bg-white px-4 py-3 shadow-none focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                     </div>
                     <div className="col-span-2">
-                        <label className="block text-xs text-gray-500 mb-1">주소</label>
+                        <label className="mb-1.5 block text-xs font-medium text-slate-500">주소</label>
                         <div className="mt-1 flex gap-2">
                             <input
                                 type="text"
                                 readOnly
                                 value={editForm.address}
-                                className="block w-full cursor-not-allowed rounded-xl border-gray-200 bg-gray-100 text-gray-900 font-medium shadow-sm focus:outline-none sm:text-sm"
+                                className="block w-full cursor-not-allowed rounded-2xl border-slate-200 bg-slate-50 text-slate-900 px-4 py-3 font-medium shadow-none focus:outline-none sm:text-sm"
                                 placeholder="기본 주소"
                             />
                             <button
                                 type="button"
                                 onClick={() => setIsPostcodeOpen(true)}
-                                className="whitespace-nowrap rounded-xl bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none"
+                                className="whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:border-indigo-200 hover:bg-indigo-50/60 hover:text-indigo-700 focus:outline-none"
                             >
                                 주소 검색
                             </button>
@@ -153,16 +155,16 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                             type="text"
                             value={editForm.detailAddress}
                             onChange={(e) => setEditForm({ ...editForm, detailAddress: e.target.value })}
-                            className="mt-2 block w-full rounded-xl border-gray-200 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
+                            className="mt-2 block w-full rounded-2xl border-slate-200 bg-white px-4 py-3 shadow-none focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                             placeholder="상세 주소 (예: 101동 202호)"
                         />
                     </div>
                 </div>
                 <div className="flex space-x-2 pt-2">
-                    <button type="submit" disabled={loading} className="flex-1 rounded-2xl bg-teal-500 py-2.5 text-sm font-bold text-white shadow-sm disabled:opacity-50">
+                    <button type="submit" disabled={loading} className="flex-1 rounded-2xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50">
                         {loading ? '저장 중...' : '저장'}
                     </button>
-                    <button type="button" onClick={() => setIsEditing(false)} disabled={loading} className="flex-1 rounded-2xl bg-gray-100 py-2.5 text-sm font-bold text-gray-600 disabled:opacity-50">
+                    <button type="button" onClick={() => setIsEditing(false)} disabled={loading} className="flex-1 rounded-2xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50">
                         취소
                     </button>
                 </div>
