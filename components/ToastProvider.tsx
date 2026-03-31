@@ -77,10 +77,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   };
 
   const typeStyles: Record<ToastType, string> = {
-    success: 'bg-green-500',
-    error: 'bg-red-500',
-    info: 'bg-indigo-500',
-    warning: 'bg-yellow-500 text-yellow-900',
+    success: 'border border-emerald-200 bg-white text-slate-900',
+    error: 'border border-rose-200 bg-white text-slate-900',
+    info: 'border border-indigo-200 bg-white text-slate-900',
+    warning: 'border border-amber-200 bg-white text-slate-900',
   };
 
   const typeIcons: Record<ToastType, string> = {
@@ -96,21 +96,21 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
       {confirmState && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl">
-            <h3 className="text-lg font-bold text-gray-900">{confirmState.title}</h3>
-            <p className="mt-2 whitespace-pre-line text-sm text-gray-600">{confirmState.message}</p>
+          <div className="w-full max-w-sm rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_20px_50px_rgba(15,23,42,0.16)]">
+            <h3 className="text-lg font-semibold text-slate-900">{confirmState.title}</h3>
+            <p className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{confirmState.message}</p>
             <div className="mt-5 flex gap-2">
               <button
                 type="button"
                 onClick={() => handleConfirmClose(false)}
-                className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                className="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
               >
                 {confirmState.cancelLabel}
               </button>
               <button
                 type="button"
                 onClick={() => handleConfirmClose(true)}
-                className="flex-1 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
+                className="flex-1 rounded-2xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
               >
                 {confirmState.confirmLabel}
               </button>
@@ -124,11 +124,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map(toast => (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium animate-slide-down ${typeStyles[toast.type]}`}
+            className={`pointer-events-auto animate-slide-down flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium shadow-[0_14px_30px_rgba(15,23,42,0.12)] ${typeStyles[toast.type]}`}
             onClick={() => removeToast(toast.id)}
             role="alert"
           >
-            <span className="text-base">{typeIcons[toast.type]}</span>
+            <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${toast.type === 'success' ? 'bg-emerald-50 text-emerald-600' : toast.type === 'error' ? 'bg-rose-50 text-rose-600' : toast.type === 'warning' ? 'bg-amber-50 text-amber-600' : 'bg-indigo-50 text-indigo-600'}`}>{typeIcons[toast.type]}</span>
             <span>{toast.message}</span>
           </div>
         ))}

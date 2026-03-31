@@ -36,20 +36,20 @@ export default function Header() {
   };
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+    <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur">
+      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         {/* 로고 */}
-        <Link href="/" className="font-bold text-xl text-indigo-600 tracking-tight">
+        <Link href="/" className="text-xl font-semibold tracking-[-0.02em] text-indigo-600">
           Together
         </Link>
 
         {/* 데스크톱 네비게이션 */}
-        <div className="hidden md:flex space-x-6 text-sm font-medium text-gray-600">
-          <Link href="/board" className="hover:text-indigo-600 transition">
+        <div className="hidden space-x-6 text-sm font-medium text-slate-600 md:flex">
+          <Link href="/board" className="transition hover:text-indigo-600">
             봉사활동 찾기
           </Link>
           {session && (
-             <Link href="/board/write" className="hover:text-indigo-600 transition">
+             <Link href="/board/write" className="transition hover:text-indigo-600">
                 봉사 모집하기
              </Link>
           )}
@@ -61,13 +61,13 @@ export default function Header() {
             <>
               <Link 
                 href="/mypage" 
-                className="px-3 py-1.5 rounded-full bg-gray-50 text-gray-700 hover:bg-gray-100 transition"
+                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50/60 hover:text-indigo-700"
               >
                 마이페이지
               </Link>
               <button 
                 onClick={handleLogout}
-                className="px-3 py-1.5 text-gray-500 hover:text-red-600 transition"
+                className="px-3 py-1.5 text-slate-500 transition hover:text-rose-600"
               >
                 로그아웃
               </button>
@@ -76,13 +76,13 @@ export default function Header() {
             <>
               <Link 
                 href="/auth/login" 
-                className="px-4 py-1.5 rounded-full text-indigo-600 hover:bg-indigo-50 transition"
+                className="rounded-full px-4 py-1.5 text-indigo-600 transition hover:bg-indigo-50"
               >
                 로그인
               </Link>
               <Link 
                 href="/auth/signup" 
-                className="px-4 py-1.5 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm transition"
+                className="rounded-full bg-indigo-600 px-4 py-1.5 text-white shadow-[0_8px_20px_rgba(79,70,229,0.18)] transition hover:bg-indigo-700"
               >
                 회원가입
               </Link>
