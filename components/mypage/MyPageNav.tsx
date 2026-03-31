@@ -2,34 +2,32 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ClipboardList, FolderOpen, LayoutDashboard, Settings, ShieldCheck } from 'lucide-react';
+import { ClipboardList, FolderOpen, ShieldCheck } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { href: '/mypage', label: '개요', icon: LayoutDashboard },
-  { href: '/mypage/applications', label: '내 신청', icon: ClipboardList },
+  { href: '/mypage', label: '내 신청', icon: ClipboardList, match: ['/mypage', '/mypage/applications'] },
   { href: '/mypage/hosting', label: '주최 관리', icon: ShieldCheck },
-  { href: '/mypage/history', label: '기록', icon: FolderOpen },
-  { href: '/mypage/profile', label: '프로필', icon: Settings },
+  { href: '/mypage/history', label: '관심/기록', icon: FolderOpen },
 ];
 
 export default function MyPageNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="overflow-x-auto pb-1">
-      <div className="flex gap-2 min-w-max">
+    <nav className="rounded-2xl border border-gray-100 bg-white p-1 shadow-sm overflow-x-auto">
+      <div className="flex min-w-max gap-1">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const isActive = item.match ? item.match.includes(pathname) : pathname === item.href;
 
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+              className={`inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'bg-white text-gray-500 border border-gray-200 hover:border-indigo-200 hover:text-indigo-600'
+                  ? 'bg-teal-500 text-white shadow-sm'
+                  : 'text-gray-500 hover:bg-gray-50 hover:text-teal-600'
               }`}
             >
               <Icon className="h-4 w-4" />
