@@ -149,32 +149,35 @@ export default function EditPage() {
 
   if (initialLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50/70">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-xl mx-auto p-4 pb-20">
+    <div className="mx-auto min-h-screen max-w-xl bg-slate-50/70 p-4 pb-20">
       {/* 헤더 */}
-      <div className="flex items-center mb-6">
-        <button onClick={() => router.back()} className="p-2 -ml-2 mr-2 rounded-full hover:bg-gray-100">
-          <ChevronLeft className="w-6 h-6 text-gray-700" />
+      <div className="mb-6 flex items-center">
+        <button onClick={() => router.back()} className="-ml-2 mr-2 rounded-full p-2 transition-colors hover:bg-slate-100">
+          <ChevronLeft className="h-6 w-6 text-slate-700" />
         </button>
-        <h1 className="text-2xl font-bold">게시글 수정</h1>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Edit activity</p>
+          <h1 className="text-2xl font-semibold tracking-[-0.02em] text-slate-900">게시글 수정</h1>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* 이미지 업로드 */}
         <div className="flex flex-col items-center">
-          <label htmlFor="image-upload" className="w-full h-64 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-colors overflow-hidden relative">
+          <label htmlFor="image-upload" className="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-3xl border border-dashed border-slate-300 bg-white transition-colors hover:border-indigo-300 hover:bg-indigo-50/40">
             {previewUrl ? (
               <Image src={previewUrl} alt="Preview" fill unoptimized className="object-cover" sizes="(max-width: 768px) 100vw, 768px" />
             ) : (
               <>
-                <ImagePlus className="w-10 h-10 text-gray-400 mb-2" strokeWidth={1} />
-                <span className="text-sm text-gray-500">이미지 변경 (클릭)</span>
+                <ImagePlus className="mb-2 h-10 w-10 text-slate-400" strokeWidth={1} />
+                <span className="text-sm text-slate-500">이미지 변경 (클릭)</span>
               </>
             )}
             <input id="image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
@@ -183,27 +186,27 @@ export default function EditPage() {
 
         {/* 제목 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">제목</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">제목</label>
           <input
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             required
             placeholder="봉사활동 제목을 입력하세요"
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
           />
         </div>
 
         {/* 마감일 & 긴급 */}
         <div className="flex gap-4">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">마감 기한</label>
+            <label className="mb-1 block text-sm font-medium text-slate-700">마감 기한</label>
             <input
               type="date"
               value={formData.dueDate}
               onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
               required
               min={minimumDueDate}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
             />
           </div>
           <div className="flex items-center pt-6">
@@ -214,21 +217,21 @@ export default function EditPage() {
                 onChange={(e) => setFormData({ ...formData, isUrgent: e.target.checked })}
                 className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300"
               />
-              <span className="font-bold text-red-500">긴급 모집</span>
+              <span className="font-semibold text-rose-600">긴급 모집</span>
             </label>
           </div>
         </div>
 
         {/* 카테고리 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">카테고리</label>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {CATEGORIES.map(cat => (
               <label key={cat} className="cursor-pointer" onClick={() => { setSelectedCategory(cat); setCategoryError(null); }}>
                 <input type="radio" name="category" value={cat} className="peer hidden" readOnly checked={selectedCategory === cat} />
-                <div className={`px-4 py-2 rounded-full border text-sm transition-all ${selectedCategory === cat
+                <div className={`rounded-full border px-4 py-2 text-sm transition-all ${selectedCategory === cat
                   ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'border-gray-200 text-gray-600'
+                  : 'border-slate-200 bg-white text-slate-600'
                   }`}>
                   {cat}
                 </div>
@@ -240,20 +243,20 @@ export default function EditPage() {
 
         {/* 내용 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">내용</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">내용</label>
           <textarea
             value={formData.content}
             onChange={(e) => setFormData({ ...formData, content: e.target.value })}
             required
             rows={8}
             placeholder="상세 활동 내용을 입력하세요"
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none"
+            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
           />
         </div>
 
         {/* 모집 인원 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">모집 인원</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">모집 인원</label>
           <div className="flex items-center space-x-4">
             <input
               type="range"
@@ -261,18 +264,18 @@ export default function EditPage() {
               max="50"
               value={formData.maxParticipants}
               onChange={(e) => setFormData({ ...formData, maxParticipants: parseInt(e.target.value) })}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-indigo-600"
             />
             <span className="text-lg font-bold text-indigo-600 min-w-[3rem]">{formData.maxParticipants}명</span>
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">봉사 시간</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">봉사 시간</label>
           <select
             value={formData.volunteerHours}
             onChange={(e) => setFormData({ ...formData, volunteerHours: parseInt(e.target.value) })}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
           >
             {Array.from({ length: 100 }, (_, index) => index + 1).map((hour) => (
               <option key={hour} value={hour}>
@@ -283,22 +286,22 @@ export default function EditPage() {
         </div>
 
         {/* 모집 상태 */}
-        <div className={`flex items-center justify-between p-4 rounded-xl border-2 transition-colors ${formData.isRecruiting ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
+        <div className={`flex items-center justify-between rounded-3xl border p-4 shadow-[0_8px_20px_rgba(15,23,42,0.04)] transition-colors ${formData.isRecruiting ? 'border-emerald-200 bg-white' : 'border-rose-200 bg-rose-50/70'
           }`}>
           <div>
-            <p className={`font-bold ${formData.isRecruiting ? 'text-green-700' : 'text-red-700'}`}>
+            <p className={`font-semibold ${formData.isRecruiting ? 'text-emerald-700' : 'text-rose-700'}`}>
               {formData.isRecruiting ? '🟢 모집 중' : '🔴 모집 마감'}
             </p>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="mt-0.5 text-xs text-slate-500">
               {formData.isRecruiting ? '참여 신청을 받고 있습니다.' : '더 이상 신청을 받지 않습니다.'}
             </p>
           </div>
           <button
             type="button"
             onClick={() => setFormData({ ...formData, isRecruiting: !formData.isRecruiting })}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${formData.isRecruiting
-              ? 'bg-red-100 text-red-600 hover:bg-red-200'
-              : 'bg-green-100 text-green-600 hover:bg-green-200'
+            className={`rounded-2xl px-4 py-2 text-sm font-semibold transition-colors ${formData.isRecruiting
+              ? 'border border-rose-200 bg-white text-rose-600 hover:bg-rose-50'
+              : 'border border-emerald-200 bg-white text-emerald-600 hover:bg-emerald-50'
               }`}
           >
             {formData.isRecruiting ? '마감으로 변경' : '모집 재개'}
@@ -309,7 +312,7 @@ export default function EditPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 disabled:opacity-50 flex items-center justify-center gap-2"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 py-4 text-sm font-semibold text-white transition-colors shadow-[0_14px_30px_rgba(79,70,229,0.22)] hover:bg-indigo-700 disabled:opacity-50"
         >
           {loading ? (
             <>

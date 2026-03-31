@@ -23,10 +23,10 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplic
   // 작성자에게는 수정하기 버튼 표시
   if (isAuthor) {
     return (
-      <button
-        onClick={() => router.push(`/board/${postId}/edit`)}
-        className="w-full bg-gray-700 text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition-colors"
-      >
+        <button
+          onClick={() => router.push(`/board/${postId}/edit`)}
+          className="w-full rounded-2xl border border-slate-300 bg-white py-3 font-semibold text-slate-800 transition-colors hover:bg-slate-50"
+        >
         수정하기
       </button>
     );
@@ -38,7 +38,7 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplic
       return (
         <button
           disabled
-          className="w-full bg-gray-100 text-gray-500 font-bold py-3 rounded-xl cursor-not-allowed border border-gray-200"
+          className="w-full cursor-not-allowed rounded-2xl border border-amber-200 bg-amber-50 py-3 font-semibold text-amber-700"
         >
           승인 대기 중
         </button>
@@ -48,7 +48,7 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplic
       return (
         <button
           disabled
-          className="w-full bg-green-100 text-green-700 font-bold py-3 rounded-xl cursor-not-allowed border border-green-200"
+          className="w-full cursor-not-allowed rounded-2xl border border-emerald-200 bg-emerald-50 py-3 font-semibold text-emerald-700"
         >
           ✓ 참여 확정
         </button>
@@ -58,7 +58,7 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplic
       return (
         <button
           disabled
-          className="w-full bg-red-50 text-red-500 font-bold py-3 rounded-xl cursor-not-allowed border border-red-100"
+          className="w-full cursor-not-allowed rounded-2xl border border-rose-200 bg-rose-50 py-3 font-semibold text-rose-600"
         >
           ✕ 신청이 반려되었습니다
         </button>
@@ -68,7 +68,7 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplic
     return (
         <button
           disabled
-          className="w-full bg-gray-100 text-gray-700 font-bold py-3 rounded-xl cursor-not-allowed border border-gray-200"
+          className="w-full cursor-not-allowed rounded-2xl border border-slate-200 bg-slate-100 py-3 font-semibold text-slate-600"
         >
           참여 신청 내역 확인
         </button>
@@ -78,7 +78,7 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplic
   // 모집 마감/완료인 경우
   if (!isRecruiting) {
     return (
-      <button disabled className={`w-full text-white font-bold py-3 rounded-xl cursor-not-allowed ${isFull ? 'bg-orange-500' : 'bg-gray-300'}`}>
+      <button disabled className={`w-full cursor-not-allowed rounded-2xl py-3 font-semibold text-white ${isFull ? 'bg-slate-500' : 'bg-slate-300'}`}>
         {isFull ? '모집 완료' : '모집 마감'}
       </button>
     );
@@ -120,7 +120,7 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplic
     <button
       onClick={handleApply}
       disabled={loading}
-      className="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 disabled:opacity-70"
+      className="w-full rounded-2xl bg-indigo-600 py-3 font-semibold text-white transition-colors shadow-[0_14px_30px_rgba(79,70,229,0.22)] hover:bg-indigo-700 disabled:opacity-70"
     >
       {loading ? '처리 중...' : '참여하기'}
     </button>

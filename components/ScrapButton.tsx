@@ -58,7 +58,7 @@ export default function ScrapButton({ postId, initialIsScraped, initialScrapCoun
   return (
     <button 
       onClick={handleToggle}
-      className={`flex flex-col items-center transition-colors ${isScraped ? 'text-red-500' : 'text-gray-400 hover:text-red-400'}`}
+      className={`flex flex-col items-center rounded-2xl px-2 py-1.5 transition-colors ${isScraped ? 'text-rose-500 bg-rose-50' : 'text-slate-400 hover:bg-slate-100 hover:text-rose-400'}`}
     >
       <Heart 
         className="w-6 h-6" 

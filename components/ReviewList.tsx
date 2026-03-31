@@ -7,28 +7,33 @@ export default async function ReviewList({ postId, userId }: { postId: string; u
 
   if (reviews.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-xl">
+      <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50/70 py-10 text-center text-slate-500">
         <p>아직 작성된 후기가 없습니다.</p>
-        <p className="text-sm mt-2">첫 후기의 주인공이 되어보세요!</p>
+        <p className="mt-2 text-sm">첫 후기의 주인공이 되어보세요!</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <h3 className="font-bold text-lg text-gray-900">활동 후기 ({reviews.length})</h3>
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Reviews</p>
+          <h3 className="mt-1 text-lg font-semibold text-slate-900">활동 후기 ({reviews.length})</h3>
+        </div>
+      </div>
       <ul className="space-y-4">
         {reviews.map((review) => (
-          <li key={review.id} className="bg-gray-50 p-4 rounded-xl">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-gray-900">
+          <li key={review.id} className="rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="font-medium text-slate-900">
                 {review.author?.username || '익명'}
               </span>
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-slate-400">
                 {new Date(review.created_at).toLocaleDateString()}
               </span>
             </div>
-            <p className="text-gray-700 whitespace-pre-wrap text-sm leading-relaxed mb-3">
+            <p className="mb-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
               {review.content}
             </p>
             <div className="flex justify-end">

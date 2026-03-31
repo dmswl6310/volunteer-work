@@ -134,24 +134,25 @@ export default function WritePage() {
   if (!userId) return null;
 
   return (
-    <div className="max-w-xl mx-auto p-4 pb-20">
-      <h1 className="text-2xl font-bold mb-6">봉사활동 모집하기</h1>
+    <div className="mx-auto max-w-xl min-h-screen bg-slate-50/70 p-4 pb-20">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Create activity</p>
+      <h1 className="mb-6 mt-1 text-2xl font-semibold tracking-[-0.02em] text-slate-900">봉사활동 모집하기</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {isContactLoading ? (
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
-            <p className="text-sm font-semibold text-gray-700">프로필 전화번호를 확인하고 있습니다...</p>
+          <div className="rounded-3xl border border-slate-200 bg-white px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+            <p className="text-sm font-semibold text-slate-700">프로필 전화번호를 확인하고 있습니다...</p>
           </div>
         ) : (
-          <div className={`rounded-xl border px-4 py-3 ${authorContact ? 'border-amber-200 bg-amber-50' : 'border-red-200 bg-red-50'}`}>
-            <p className={`text-sm font-semibold ${authorContact ? 'text-amber-800' : 'text-red-700'}`}>
+          <div className={`rounded-3xl border px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.04)] ${authorContact ? 'border-indigo-100 bg-white' : 'border-rose-200 bg-rose-50/70'}`}>
+            <p className={`text-sm font-semibold ${authorContact ? 'text-slate-800' : 'text-rose-700'}`}>
               게시글 등록 시 프로필에 저장된 전화번호가 게시글에 공개됩니다.
             </p>
-            <p className={`mt-1 text-sm ${authorContact ? 'text-amber-700' : 'text-red-600'}`}>
+            <p className={`mt-1 text-sm ${authorContact ? 'text-slate-500' : 'text-rose-600'}`}>
               현재 공개 예정 번호: {authorContact || '등록된 전화번호가 없습니다.'}
             </p>
             {!authorContact && (
-              <Link href="/mypage" className="mt-2 inline-flex text-sm font-semibold text-red-700 underline underline-offset-2">
+              <Link href="/mypage" className="mt-2 inline-flex text-sm font-semibold text-rose-700 underline underline-offset-2">
                 마이페이지에서 전화번호 등록하기
               </Link>
             )}
@@ -160,13 +161,13 @@ export default function WritePage() {
 
         {/* Image Upload */}
         <div className="flex flex-col items-center">
-          <label htmlFor="image-upload" className="w-full h-64 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-colors overflow-hidden relative">
+          <label htmlFor="image-upload" className="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-3xl border border-dashed border-slate-300 bg-white transition-colors hover:border-indigo-300 hover:bg-indigo-50/40">
             {previewUrl ? (
               <Image src={previewUrl} alt="Preview" fill unoptimized className="object-cover" sizes="(max-width: 768px) 100vw, 768px" />
             ) : (
               <>
-                <ImagePlus className="w-10 h-10 text-gray-400 mb-2" strokeWidth={1} />
-                <span className="text-sm text-gray-500">이미지 등록 (클릭)</span>
+                <ImagePlus className="mb-2 h-10 w-10 text-slate-400" strokeWidth={1} />
+                <span className="text-sm text-slate-500">이미지 등록 (클릭)</span>
               </>
             )}
             <input id="image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
@@ -175,40 +176,40 @@ export default function WritePage() {
 
         {/* Title */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">제목</label>
-          <input name="title" required placeholder="봉사활동 제목을 입력하세요" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" />
+          <label className="mb-1 block text-sm font-medium text-slate-700">제목</label>
+          <input name="title" required placeholder="봉사활동 제목을 입력하세요" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" />
         </div>
 
         {/* Urgent & Due Date */}
         <div className="flex gap-4">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">마감 기한</label>
+              <label className="mb-1 block text-sm font-medium text-slate-700">마감 기한</label>
             <input
               type="date"
               name="dueDate"
               required
               min={minimumDueDate}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-            />
+               className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+             />
           </div>
           <div className="flex items-center pt-6">
             <label className="flex items-center space-x-2 cursor-pointer">
               <input type="checkbox" name="isUrgent" value="true" className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300" />
-              <span className="font-bold text-red-500">긴급 모집</span>
+              <span className="font-semibold text-rose-600">긴급 모집</span>
             </label>
           </div>
         </div>
 
         {/* Category */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">카테고리</label>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {CATEGORIES.map(cat => (
               <label key={cat} className="cursor-pointer" onClick={() => { setSelectedCategory(cat); setCategoryError(null); }}>
                 <input type="radio" name="category" value={cat} className="peer hidden" readOnly checked={selectedCategory === cat} />
-                <div className={`px-4 py-2 rounded-full border text-sm transition-all ${selectedCategory === cat
+                <div className={`rounded-full border px-4 py-2 text-sm transition-all ${selectedCategory === cat
                   ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'border-gray-200 text-gray-600'
+                  : 'border-slate-200 bg-white text-slate-600'
                   }`}>
                   {cat}
                 </div>
@@ -220,17 +221,17 @@ export default function WritePage() {
 
         {/* Content */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">내용</label>
-          <textarea name="content" required rows={10} defaultValue={POST_CONTENT_TEMPLATE} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none whitespace-pre-wrap"></textarea>
-          <p className="mt-1 text-xs text-gray-500">템플릿을 참고해서 일정, 장소, 준비물, 참고사항을 채워주세요.</p>
+          <label className="mb-1 block text-sm font-medium text-slate-700">내용</label>
+          <textarea name="content" required rows={10} defaultValue={POST_CONTENT_TEMPLATE} className="w-full resize-none whitespace-pre-wrap rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"></textarea>
+          <p className="mt-1 text-xs text-slate-500">템플릿을 참고해서 일정, 장소, 준비물, 참고사항을 채워주세요.</p>
         </div>
 
         {/* Max Participants */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">모집 인원</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">모집 인원</label>
           <div className="flex items-center space-x-4">
             <input type="range" name="maxParticipants" min="1" max="50" defaultValue="10"
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-indigo-600"
               onChange={(e) => {
                 e.target.nextElementSibling!.textContent = `${e.target.value}명`;
               }}
@@ -240,12 +241,12 @@ export default function WritePage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">봉사 시간</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">봉사 시간</label>
           <select
             name="volunteerHours"
             defaultValue="1"
             required
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
           >
             {VOLUNTEER_HOUR_OPTIONS.map((hour) => (
               <option key={hour} value={hour}>
@@ -253,11 +254,11 @@ export default function WritePage() {
               </option>
             ))}
           </select>
-          <p className="mt-1 text-xs text-gray-500">1시간 단위로 선택할 수 있습니다.</p>
+          <p className="mt-1 text-xs text-slate-500">1시간 단위로 선택할 수 있습니다.</p>
         </div>
 
         {/* Submit */}
-        <button type="submit" disabled={loading || !authorContact} className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 disabled:opacity-50 flex items-center justify-center gap-2">
+        <button type="submit" disabled={loading || !authorContact} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 py-4 text-sm font-semibold text-white transition-colors shadow-[0_14px_30px_rgba(79,70,229,0.22)] hover:bg-indigo-700 disabled:opacity-50">
           {loading ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />

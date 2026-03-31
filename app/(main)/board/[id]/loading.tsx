@@ -1,72 +1,72 @@
 export default function PostDetailLoading() {
   return (
-    <div className="pb-24 bg-white min-h-screen animate-pulse">
+    <div className="min-h-screen animate-pulse bg-slate-50/70 pb-24">
       {/* Top Nav Skeleton */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-gray-100">
-        <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-        <div className="h-4 bg-gray-200 rounded w-32"></div>
+      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur-md">
+        <div className="h-10 w-10 rounded-full bg-slate-200"></div>
+        <div className="h-4 w-32 rounded bg-slate-200"></div>
         <div className="w-8"></div> {/* Spacer */}
       </div>
 
       {/* Image Header Skeleton */}
-      <div className="relative w-full aspect-video bg-gray-200"></div>
+      <div className="relative aspect-video w-full bg-slate-200"></div>
 
       <div className="px-5 py-6">
         {/* Title & Category Skeletons */}
         <div className="mb-6">
           <div className="flex items-center space-x-2 mb-3">
-            <div className="h-6 w-16 bg-gray-200 rounded-full"></div>
-            <div className="h-6 w-12 bg-red-100 rounded-full"></div>
+            <div className="h-6 w-16 rounded-full bg-slate-200"></div>
+            <div className="h-6 w-12 rounded-full bg-slate-200"></div>
           </div>
           
-          <div className="h-8 bg-gray-200 rounded w-full mb-3"></div>
-          <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div className="mb-3 h-8 w-full rounded bg-slate-200"></div>
+          <div className="mb-4 h-8 w-3/4 rounded bg-slate-200"></div>
           
           <div className="flex items-center space-x-3">
-            <div className="h-4 w-24 bg-gray-200 rounded"></div>
-            <div className="h-4 w-16 bg-gray-200 rounded"></div>
+            <div className="h-4 w-24 rounded bg-slate-200"></div>
+            <div className="h-4 w-16 rounded bg-slate-200"></div>
           </div>
         </div>
 
         {/* Organizer Profile Skeleton */}
-        <div className="flex items-center p-4 bg-gray-50 rounded-xl mb-8">
-          <div className="w-12 h-12 bg-gray-200 rounded-full mr-4"></div>
+        <div className="mb-8 flex items-center rounded-3xl border border-slate-200 bg-white p-4">
+          <div className="mr-4 h-12 w-12 rounded-2xl bg-slate-200"></div>
           <div className="flex-1">
-            <div className="h-5 bg-gray-200 rounded w-32 mb-2"></div>
-            <div className="h-3 bg-gray-200 rounded w-20"></div>
+            <div className="mb-2 h-5 w-32 rounded bg-slate-200"></div>
+            <div className="h-3 w-20 rounded bg-slate-200"></div>
           </div>
         </div>
 
         {/* Content Skeleton */}
-        <div className="space-y-3 mb-10">
-          <div className="h-4 bg-gray-200 rounded w-full"></div>
-          <div className="h-4 bg-gray-200 rounded w-full"></div>
-          <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-          <div className="h-4 bg-gray-200 rounded w-4/5"></div>
-          <div className="h-4 bg-gray-200 rounded w-full pt-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+        <div className="mb-10 space-y-3 rounded-3xl border border-slate-200 bg-white px-5 py-6">
+          <div className="h-4 w-full rounded bg-slate-200"></div>
+          <div className="h-4 w-full rounded bg-slate-200"></div>
+          <div className="h-4 w-5/6 rounded bg-slate-200"></div>
+          <div className="h-4 w-4/5 rounded bg-slate-200"></div>
+          <div className="h-4 w-full rounded bg-slate-200 pt-4"></div>
+          <div className="h-4 w-3/4 rounded bg-slate-200"></div>
         </div>
 
         {/* Info Grid Skeleton */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="bg-gray-50 p-4 rounded-xl flex flex-col items-center justify-center h-20">
-            <div className="h-3 bg-gray-200 rounded w-16 mb-2"></div>
-            <div className="h-5 bg-gray-200 rounded w-24"></div>
+        <div className="mb-8 grid grid-cols-2 gap-4">
+          <div className="flex h-20 flex-col items-center justify-center rounded-3xl border border-slate-200 bg-white p-4">
+            <div className="mb-2 h-3 w-16 rounded bg-slate-200"></div>
+            <div className="h-5 w-24 rounded bg-slate-200"></div>
           </div>
-          <div className="bg-gray-50 p-4 rounded-xl flex flex-col items-center justify-center h-20">
-            <div className="h-3 bg-gray-200 rounded w-16 mb-2"></div>
-            <div className="h-5 bg-gray-200 rounded w-24"></div>
+          <div className="flex h-20 flex-col items-center justify-center rounded-3xl border border-slate-200 bg-white p-4">
+            <div className="mb-2 h-3 w-16 rounded bg-slate-200"></div>
+            <div className="h-5 w-24 rounded bg-slate-200"></div>
           </div>
         </div>
         
         {/* Approved Participants Section Skeleton */}
         <div className="mb-10">
-           <div className="h-5 bg-gray-200 rounded w-40 mb-4"></div>
+           <div className="mb-4 h-5 w-40 rounded bg-slate-200"></div>
            <div className="grid grid-cols-4 gap-3">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="flex flex-col items-center">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full mb-1"></div>
-                  <div className="h-3 bg-gray-200 rounded w-12"></div>
+                  <div className="mb-1 h-10 w-10 rounded-full bg-slate-200"></div>
+                  <div className="h-3 w-12 rounded bg-slate-200"></div>
                 </div>
               ))}
            </div>
@@ -74,17 +74,17 @@ export default function PostDetailLoading() {
 
         {/* Reviews Section Skeleton */}
         <div className="mb-8">
-           <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
-           <div className="h-32 bg-gray-50 rounded-xl"></div>
-        </div>
+           <div className="mb-4 h-6 w-32 rounded bg-slate-200"></div>
+           <div className="h-32 rounded-3xl border border-slate-200 bg-white"></div>
+         </div>
       </div>
 
       {/* Bottom Sticky Action Bar Skeleton */}
-      <div className="fixed bottom-[64px] left-0 right-0 p-4 bg-white border-t border-gray-100 flex items-center justify-between safe-area-bottom max-w-md mx-auto z-40 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+      <div className="fixed bottom-[64px] left-0 right-0 z-40 mx-auto flex max-w-md items-center justify-between border-t border-slate-200 bg-white/95 p-4 pb-safe shadow-[0_-8px_20px_rgba(15,23,42,0.06)] backdrop-blur safe-area-bottom">
         <div className="flex items-center space-x-4">
-           <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+           <div className="h-10 w-10 rounded-2xl bg-slate-200"></div>
         </div>
-        <div className="flex-1 ml-4 h-12 bg-indigo-100 rounded-xl"></div>
+        <div className="ml-4 h-12 flex-1 rounded-2xl bg-indigo-100"></div>
       </div>
     </div>
   );

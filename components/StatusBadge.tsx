@@ -4,11 +4,11 @@
  */
 export default function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    approved: 'bg-green-100 text-green-800',
-    rejected: 'bg-red-100 text-red-800',
-    confirmed: 'bg-blue-100 text-blue-800',
-    cancelled: 'bg-gray-100 text-gray-800',
+    pending: 'border border-amber-200 bg-amber-50 text-amber-700',
+    approved: 'border border-emerald-200 bg-emerald-50 text-emerald-700',
+    rejected: 'border border-rose-200 bg-rose-50 text-rose-700',
+    confirmed: 'border border-indigo-200 bg-indigo-50 text-indigo-700',
+    cancelled: 'border border-slate-200 bg-slate-100 text-slate-600',
   };
 
   const labels: Record<string, string> = {
@@ -20,7 +20,7 @@ export default function StatusBadge({ status }: { status: string }) {
   };
 
   return (
-    <span className={`px-2 py-0.5 rounded text-xs font-bold ${styles[status] || 'bg-gray-100'}`}>
+    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${styles[status] || 'border border-slate-200 bg-slate-100 text-slate-600'}`}>
       {labels[status] || status}
     </span>
   );
