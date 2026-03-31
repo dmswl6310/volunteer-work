@@ -55,13 +55,13 @@ export default function InfiniteScrollBoard({ initialPosts, initialNextId, sort 
       )}
 
       {nextId === null && posts.length > 0 && (
-        <div className="text-center p-8 text-gray-400 text-sm">
+        <div className="p-8 text-center text-sm text-slate-400">
           모든 게시물을 불러왔습니다.
         </div>
       )}
 
       {posts.length === 0 && (
-        <div className="text-center py-20 text-gray-400">
+        <div className="rounded-3xl border border-dashed border-slate-200 bg-white px-4 py-20 text-center text-slate-400">
           등록된 봉사활동이 없습니다.
         </div>
       )}

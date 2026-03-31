@@ -36,14 +36,14 @@ export default function StatusFilter() {
       <select
         value={activeStatus}
         onChange={handleChange}
-        className="appearance-none rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-8 text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500"
+        className="cursor-pointer appearance-none rounded-full border border-slate-200 bg-white py-2 pl-3.5 pr-8 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
       >
         <option value="recruiting">모집중</option>
         <option value="closed">마감</option>
         <option value="all">전체</option>
       </select>
       {/* 드롭다운 화살표 아이콘 */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
         <ChevronDown className="h-4 w-4" />
       </div>
     </div>

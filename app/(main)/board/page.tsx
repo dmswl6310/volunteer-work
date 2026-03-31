@@ -20,12 +20,15 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
   const initialData = await getPosts({ page: 1, limit: 10, sort, category, status, q });
 
   return (
-    <div className="pb-20 relative min-h-screen">
+    <div className="relative min-h-screen bg-slate-50/70 pb-20">
       {/* Header with Search/Filter Title */}
-      <div className="sticky top-0 z-30 border-b border-gray-100 bg-white px-4 py-3 shadow-sm">
-        <div className="flex items-center justify-between mb-2">
+      <div className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur">
+        <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <h1 className="text-xl font-bold text-gray-900 tracking-tight">봉사활동 찾기</h1>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Volunteer board</p>
+              <h1 className="text-xl font-semibold tracking-[-0.02em] text-slate-900">봉사활동 찾기</h1>
+            </div>
           </div>
           <div className="flex space-x-3 items-center">
             <SearchInput />
@@ -60,7 +63,7 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
       {/* Floating Action Button for Writing */}
       <Link
         href="/board/write"
-        className="fixed bottom-20 right-6 z-40 flex transform items-center justify-center rounded-full bg-teal-500 p-4 text-white shadow-lg transition-transform hover:-translate-y-1 hover:bg-teal-600 active:scale-95"
+        className="fixed bottom-20 right-6 z-40 flex transform items-center justify-center rounded-full bg-indigo-600 p-4 text-white shadow-[0_14px_30px_rgba(79,70,229,0.28)] transition-transform hover:-translate-y-1 hover:bg-indigo-700 active:scale-95"
         aria-label="글쓰기"
       >
         <Plus className="w-6 h-6" strokeWidth={3} />

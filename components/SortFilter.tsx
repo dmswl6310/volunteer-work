@@ -27,17 +27,17 @@ export default function SortFilter() {
   };
 
   return (
-    <div className="flex space-x-3 items-center">
+    <div className="flex items-center space-x-3">
       <button
         onClick={() => handleClick('latest')}
-        className={`touch-feedback text-sm font-medium transition-colors ${activeSort === 'latest' ? 'text-gray-900' : 'text-gray-400 hover:text-teal-600'}`}
+        className={`touch-feedback text-sm font-medium transition-colors ${activeSort === 'latest' ? 'text-slate-900' : 'text-slate-400 hover:text-indigo-600'}`}
       >
         최신순
       </button>
-      <span className="text-gray-200">|</span>
+      <span className="text-slate-200">|</span>
       <button
         onClick={() => handleClick('deadline')}
-        className={`touch-feedback text-sm font-medium transition-colors ${activeSort === 'deadline' ? 'text-gray-900' : 'text-gray-400 hover:text-teal-600'}`}
+        className={`touch-feedback text-sm font-medium transition-colors ${activeSort === 'deadline' ? 'text-slate-900' : 'text-slate-400 hover:text-indigo-600'}`}
       >
         마감임박순
       </button>

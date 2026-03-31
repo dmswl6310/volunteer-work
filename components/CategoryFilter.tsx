@@ -49,10 +49,10 @@ export default function CategoryFilter() {
           <button
             key={cat.id}
             onClick={() => handleClick(cat.id)}
-            className={`whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-medium transition-colors touch-feedback ${
+            className={`touch-feedback whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-teal-500 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-indigo-600 text-white shadow-[0_8px_18px_rgba(79,70,229,0.22)]'
+                : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
             }`}
           >
             {cat.name}

@@ -19,10 +19,10 @@ export default function PostCard({ post }: PostCardProps) {
 
   return (
     <Link href={`/board/${post.id}`} className="block group touch-feedback">
-      <div className={`rounded-3xl border border-gray-100 bg-white p-4 shadow-sm flex gap-4 transition-colors ${isClosed ? 'opacity-50 grayscale' : 'hover:border-teal-200 hover:bg-gray-50'
+      <div className={`flex gap-4 rounded-3xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_26px_rgba(15,23,42,0.04)] transition-colors ${isClosed ? 'opacity-55 grayscale' : 'hover:border-slate-300 hover:bg-slate-50/40'
         }`}>
         {/* 이미지 - 왼쪽 */}
-          <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl bg-gray-200">
+          <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl bg-slate-200">
           {post.image_url ? (
             <Image
               src={post.image_url}
@@ -35,9 +35,9 @@ export default function PostCard({ post }: PostCardProps) {
             <FallbackImage category={post.category ?? undefined} className="rounded-lg" iconSize={24} />
           )}
           {post.is_urgent && !isClosed && (
-            <span className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg">
-              긴급
-            </span>
+              <span className="absolute left-0 top-0 rounded-br-xl bg-rose-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                긴급
+              </span>
           )}
           {isClosed && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
@@ -49,13 +49,13 @@ export default function PostCard({ post }: PostCardProps) {
         {/* 컨텐츠 - 오른쪽 */}
         <div className="flex-1 flex flex-col justify-between py-0.5">
           <div>
-            <div className="flex justify-between items-start mb-1">
-              <h3 className="text-base font-bold text-gray-900 line-clamp-2 leading-tight transition-colors group-hover:text-teal-600">
+            <div className="mb-1 flex justify-between items-start">
+              <h3 className="line-clamp-2 text-base font-semibold leading-tight text-slate-900 transition-colors group-hover:text-indigo-700">
                 {post.title}
               </h3>
             </div>
-            <div className="flex items-center space-x-2 text-xs text-gray-500 mb-1">
-              <span className="font-medium text-gray-700">{post.category || '기타'}</span>
+            <div className="mb-1 flex items-center space-x-2 text-xs text-slate-500">
+              <span className="font-medium text-slate-700">{post.category || '기타'}</span>
               <span>·</span>
               <span>{post.author?.username || '익명'}</span>
             </div>
@@ -64,19 +64,19 @@ export default function PostCard({ post }: PostCardProps) {
           <div className="flex items-center justify-between mt-2">
             <div className="flex items-center space-x-2 text-xs">
               {!isClosed && !isFull && (
-                <span className="font-bold text-teal-600">모집중</span>
+                <span className="font-semibold text-indigo-600">모집중</span>
               )}
               {!isClosed && isFull && (
-                <span className="font-bold text-orange-500">모집 완료</span>
+                <span className="font-semibold text-slate-500">모집 완료</span>
               )}
-              <span className="text-gray-400">
+              <span className="text-slate-400">
                 {post.current_participants}/{post.max_participants}명
               </span>
             </div>
 
             {/* D-day: 마감되지 않은 게시글만 표시 */}
             {!isClosed && dueDate && (
-              <span className="text-xs font-medium text-red-500">
+              <span className="text-xs font-medium text-rose-500">
                 D-{Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))}
               </span>
             )}

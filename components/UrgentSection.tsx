@@ -11,12 +11,12 @@ export default async function UrgentSection({ status = 'recruiting' }: { status?
   return (
     <section className="mb-8">
       <div className="flex items-center justify-between mb-4 px-1">
-        <h2 className="text-lg font-bold text-gray-900 flex items-center">
-          <span className="w-2 h-2 rounded-full bg-red-500 mr-2 animate-pulse"></span>
+        <h2 className="flex items-center text-lg font-semibold text-slate-900">
+          <span className="mr-2 h-2 w-2 rounded-full bg-rose-500 animate-pulse"></span>
           긴급 봉사활동
         </h2>
         {/* 스크롤 힌트 */}
-        <span className="text-xs text-gray-400">옆으로 넘겨보세요 &rarr;</span>
+        <span className="text-xs text-slate-400">옆으로 넘겨보세요 &rarr;</span>
       </div>
 
       <div className="flex overflow-x-auto space-x-4 pb-4 -mx-4 px-4 scrollbar-hide snap-x snap-mandatory">
@@ -34,11 +34,11 @@ export default async function UrgentSection({ status = 'recruiting' }: { status?
             <Link
               key={post.id}
               href={`/board/${post.id}`}
-              className="flex-shrink-0 w-[85vw] sm:w-72 bg-white rounded-xl border border-red-100 shadow-sm relative hover:border-red-300 transition-colors snap-center"
+              className="relative w-[85vw] flex-shrink-0 snap-center rounded-3xl border border-slate-200/80 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.04)] transition-colors hover:border-slate-300 sm:w-72"
             >
               <div className="flex p-3 gap-3">
                 {/* Image */}
-                <div className="relative w-24 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl bg-slate-200">
                   {post.image_url ? (
                     <Image 
                       src={post.image_url} 
@@ -48,9 +48,9 @@ export default async function UrgentSection({ status = 'recruiting' }: { status?
                       sizes="96px"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
-                      <span className="text-[10px]">No Img</span>
-                    </div>
+                      <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-300">
+                        <span className="text-[10px]">No Img</span>
+                      </div>
                   )}
                 </div>
 
@@ -58,17 +58,17 @@ export default async function UrgentSection({ status = 'recruiting' }: { status?
                 <div className="flex-1 flex flex-col justify-between py-1">
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <span className={`inline-block px-1.5 py-0.5 text-[10px] font-bold rounded ${isFull ? 'text-orange-600 bg-orange-50' : 'text-red-600 bg-red-50'}`}>
+                      <span className={`inline-block rounded-full px-2 py-1 text-[10px] font-semibold ${isFull ? 'border border-slate-200 bg-slate-100 text-slate-600' : 'border border-rose-200 bg-rose-50 text-rose-700'}`}>
                         {dDayText}
                       </span>
                     </div>
-                    <h3 className="text-sm font-bold text-gray-900 line-clamp-2 leading-tight mb-1">{post.title}</h3>
-                    <p className="text-xs text-gray-500">{post.category || '기타'}</p>
+                    <h3 className="mb-1 line-clamp-2 text-sm font-semibold leading-tight text-slate-900">{post.title}</h3>
+                    <p className="text-xs text-slate-500">{post.category || '기타'}</p>
                   </div>
 
                   <div className="flex justify-between items-end text-xs mt-2">
-                    <span className="text-gray-600 font-medium">{post.author.username || '익명'}</span>
-                    <span className="text-gray-400">{post.current_participants}/{post.max_participants}명</span>
+                    <span className="font-medium text-slate-600">{post.author.username || '익명'}</span>
+                    <span className="text-slate-400">{post.current_participants}/{post.max_participants}명</span>
                   </div>
                 </div>
               </div>
