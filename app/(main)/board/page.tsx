@@ -22,7 +22,7 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
   return (
     <div className="pb-20 relative min-h-screen">
       {/* Header with Search/Filter Title */}
-      <div className="bg-white sticky top-0 z-30 px-4 py-3 border-b border-gray-100 shadow-sm">
+      <div className="sticky top-0 z-30 border-b border-gray-100 bg-white px-4 py-3 shadow-sm">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2">
             <h1 className="text-xl font-bold text-gray-900 tracking-tight">봉사활동 찾기</h1>
@@ -42,7 +42,7 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
         <CategoryFilter />
       </div>
 
-      <div className="p-4 space-y-6">
+      <div className="space-y-6 p-4">
         {/* Urgent Section Always Visible */}
         <UrgentSection status={status} />
 
@@ -60,7 +60,7 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
       {/* Floating Action Button for Writing */}
       <Link
         href="/board/write"
-        className="fixed bottom-20 right-6 p-4 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition-transform active:scale-95 z-40 flex items-center justify-center transform hover:-translate-y-1"
+        className="fixed bottom-20 right-6 z-40 flex transform items-center justify-center rounded-full bg-teal-500 p-4 text-white shadow-lg transition-transform hover:-translate-y-1 hover:bg-teal-600 active:scale-95"
         aria-label="글쓰기"
       >
         <Plus className="w-6 h-6" strokeWidth={3} />

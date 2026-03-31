@@ -19,10 +19,10 @@ export default function PostCard({ post }: PostCardProps) {
 
   return (
     <Link href={`/board/${post.id}`} className="block group touch-feedback">
-      <div className={`bg-white p-4 border-b border-gray-100 flex gap-4 transition-colors ${isClosed ? 'opacity-50 grayscale' : 'hover:bg-gray-50'
+      <div className={`rounded-3xl border border-gray-100 bg-white p-4 shadow-sm flex gap-4 transition-colors ${isClosed ? 'opacity-50 grayscale' : 'hover:border-teal-200 hover:bg-gray-50'
         }`}>
         {/* 이미지 - 왼쪽 */}
-        <div className="relative w-24 h-24 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
+          <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl bg-gray-200">
           {post.image_url ? (
             <Image
               src={post.image_url}
@@ -50,7 +50,7 @@ export default function PostCard({ post }: PostCardProps) {
         <div className="flex-1 flex flex-col justify-between py-0.5">
           <div>
             <div className="flex justify-between items-start mb-1">
-              <h3 className="text-base font-bold text-gray-900 line-clamp-2 leading-tight group-hover:text-indigo-600 transition-colors">
+              <h3 className="text-base font-bold text-gray-900 line-clamp-2 leading-tight transition-colors group-hover:text-teal-600">
                 {post.title}
               </h3>
             </div>
@@ -64,7 +64,7 @@ export default function PostCard({ post }: PostCardProps) {
           <div className="flex items-center justify-between mt-2">
             <div className="flex items-center space-x-2 text-xs">
               {!isClosed && !isFull && (
-                <span className="font-bold text-green-600">모집중</span>
+                <span className="font-bold text-teal-600">모집중</span>
               )}
               {!isClosed && isFull && (
                 <span className="font-bold text-orange-500">모집 완료</span>
