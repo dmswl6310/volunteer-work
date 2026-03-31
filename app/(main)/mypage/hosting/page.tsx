@@ -40,7 +40,7 @@ export default async function MyHostingPage({ searchParams }: { searchParams?: P
         )}
         {incomingRequests.length > limit && (
           <div className="mt-3 text-center">
-            <Link href={`/mypage/hosting?limit=${limit + 8}`} className="text-sm font-semibold text-indigo-600 hover:underline">
+            <Link href={`/mypage/hosting?limit=${limit + 8}`} className="text-sm font-semibold text-teal-600 hover:underline">
               승인 요청 더보기
             </Link>
           </div>
@@ -70,7 +70,7 @@ export default async function MyHostingPage({ searchParams }: { searchParams?: P
         )}
         {attendancePosts.length > limit && (
           <div className="mt-3 text-center">
-            <Link href={`/mypage/hosting?limit=${limit + 8}`} className="text-sm font-semibold text-indigo-600 hover:underline">
+            <Link href={`/mypage/hosting?limit=${limit + 8}`} className="text-sm font-semibold text-teal-600 hover:underline">
               참여 확인 게시글 더보기
             </Link>
           </div>
@@ -87,7 +87,7 @@ export default async function MyHostingPage({ searchParams }: { searchParams?: P
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {visibleHostedPosts.map((post) => (
-              <Link key={post.id} href={`/board/${post.id}`} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm hover:border-indigo-200 hover:shadow-md transition-all">
+              <Link key={post.id} href={`/board/${post.id}`} className="rounded-3xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:border-teal-200 hover:shadow-md">
                 <h4 className="font-bold text-gray-900 truncate">{post.title}</h4>
                 <div className="mt-3 flex items-center justify-between text-sm text-gray-500">
                   <span>{post.current_participants}/{post.max_participants}명</span>
@@ -99,7 +99,7 @@ export default async function MyHostingPage({ searchParams }: { searchParams?: P
         )}
         {hostedPosts.length > limit && (
           <div className="mt-3 text-center">
-            <Link href={`/mypage/hosting?limit=${limit + 8}`} className="text-sm font-semibold text-indigo-600 hover:underline">
+            <Link href={`/mypage/hosting?limit=${limit + 8}`} className="text-sm font-semibold text-teal-600 hover:underline">
               내가 올린 글 더보기
             </Link>
           </div>

@@ -20,8 +20,8 @@ export default async function MyHistoryPage({ searchParams }: { searchParams?: P
   return (
     <div className="space-y-6">
       <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-bold text-gray-900">기록</h2>
-        <p className="mt-1 text-sm text-gray-500">완료된 활동, 관심 봉사활동, 내가 작성한 후기를 차분하게 모아볼 수 있어요.</p>
+        <h2 className="text-lg font-bold text-gray-900">관심/기록</h2>
+        <p className="mt-1 text-sm text-gray-500">참여 완료 활동, 관심 봉사활동, 포인트 내역, 작성한 후기를 한 번에 모아볼 수 있어요.</p>
       </section>
 
       <section>
@@ -40,7 +40,7 @@ export default async function MyHistoryPage({ searchParams }: { searchParams?: P
         )}
         {completedActivities.length > limit && (
           <div className="mt-3 text-center">
-            <Link href={`/mypage/history?limit=${limit + 10}`} className="text-sm font-semibold text-indigo-600 hover:underline">
+            <Link href={`/mypage/history?limit=${limit + 10}`} className="text-sm font-semibold text-teal-600 hover:underline">
               완료된 활동 더보기
             </Link>
           </div>
@@ -60,12 +60,12 @@ export default async function MyHistoryPage({ searchParams }: { searchParams?: P
                     <p className="font-bold text-gray-900">{transaction.description}</p>
                     <p className="mt-1 text-xs text-gray-500">적립일: {formatDate(transaction.created_at)}</p>
                     {transaction.posts?.title && (
-                      <Link href={`/board/${transaction.post_id || transaction.posts.id}`} className="mt-2 inline-flex text-xs font-semibold text-indigo-600 hover:underline">
+                      <Link href={`/board/${transaction.post_id || transaction.posts.id}`} className="mt-2 inline-flex text-xs font-semibold text-teal-600 hover:underline">
                         {transaction.posts.title}
                       </Link>
                     )}
                   </div>
-                  <span className="shrink-0 text-base font-extrabold text-indigo-600">+{transaction.points}P</span>
+                  <span className="shrink-0 text-base font-extrabold text-teal-600">+{transaction.points}P</span>
                 </div>
               </div>
             ))}
@@ -73,7 +73,7 @@ export default async function MyHistoryPage({ searchParams }: { searchParams?: P
         )}
         {pointTransactions.length >= limit && (
           <div className="mt-3 text-center">
-            <Link href={`/mypage/history?limit=${limit + 10}`} className="text-sm font-semibold text-indigo-600 hover:underline">
+            <Link href={`/mypage/history?limit=${limit + 10}`} className="text-sm font-semibold text-teal-600 hover:underline">
               포인트 내역 더보기
             </Link>
           </div>
@@ -96,7 +96,7 @@ export default async function MyHistoryPage({ searchParams }: { searchParams?: P
         )}
         {scraps.length >= limit && (
           <div className="mt-3 text-center">
-            <Link href={`/mypage/history?limit=${limit + 10}`} className="text-sm font-semibold text-indigo-600 hover:underline">
+            <Link href={`/mypage/history?limit=${limit + 10}`} className="text-sm font-semibold text-teal-600 hover:underline">
               관심 봉사활동 더보기
             </Link>
           </div>
@@ -120,7 +120,7 @@ export default async function MyHistoryPage({ searchParams }: { searchParams?: P
         )}
         {reviews.length >= limit && (
           <div className="mt-3 text-center">
-            <Link href={`/mypage/history?limit=${limit + 10}`} className="text-sm font-semibold text-indigo-600 hover:underline">
+            <Link href={`/mypage/history?limit=${limit + 10}`} className="text-sm font-semibold text-teal-600 hover:underline">
               내가 쓴 후기 더보기
             </Link>
           </div>
