@@ -86,13 +86,13 @@ export default function AttendanceConfirmationCard({
   };
 
   return (
-    <section className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+    <section className="rounded-3xl border border-gray-100 bg-white p-4 shadow-sm">
       <div className="flex flex-col gap-1 mb-4">
-        <Link href={`/board/${postId}`} className="font-bold text-gray-900 hover:text-indigo-600 underline-offset-2 hover:underline">
+        <Link href={`/board/${postId}`} className="font-bold text-gray-900 hover:text-teal-600 underline-offset-2 hover:underline">
           {title}
         </Link>
         <p className="text-xs text-gray-500">진행일: {dueDate ? new Date(dueDate).toLocaleDateString() : '-'}</p>
-        <p className="text-xs font-semibold text-indigo-600">참여 확인 시 1인당 {pointsPerParticipant}P 지급</p>
+        <p className="text-xs font-semibold text-teal-600">참여 확인 시 1인당 {pointsPerParticipant}P 지급</p>
       </div>
 
       <div className="space-y-3">
@@ -109,7 +109,7 @@ export default function AttendanceConfirmationCard({
             >
               <input
                 type="checkbox"
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-teal-500 focus:ring-teal-500"
                 checked={selectedIds.includes(application.id)}
                 disabled={!canSelect || loading}
                 onChange={() => toggleSelection(application.id)}
@@ -142,7 +142,7 @@ export default function AttendanceConfirmationCard({
           type="button"
           onClick={handleConfirm}
           disabled={loading || selectedIds.length === 0}
-          className="mt-4 w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white hover:bg-indigo-700 disabled:opacity-50"
+          className="mt-4 w-full rounded-2xl bg-teal-500 px-4 py-3 text-sm font-bold text-white hover:bg-teal-600 disabled:opacity-50"
         >
           {loading ? '처리 중...' : `선택한 참여자 확인 및 포인트 지급 (${selectedIds.length}명)`}
         </button>

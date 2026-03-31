@@ -82,53 +82,52 @@ export default function IncomingRequestItem({ application }: { application: Inco
   };
 
   return (
-    <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-lg shadow-sm">
-      <div>
-        <p className="font-bold text-gray-900 text-base mb-1">
-          {application.users?.username || '이름 없음'}
-        </p>
-        <div className="text-sm text-gray-600 mb-2 space-y-0.5">
-          {application.users?.contact && <p>📞 연락처: {application.users.contact}</p>}
-          {application.users?.email && <p>📧 이메일: {application.users.email}</p>}
-          {application.users?.job && <p>💼 직업/소속기관: {application.users.job}</p>}
-          {application.users?.address && <p>🏠 거주지: {application.users.address}</p>}
+    <div className="rounded-3xl border border-gray-100 bg-white p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <p className="mb-1 text-base font-bold text-gray-900">{application.users?.username || '이름 없음'}</p>
+          <div className="mb-3 space-y-1 rounded-2xl bg-gray-50 p-3 text-sm text-gray-600">
+            {application.users?.contact && <p>📞 연락처: {application.users.contact}</p>}
+            {application.users?.email && <p>📧 이메일: {application.users.email}</p>}
+            {application.users?.job && <p>💼 직업/소속기관: {application.users.job}</p>}
+            {application.users?.address && <p>🏠 거주지: {application.users.address}</p>}
+          </div>
+          <p className="text-xs text-gray-400">신청일: {new Date(application.created_at).toLocaleString()}</p>
+          <p className="mt-1 text-xs text-gray-400">
+            지원 공고:{' '}
+            <Link href={`/board/${application.post.id}`} className="font-medium text-gray-600 underline underline-offset-2 hover:text-teal-600">
+              {application.post.title}
+            </Link>
+          </p>
+          {isFull && <p className="mt-1 text-xs font-medium text-orange-600">모집 인원이 모두 차서 승인할 수 없습니다.</p>}
+          {isFull && (
+            <button
+              type="button"
+              onClick={handleBulkReject}
+              disabled={bulkRejectLoading || loading}
+              className="mt-2 text-xs font-semibold text-red-600 underline underline-offset-2 hover:text-red-700 disabled:opacity-50"
+            >
+              {bulkRejectLoading ? '처리 중...' : '남은 신청 일괄 거절'}
+            </button>
+          )}
         </div>
-        <p className="text-xs text-gray-400">
-          신청일: {new Date(application.created_at).toLocaleString()}
-        </p>
-        <p className="text-xs text-gray-400 mt-1">
-          지원 공고:{' '}
-          <Link href={`/board/${application.post.id}`} className="font-medium text-gray-600 underline underline-offset-2 hover:text-indigo-600">
-            {application.post.title}
-          </Link>
-        </p>
-        {isFull && <p className="mt-1 text-xs font-medium text-orange-600">모집 인원이 모두 차서 승인할 수 없습니다.</p>}
-        {isFull && (
+
+        <div className="flex w-[104px] shrink-0 flex-col space-y-2">
           <button
-            type="button"
-            onClick={handleBulkReject}
-            disabled={bulkRejectLoading || loading}
-            className="mt-2 text-xs font-semibold text-red-600 underline underline-offset-2 hover:text-red-700 disabled:opacity-50"
+            onClick={() => handleStatus('approved')}
+            disabled={loading || isFull}
+            className="rounded-2xl bg-teal-500 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-teal-600 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
           >
-            {bulkRejectLoading ? '처리 중...' : '남은 신청 일괄 거절'}
+            {isFull ? '모집 완료' : '승인하기'}
           </button>
-        )}
-      </div>
-      <div className="flex flex-col space-y-2 ml-4">
-        <button
-          onClick={() => handleStatus('approved')}
-          disabled={loading || isFull}
-          className="px-4 py-2 bg-green-100 text-green-700 text-sm font-bold rounded-lg hover:bg-green-200 transition-colors disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
-        >
-          {isFull ? '모집 완료' : '승인하기'}
-        </button>
-        <button
-          onClick={() => handleStatus('rejected')}
-          disabled={loading}
-          className="px-4 py-2 bg-red-100 text-red-700 text-sm font-bold rounded-lg hover:bg-red-200 transition-colors"
-        >
-          거절하기
-        </button>
+          <button
+            onClick={() => handleStatus('rejected')}
+            disabled={loading}
+            className="rounded-2xl bg-gray-100 px-4 py-2.5 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-200"
+          >
+            거절하기
+          </button>
+        </div>
       </div>
     </div>
   );

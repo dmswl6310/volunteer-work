@@ -74,14 +74,14 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                     </div>
                     <button
                         onClick={() => setIsEditing(true)}
-                        className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                        className="rounded-2xl p-2 text-gray-400 transition-colors hover:bg-teal-50 hover:text-teal-600"
                         title="프로필 수정"
                     >
                         <Pencil className="w-5 h-5" />
                     </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-4 rounded-xl mb-4">
+                <div className="mb-4 grid grid-cols-2 gap-4 rounded-2xl bg-gray-50 p-4 text-sm">
                     <div>
                         <span className="block text-gray-500 text-xs mb-1">연락처</span>
                         <span className="font-bold text-gray-900">{user.contact || '-'}</span>
@@ -118,7 +118,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                         type="text"
                         value={editForm.contact}
                         onChange={(e) => setEditForm({ ...editForm, contact: e.target.value })}
-                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className="block w-full rounded-xl border-gray-200 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -128,7 +128,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                             type="text"
                             value={editForm.job}
                             onChange={(e) => setEditForm({ ...editForm, job: e.target.value })}
-                            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            className="block w-full rounded-xl border-gray-200 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                         />
                     </div>
                     <div className="col-span-2">
@@ -138,13 +138,13 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                                 type="text"
                                 readOnly
                                 value={editForm.address}
-                                className="block w-full border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-900 font-medium focus:outline-none sm:text-sm cursor-not-allowed"
+                                className="block w-full cursor-not-allowed rounded-xl border-gray-200 bg-gray-100 text-gray-900 font-medium shadow-sm focus:outline-none sm:text-sm"
                                 placeholder="기본 주소"
                             />
                             <button
                                 type="button"
                                 onClick={() => setIsPostcodeOpen(true)}
-                                className="whitespace-nowrap px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none transition-colors"
+                                className="whitespace-nowrap rounded-xl bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none"
                             >
                                 주소 검색
                             </button>
@@ -153,16 +153,16 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                             type="text"
                             value={editForm.detailAddress}
                             onChange={(e) => setEditForm({ ...editForm, detailAddress: e.target.value })}
-                            className="mt-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            className="mt-2 block w-full rounded-xl border-gray-200 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                             placeholder="상세 주소 (예: 101동 202호)"
                         />
                     </div>
                 </div>
                 <div className="flex space-x-2 pt-2">
-                    <button type="submit" disabled={loading} className="flex-1 bg-indigo-600 text-white py-2 rounded-lg text-sm font-bold shadow-sm disabled:opacity-50">
+                    <button type="submit" disabled={loading} className="flex-1 rounded-2xl bg-teal-500 py-2.5 text-sm font-bold text-white shadow-sm disabled:opacity-50">
                         {loading ? '저장 중...' : '저장'}
                     </button>
-                    <button type="button" onClick={() => setIsEditing(false)} disabled={loading} className="flex-1 bg-gray-100 text-gray-600 py-2 rounded-lg text-sm font-bold disabled:opacity-50">
+                    <button type="button" onClick={() => setIsEditing(false)} disabled={loading} className="flex-1 rounded-2xl bg-gray-100 py-2.5 text-sm font-bold text-gray-600 disabled:opacity-50">
                         취소
                     </button>
                 </div>
