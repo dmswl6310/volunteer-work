@@ -20,6 +20,7 @@ export default async function MyHistoryPage({ searchParams }: { searchParams?: P
   return (
     <div className="space-y-6">
       <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">활동 아카이브</p>
         <h2 className="text-lg font-bold text-gray-900">관심/기록</h2>
       </section>
 
