@@ -2,13 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ClipboardList, FolderOpen, ShieldCheck, WalletCards } from 'lucide-react';
+import { ClipboardList, FolderOpen, ShieldCheck } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/mypage', label: '내 신청', icon: ClipboardList, match: ['/mypage', '/mypage/applications'] },
   { href: '/mypage/hosting', label: '주최 관리', icon: ShieldCheck },
   { href: '/mypage/history', label: '관심/기록', icon: FolderOpen },
-  { href: '/mypage/points', label: '포인트', icon: WalletCards },
 ];
 
 export default function MyPageNav() {

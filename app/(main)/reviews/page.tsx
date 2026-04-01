@@ -25,18 +25,18 @@ export default async function ReviewPage() {
                     </div>
                 ) : (
                     reviews.map((review) => (
-                        <div key={review.id} className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
-                            <Link href={`/board/${review.post_id}`} className="block mb-3">
-                                <span className="mb-2 inline-block rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+                        <div key={review.id} className="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
+                            <Link href={`/board/${review.post_id}`} className="block mb-2">
+                                <span className="inline-block rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700">
                                     {review.posts?.title || '삭제된 활동'}
                                 </span>
                             </Link>
-                            <p className="mb-4 whitespace-pre-wrap leading-relaxed text-slate-800">
+                            <p className="mb-3 whitespace-pre-wrap text-sm leading-6 text-slate-800">
                                 {review.content}
                             </p>
-                            <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
+                            <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-xs text-slate-500">
                                 <div className="flex items-center space-x-2">
-                                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 font-bold text-[10px] text-slate-600">
+                                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 font-bold text-[10px] text-slate-600">
                                         {review.author?.username?.[0] || 'U'}
                                     </div>
                                     <span>{review.author?.username || '익명'}</span>
