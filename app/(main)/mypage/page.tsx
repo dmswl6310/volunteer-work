@@ -29,7 +29,14 @@ export default async function MyPagePage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-slate-800">진행 중인 신청</p>
-              <span className="text-xs text-slate-400">{visibleActiveApplications.length}건</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-400">{activeApplications.length}건</span>
+                {activeApplications.length > 5 && (
+                  <Link href="/mypage/applications?section=active&limit=10" className="text-xs font-semibold text-teal-600 hover:underline">
+                    더보기
+                  </Link>
+                )}
+              </div>
             </div>
             {visibleActiveApplications.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-6 text-center text-sm text-slate-400">진행 중인 신청이 없습니다.</div>
@@ -60,7 +67,14 @@ export default async function MyPagePage() {
           <div className="space-y-3 border-t border-slate-100 pt-1">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-slate-800">참여 완료</p>
-              <span className="text-xs text-slate-400">{visibleCompletedActivities.length}건</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-400">{completedActivities.length}건</span>
+                {completedActivities.length > 5 && (
+                  <Link href="/mypage/applications?section=completed&limit=10" className="text-xs font-semibold text-teal-600 hover:underline">
+                    더보기
+                  </Link>
+                )}
+              </div>
             </div>
             {visibleCompletedActivities.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-6 text-center text-sm text-slate-400">참여 완료된 활동이 없습니다.</div>
