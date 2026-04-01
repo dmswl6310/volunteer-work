@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CircleUserRound, PencilLine, WalletMinimal } from 'lucide-react';
+import { Award, CircleUserRound, PencilLine } from 'lucide-react';
 import { getMyProfileData } from '@/actions/user';
 import LogoutButton from '@/components/LogoutButton';
 
@@ -8,26 +8,26 @@ export default async function MyPageHeaderCard() {
 
   return (
     <section className="rounded-3xl border border-slate-200/80 bg-white px-5 py-5 shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
-      <div className="flex items-start gap-4">
+      <div className="flex items-center gap-4">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-600">
           <CircleUserRound className="h-7 w-7" />
         </div>
-        <div className="min-w-0 flex-1 space-y-3">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">내 계정</p>
+        <div className="min-w-0 flex-1 space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Account</p>
               <p className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">{profile.username}</p>
             </div>
-            <Link href="/mypage/points" className="shrink-0 rounded-2xl border border-indigo-100 bg-indigo-50/90 px-4 py-3 text-indigo-700 transition-colors hover:bg-indigo-100/90">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-indigo-500">Points</p>
-              <span className="mt-1 inline-flex items-center gap-2 text-lg font-extrabold tracking-[-0.02em] text-indigo-700">
-                <WalletMinimal className="h-5 w-5" />
+            <Link href="/mypage/points" className="shrink-0 rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-indigo-100/70 px-4 py-3 text-indigo-700 shadow-[0_10px_24px_rgba(99,102,241,0.12)] transition-colors hover:from-indigo-100 hover:to-indigo-100">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-500">Points</p>
+              <span className="mt-1 inline-flex items-center gap-2 text-xl font-extrabold tracking-[-0.02em] text-indigo-700">
+                <Award className="h-5 w-5" />
                 {profile.points.toLocaleString()} P
               </span>
             </Link>
           </div>
 
-          <div className="flex flex-wrap justify-end gap-2 pt-1">
+          <div className="flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-3">
             <Link
               href="/mypage/profile"
               className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-medium text-slate-500 transition-colors hover:border-indigo-200 hover:bg-indigo-50/60 hover:text-indigo-700"

@@ -352,7 +352,15 @@ export async function getMyHostingPageData(): Promise<MyPageHostingData> {
   };
 }
 
-export async function getMyHistoryPageData(limit = 12): Promise<MyPageHistoryData> {
+export async function getMyHistoryPageData({
+  completedLimit = 12,
+  scrapLimit = 12,
+  reviewLimit = 12,
+}: {
+  completedLimit?: number;
+  scrapLimit?: number;
+  reviewLimit?: number;
+} = {}): Promise<MyPageHistoryData> {
   const { supabase, authUser, profile } = await getMyPageProfile();
 
   const [applicationsRes, scrapsRes, reviewsRes] = await Promise.all([
@@ -366,18 +374,18 @@ export async function getMyHistoryPageData(limit = 12): Promise<MyPageHistoryDat
       .select('id, post_id, created_at, posts(id, title)')
       .eq('user_id', authUser.id)
       .order('created_at', { ascending: false })
-      .range(0, limit - 1),
+      .range(0, scrapLimit - 1),
     supabase
       .from('reviews')
       .select('id, content, created_at, posts(title, id)')
       .eq('author_id', authUser.id)
       .order('created_at', { ascending: false })
-      .range(0, limit - 1),
+      .range(0, reviewLimit - 1),
   ]);
 
   return {
     profile,
-    completedActivities: deriveCompletedActivities((applicationsRes.data ?? []) as MyPageApplication[]),
+    completedActivities: deriveCompletedActivities((applicationsRes.data ?? []) as MyPageApplication[]).slice(0, completedLimit),
     scraps: (scrapsRes.data ?? []) as MyPageScrap[],
     reviews: (reviewsRes.data ?? []) as MyPageReview[],
   };
