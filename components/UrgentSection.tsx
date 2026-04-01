@@ -1,6 +1,7 @@
 import { getUrgentPosts } from '@/actions/posts';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getPostStatus, getUrgentStatusLabel } from '@/lib/post-status';
 
 /** 긴급 봉사활동 가로 스크롤 섹션 (서버 컴포넌트) */
 export default async function UrgentSection({ status = 'recruiting' }: { status?: 'recruiting' | 'closed' | 'all' }) {
@@ -21,14 +22,13 @@ export default async function UrgentSection({ status = 'recruiting' }: { status?
 
       <div className="flex overflow-x-auto space-x-4 pb-4 -mx-4 px-4 scrollbar-hide snap-x snap-mandatory">
         {urgentPosts.map((post) => {
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          const dueDate = post.due_date ? new Date(post.due_date) : null;
-          if (dueDate) dueDate.setHours(0, 0, 0, 0);
-          const diffDays = dueDate ? Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : 0;
-          const isFull = post.current_participants >= post.max_participants;
-          let dDayText = diffDays > 0 ? `D-${diffDays}` : (diffDays === 0 ? 'D-Day' : '마감');
-          if (diffDays >= 0 && isFull) dDayText = '모집 완료';
+          const status = getPostStatus({
+            dueDate: post.due_date,
+            isRecruiting: post.is_recruiting,
+            currentParticipants: post.current_participants,
+            maxParticipants: post.max_participants,
+          });
+          const dDayText = getUrgentStatusLabel(status);
 
           return (
             <Link
@@ -40,13 +40,14 @@ export default async function UrgentSection({ status = 'recruiting' }: { status?
                 {/* Image */}
                 <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl bg-slate-200">
                   {post.image_url ? (
-                    <Image 
-                      src={post.image_url} 
-                      alt={post.title} 
-                      fill 
-                      className="object-cover" 
-                      sizes="96px"
-                    />
+                      <Image 
+                        src={post.image_url} 
+                        alt={post.title} 
+                        fill 
+                        className="object-cover" 
+                        sizes="96px"
+                        priority={post.id === urgentPosts[0]?.id}
+                      />
                   ) : (
                       <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-300">
                         <span className="text-[10px]">No Img</span>
@@ -58,7 +59,7 @@ export default async function UrgentSection({ status = 'recruiting' }: { status?
                 <div className="flex-1 flex flex-col justify-between py-1">
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <span className={`inline-block rounded-full px-2 py-1 text-[10px] font-semibold ${isFull ? 'border border-slate-200 bg-slate-100 text-slate-600' : 'border border-rose-200 bg-rose-50 text-rose-700'}`}>
+                      <span className={`inline-block rounded-full px-2 py-1 text-[10px] font-semibold ${status.isFull && !status.isExpired ? 'border border-slate-200 bg-slate-100 text-slate-600' : 'border border-rose-200 bg-rose-50 text-rose-700'}`}>
                         {dDayText}
                       </span>
                     </div>
