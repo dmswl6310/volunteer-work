@@ -67,7 +67,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                         {user.username?.[0] || 'U'}
                     </div>
                     <div className="flex-1">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Account details</p>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">계정 정보</p>
                         <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">
                             {user.username || '이름 없음'}
                         </h2>
@@ -107,7 +107,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                     {user.username?.[0] || 'U'}
                 </div>
                 <div className="flex-1">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Edit profile</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">프로필 수정</p>
                     <p className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">{user.username || '이름 없음'}</p>
                     <p className="mt-1 text-sm text-slate-500">닉네임은 가입할 때 한 번만 설정할 수 있습니다.</p>
                 </div>

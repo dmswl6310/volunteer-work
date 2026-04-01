@@ -21,14 +21,13 @@ export default async function MyPointsPage({ searchParams }: { searchParams?: Pr
       <section className="rounded-2xl border border-slate-200/80 bg-white px-5 py-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Points</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">포인트</p>
             <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">포인트 내역</h2>
           </div>
           <span className="rounded-full bg-indigo-50 px-3 py-1 text-sm font-bold text-indigo-700">
             {profile.points.toLocaleString()} P
           </span>
         </div>
-        <p className="text-sm text-slate-500">적립된 포인트를 통장처럼 순서대로 확인할 수 있어요.</p>
       </section>
 
       <section>

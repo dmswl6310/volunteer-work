@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CircleUserRound, Coins, PencilLine } from 'lucide-react';
+import { CircleUserRound, PencilLine, WalletMinimal } from 'lucide-react';
 import { getMyProfileData } from '@/actions/user';
 import LogoutButton from '@/components/LogoutButton';
 
@@ -13,25 +13,25 @@ export default async function MyPageHeaderCard() {
           <CircleUserRound className="h-7 w-7" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">My account</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">내 계정</p>
           <p className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">{profile.username}</p>
           <Link href="/mypage/points" className="mt-3 flex w-fit items-center gap-2 rounded-2xl border border-indigo-100 bg-indigo-50/90 px-4 py-2 text-sm font-bold text-indigo-700 transition-colors hover:bg-indigo-100/90">
-            <Coins className="h-5 w-5" />
+            <WalletMinimal className="h-5 w-5" />
             <span>{profile.points.toLocaleString()} P</span>
           </Link>
         </div>
       </div>
 
-      <div className="mt-4 flex gap-2">
+      <div className="mt-3 flex gap-2">
         <Link
           href="/mypage/profile"
-          className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:border-indigo-200 hover:bg-indigo-50/60 hover:text-indigo-700"
+          className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 transition-colors hover:border-indigo-200 hover:bg-indigo-50/60 hover:text-indigo-700"
         >
-          <PencilLine className="h-3.5 w-3.5" />
+          <PencilLine className="h-3 w-3" />
           <span>프로필 편집</span>
         </Link>
-        <div className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-xs font-semibold text-slate-700">
-          <LogoutButton />
+        <div className="rounded-xl border border-slate-200 bg-slate-50/70 px-1.5 py-1 text-[11px] font-semibold text-slate-700">
+          <LogoutButton variant="compact" />
         </div>
       </div>
 

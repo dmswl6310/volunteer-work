@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from '@/lib/supabase';
 import { redirect } from 'next/navigation';
 import BottomNav from '@/components/BottomNav';
 import PullToRefresh from '@/components/PullToRefresh';
+import { Analytics } from '@vercel/analytics/react';
 
 export default async function MainLayout({
     children,
@@ -37,6 +38,7 @@ export default async function MainLayout({
                 </PullToRefresh>
             </main>
             <BottomNav />
+            <Analytics />
         </>
     );
 }
