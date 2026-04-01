@@ -88,11 +88,11 @@ export default function AttendanceConfirmationCard({
   return (
     <section className="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
       <div className="mb-4 flex flex-col gap-1">
-        <Link href={`/board/${postId}`} className="font-semibold text-slate-900 underline-offset-2 transition-colors hover:text-indigo-700 hover:underline">
+        <Link href={`/board/${postId}`} className="font-semibold text-slate-900 underline-offset-2 transition-colors hover:text-slate-800 hover:underline">
           {title}
         </Link>
         <p className="text-xs text-slate-500">진행일: {dueDate ? new Date(dueDate).toLocaleDateString() : '-'}</p>
-        <p className="text-xs font-semibold text-indigo-600">참여 확인 시 1인당 {pointsPerParticipant}P 지급</p>
+        <p className="text-xs font-medium text-slate-500">참여 확인 시 1인당 {pointsPerParticipant}P 지급</p>
       </div>
 
       <div className="space-y-3">

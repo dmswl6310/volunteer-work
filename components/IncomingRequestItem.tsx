@@ -95,7 +95,7 @@ export default function IncomingRequestItem({ application }: { application: Inco
           <p className="text-xs text-slate-400">신청일: {new Date(application.created_at).toLocaleString()}</p>
           <p className="mt-1 text-xs text-slate-400">
             지원 공고:{' '}
-            <Link href={`/board/${application.post.id}`} className="font-medium text-slate-600 underline underline-offset-2 transition-colors hover:text-indigo-700">
+            <Link href={`/board/${application.post.id}`} className="font-medium text-slate-600 underline underline-offset-2 transition-colors hover:text-slate-800">
               {application.post.title}
             </Link>
           </p>

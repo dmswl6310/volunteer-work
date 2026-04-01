@@ -145,6 +145,10 @@ export type MyPageHistoryData = {
   completedActivities: MyPageApplication[];
   scraps: MyPageScrap[];
   reviews: MyPageReview[];
+};
+
+export type MyPagePointsData = {
+  profile: MyPageProfile;
   pointTransactions: MyPointTransaction[];
 };
 
@@ -253,7 +257,10 @@ function deriveAttendancePosts(posts: MyPageHostingPost[]) {
   return posts.filter((post) => {
     const dueDate = normalizeDate(post.due_date);
     if (!dueDate || dueDate > today) return false;
-    return post.applications.some((application) => application.status === 'approved');
+    return post.applications.some(
+      (application) =>
+        application.status === 'approved' && !application.attended_at && !application.points_awarded_at
+    );
   });
 }
 
@@ -348,7 +355,7 @@ export async function getMyHostingPageData(): Promise<MyPageHostingData> {
 export async function getMyHistoryPageData(limit = 12): Promise<MyPageHistoryData> {
   const { supabase, authUser, profile } = await getMyPageProfile();
 
-  const [applicationsRes, scrapsRes, reviewsRes, pointTransactionsRes] = await Promise.all([
+  const [applicationsRes, scrapsRes, reviewsRes] = await Promise.all([
     supabase
       .from('applications')
       .select('id, status, post_id, created_at, attended_at, points_awarded_at, posts(id, title, due_date, volunteer_hours)')
@@ -366,12 +373,6 @@ export async function getMyHistoryPageData(limit = 12): Promise<MyPageHistoryDat
       .eq('author_id', authUser.id)
       .order('created_at', { ascending: false })
       .range(0, limit - 1),
-    supabase
-      .from('point_transactions')
-      .select('id, points, transaction_type, description, created_at, post_id, posts(id, title)')
-      .eq('user_id', authUser.id)
-      .order('created_at', { ascending: false })
-      .range(0, limit - 1),
   ]);
 
   return {
@@ -379,7 +380,22 @@ export async function getMyHistoryPageData(limit = 12): Promise<MyPageHistoryDat
     completedActivities: deriveCompletedActivities((applicationsRes.data ?? []) as MyPageApplication[]),
     scraps: (scrapsRes.data ?? []) as MyPageScrap[],
     reviews: (reviewsRes.data ?? []) as MyPageReview[],
-    pointTransactions: (pointTransactionsRes.data ?? []) as MyPointTransaction[],
+  };
+}
+
+export async function getMyPointsPageData(limit = 20): Promise<MyPagePointsData> {
+  const { supabase, authUser, profile } = await getMyPageProfile();
+
+  const { data } = await supabase
+    .from('point_transactions')
+    .select('id, points, transaction_type, description, created_at, post_id, posts(id, title)')
+    .eq('user_id', authUser.id)
+    .order('created_at', { ascending: false })
+    .range(0, limit - 1);
+
+  return {
+    profile,
+    pointTransactions: (data ?? []) as MyPointTransaction[],
   };
 }
 
