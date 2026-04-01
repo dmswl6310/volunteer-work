@@ -15,22 +15,22 @@ export default async function MyPageHeaderCard() {
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">My account</p>
           <p className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">{profile.username}</p>
-          <Link href="/mypage/points" className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50/80 px-3 py-1 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-100/80">
-            <Coins className="h-3.5 w-3.5" />
+          <Link href="/mypage/points" className="mt-3 flex w-fit items-center gap-2 rounded-2xl border border-indigo-100 bg-indigo-50/90 px-4 py-2 text-sm font-bold text-indigo-700 transition-colors hover:bg-indigo-100/90">
+            <Coins className="h-5 w-5" />
             <span>{profile.points.toLocaleString()} P</span>
           </Link>
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-2.5">
+      <div className="mt-4 flex gap-2">
         <Link
           href="/mypage/profile"
-          className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-indigo-200 hover:bg-indigo-50/60 hover:text-indigo-700"
+          className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:border-indigo-200 hover:bg-indigo-50/60 hover:text-indigo-700"
         >
-          <PencilLine className="h-4 w-4" />
+          <PencilLine className="h-3.5 w-3.5" />
           <span>프로필 편집</span>
         </Link>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-3 py-3 text-sm font-semibold text-slate-700">
+        <div className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-xs font-semibold text-slate-700">
           <LogoutButton />
         </div>
       </div>
