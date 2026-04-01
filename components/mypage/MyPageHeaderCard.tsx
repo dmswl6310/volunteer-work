@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Award, CircleUserRound, PencilLine } from 'lucide-react';
+import { CircleUserRound, PencilLine } from 'lucide-react';
 import { getMyProfileData } from '@/actions/user';
 import LogoutButton from '@/components/LogoutButton';
 
@@ -13,18 +13,15 @@ export default async function MyPageHeaderCard() {
           <CircleUserRound className="h-7 w-7" />
         </div>
         <div className="min-w-0 flex-1 space-y-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Account</p>
-              <p className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">{profile.username}</p>
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Account</p>
+            <div className="mt-1 flex flex-wrap items-center gap-2.5">
+              <p className="text-xl font-semibold tracking-[-0.02em] text-slate-900">{profile.username}</p>
+              <Link href="/mypage/points" className="inline-flex items-center rounded-full border border-indigo-100 bg-indigo-50 px-3.5 py-1.5 text-sm font-bold text-indigo-700 transition-colors hover:bg-indigo-100/90">
+                <span className="mr-1.5 text-[11px] font-semibold text-indigo-500">포인트</span>
+                <span>{profile.points.toLocaleString()}P</span>
+              </Link>
             </div>
-            <Link href="/mypage/points" className="shrink-0 rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-indigo-100/70 px-4 py-3 text-indigo-700 shadow-[0_10px_24px_rgba(99,102,241,0.12)] transition-colors hover:from-indigo-100 hover:to-indigo-100">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-500">Points</p>
-              <span className="mt-1 inline-flex items-center gap-2 text-xl font-extrabold tracking-[-0.02em] text-indigo-700">
-                <Award className="h-5 w-5" />
-                {profile.points.toLocaleString()} P
-              </span>
-            </Link>
           </div>
 
           <div className="flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-3">
