@@ -17,12 +17,9 @@ export default async function MyPagePage() {
       <section className="rounded-3xl border border-slate-200/80 bg-white px-5 py-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
         <div className="mb-5 flex items-end justify-between gap-3">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Overview</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">신청 현황</p>
             <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">내 신청</h2>
           </div>
-          <Link href="/mypage/applications" className="text-xs font-semibold text-indigo-600 transition-colors hover:text-indigo-700">
-            전체보기
-          </Link>
         </div>
 
         <div className="space-y-6">

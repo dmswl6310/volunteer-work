@@ -6,7 +6,10 @@ export default function MyPageLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-slate-50/70 pb-24">
       <div className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur">
-        <h1 className="text-base font-semibold tracking-[-0.01em] text-slate-900 text-center">마이페이지</h1>
+        <div className="text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">My page</p>
+          <h1 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">마이페이지</h1>
+        </div>
       </div>
 
       <div className="mx-auto w-full max-w-md p-4 space-y-4">
