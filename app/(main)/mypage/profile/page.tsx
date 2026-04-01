@@ -8,7 +8,7 @@ export default async function MyProfilePage() {
   return (
     <div className="space-y-4">
       <section className="rounded-3xl border border-slate-200/80 bg-white px-5 py-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">내 프로필</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Profile</p>
         <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">내 정보</h2>
         <p className="mt-2 text-sm leading-6 text-slate-500">연락처, 주소, 직업을 수정하고 계정 정보를 관리할 수 있어요.</p>
       </section>
