@@ -86,13 +86,13 @@ export default function AttendanceConfirmationCard({
   };
 
   return (
-    <section className="rounded-3xl border border-gray-100 bg-white p-4 shadow-sm">
-      <div className="flex flex-col gap-1 mb-4">
-        <Link href={`/board/${postId}`} className="font-bold text-gray-900 hover:text-teal-600 underline-offset-2 hover:underline">
+    <section className="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
+      <div className="mb-4 flex flex-col gap-1">
+        <Link href={`/board/${postId}`} className="font-semibold text-slate-900 underline-offset-2 transition-colors hover:text-indigo-700 hover:underline">
           {title}
         </Link>
-        <p className="text-xs text-gray-500">진행일: {dueDate ? new Date(dueDate).toLocaleDateString() : '-'}</p>
-        <p className="text-xs font-semibold text-teal-600">참여 확인 시 1인당 {pointsPerParticipant}P 지급</p>
+        <p className="text-xs text-slate-500">진행일: {dueDate ? new Date(dueDate).toLocaleDateString() : '-'}</p>
+        <p className="text-xs font-semibold text-indigo-600">참여 확인 시 1인당 {pointsPerParticipant}P 지급</p>
       </div>
 
       <div className="space-y-3">
@@ -103,33 +103,33 @@ export default function AttendanceConfirmationCard({
           return (
             <label
               key={application.id}
-              className={`flex items-start gap-3 rounded-xl border p-3 ${
-                isCompleted ? 'border-green-100 bg-green-50' : 'border-gray-200 bg-white'
+              className={`flex items-start gap-3 rounded-2xl border p-3 transition-colors ${
+                isCompleted ? 'border-emerald-200 bg-emerald-50/70' : 'border-slate-200 bg-slate-50/40 hover:border-slate-300 hover:bg-white'
               }`}
             >
               <input
                 type="checkbox"
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-teal-500 focus:ring-teal-500"
+                className="mt-1 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                 checked={selectedIds.includes(application.id)}
                 disabled={!canSelect || loading}
                 onChange={() => toggleSelection(application.id)}
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="font-semibold text-gray-900 truncate">
-                    {application.users?.username || '이름 없음'}
-                  </p>
-                  <span
-                    className={`text-xs font-bold px-2 py-1 rounded-full ${
-                      isCompleted ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-                    }`}
-                  >
-                    {isCompleted ? '참여 확인 완료' : '확인 대기'}
-                  </span>
-                </div>
-                {application.users?.contact && <p className="text-sm text-gray-600 mt-1">연락처: {application.users.contact}</p>}
+                    <p className="truncate font-semibold text-slate-900">
+                      {application.users?.username || '이름 없음'}
+                    </p>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                        isCompleted ? 'border border-emerald-200 bg-emerald-50 text-emerald-700' : 'border border-amber-200 bg-amber-50 text-amber-700'
+                      }`}
+                    >
+                      {isCompleted ? '참여 확인 완료' : '확인 대기'}
+                    </span>
+                  </div>
+                {application.users?.contact && <p className="mt-1 text-sm text-slate-600">연락처: {application.users.contact}</p>}
                 {isCompleted && (
-                  <p className="text-xs text-gray-500 mt-1">처리 시각: {formatDateTime(application.attended_at || application.points_awarded_at)}</p>
+                  <p className="mt-1 text-xs text-slate-500">처리 시각: {formatDateTime(application.attended_at || application.points_awarded_at)}</p>
                 )}
               </div>
             </label>
@@ -142,12 +142,12 @@ export default function AttendanceConfirmationCard({
           type="button"
           onClick={handleConfirm}
           disabled={loading || selectedIds.length === 0}
-          className="mt-4 w-full rounded-2xl bg-teal-500 px-4 py-3 text-sm font-bold text-white hover:bg-teal-600 disabled:opacity-50"
+          className="mt-4 w-full rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(79,70,229,0.22)] transition-colors hover:bg-indigo-700 disabled:opacity-50"
         >
           {loading ? '처리 중...' : `선택한 참여자 확인 및 포인트 지급 (${selectedIds.length}명)`}
         </button>
       ) : (
-        <p className="mt-4 text-sm text-gray-500 text-center">이 게시글은 참석 확인이 모두 끝났습니다.</p>
+        <p className="mt-4 text-center text-sm text-slate-500">이 게시글은 참석 확인이 모두 끝났습니다.</p>
       )}
     </section>
   );

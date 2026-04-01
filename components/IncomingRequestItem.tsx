@@ -82,30 +82,30 @@ export default function IncomingRequestItem({ application }: { application: Inco
   };
 
   return (
-    <div className="rounded-3xl border border-gray-100 bg-white p-4 shadow-sm">
+    <div className="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <p className="mb-1 text-base font-bold text-gray-900">{application.users?.username || '이름 없음'}</p>
-          <div className="mb-3 space-y-1 rounded-2xl bg-gray-50 p-3 text-sm text-gray-600">
+          <p className="mb-1 text-base font-semibold text-slate-900">{application.users?.username || '이름 없음'}</p>
+          <div className="mb-3 space-y-1 rounded-2xl border border-slate-200 bg-slate-50/50 p-3 text-sm text-slate-600">
             {application.users?.contact && <p>📞 연락처: {application.users.contact}</p>}
             {application.users?.email && <p>📧 이메일: {application.users.email}</p>}
             {application.users?.job && <p>💼 직업/소속기관: {application.users.job}</p>}
             {application.users?.address && <p>🏠 거주지: {application.users.address}</p>}
           </div>
-          <p className="text-xs text-gray-400">신청일: {new Date(application.created_at).toLocaleString()}</p>
-          <p className="mt-1 text-xs text-gray-400">
+          <p className="text-xs text-slate-400">신청일: {new Date(application.created_at).toLocaleString()}</p>
+          <p className="mt-1 text-xs text-slate-400">
             지원 공고:{' '}
-            <Link href={`/board/${application.post.id}`} className="font-medium text-gray-600 underline underline-offset-2 hover:text-teal-600">
+            <Link href={`/board/${application.post.id}`} className="font-medium text-slate-600 underline underline-offset-2 transition-colors hover:text-indigo-700">
               {application.post.title}
             </Link>
           </p>
-          {isFull && <p className="mt-1 text-xs font-medium text-orange-600">모집 인원이 모두 차서 승인할 수 없습니다.</p>}
+          {isFull && <p className="mt-1 text-xs font-medium text-amber-600">모집 인원이 모두 차서 승인할 수 없습니다.</p>}
           {isFull && (
             <button
               type="button"
               onClick={handleBulkReject}
               disabled={bulkRejectLoading || loading}
-              className="mt-2 text-xs font-semibold text-red-600 underline underline-offset-2 hover:text-red-700 disabled:opacity-50"
+              className="mt-2 text-xs font-semibold text-rose-600 underline underline-offset-2 transition-colors hover:text-rose-700 disabled:opacity-50"
             >
               {bulkRejectLoading ? '처리 중...' : '남은 신청 일괄 거절'}
             </button>
@@ -116,14 +116,14 @@ export default function IncomingRequestItem({ application }: { application: Inco
           <button
             onClick={() => handleStatus('approved')}
             disabled={loading || isFull}
-            className="rounded-2xl bg-teal-500 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-teal-600 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
+            className="rounded-2xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
           >
             {isFull ? '모집 완료' : '승인하기'}
           </button>
           <button
             onClick={() => handleStatus('rejected')}
             disabled={loading}
-            className="rounded-2xl bg-gray-100 px-4 py-2.5 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-200"
+            className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50"
           >
             거절하기
           </button>
