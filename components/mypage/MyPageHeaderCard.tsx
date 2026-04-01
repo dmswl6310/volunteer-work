@@ -15,10 +15,10 @@ export default async function MyPageHeaderCard() {
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">My account</p>
           <p className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">{profile.username}</p>
-          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50/80 px-3 py-1 text-xs font-semibold text-indigo-700">
+          <Link href="/mypage/points" className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50/80 px-3 py-1 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-100/80">
             <Coins className="h-3.5 w-3.5" />
             <span>{profile.points.toLocaleString()} P</span>
-          </div>
+          </Link>
         </div>
       </div>
 
