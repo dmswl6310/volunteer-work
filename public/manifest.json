@@ -1,6 +1,6 @@
 {
-  "name": "Together - 봉사활동 플랫폼",
-  "short_name": "Together",
+  "name": "사과 - 봉사활동 플랫폼",
+  "short_name": "사과",
   "description": "함께하는 봉사활동 참여 및 관리 플랫폼",
   "start_url": "/board",
   "display": "standalone",
