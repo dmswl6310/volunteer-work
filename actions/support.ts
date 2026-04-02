@@ -4,29 +4,12 @@ import nodemailer from 'nodemailer';
 import { createClient } from '@supabase/supabase-js';
 import { revalidatePath } from 'next/cache';
 import { requireAdminUser, requireApprovedUser } from '@/lib/server-auth';
-
-export type SupportTicketCategory = 'inquiry' | 'bug' | 'feedback';
-export type SupportTicketStatus = 'pending' | 'in_progress' | 'resolved';
-
-export type SupportTicket = {
-  id: string;
-  user_id: string;
-  category: SupportTicketCategory;
-  title: string;
-  content: string;
-  status: SupportTicketStatus;
-  username_snapshot: string | null;
-  email_snapshot: string | null;
-  admin_note: string | null;
-  resolved_at: string | null;
-  created_at: string;
-};
-
-const CATEGORY_LABELS: Record<SupportTicketCategory, string> = {
-  inquiry: '문의',
-  bug: '버그 제보',
-  feedback: '의견/기능 제안',
-};
+import {
+  SUPPORT_CATEGORY_LABELS,
+  type SupportTicket,
+  type SupportTicketCategory,
+  type SupportTicketStatus,
+} from '@/lib/support';
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -69,9 +52,9 @@ async function sendSupportNotificationEmail(ticket: SupportTicket) {
     from: `Volunteer Platform <${smtpUser}>`,
     to: recipients,
     replyTo: ticket.email_snapshot || undefined,
-    subject: `[고객문의] ${CATEGORY_LABELS[ticket.category]} - ${ticket.title}`,
+    subject: `[고객문의] ${SUPPORT_CATEGORY_LABELS[ticket.category]} - ${ticket.title}`,
     text: [
-      `문의 종류: ${CATEGORY_LABELS[ticket.category]}`,
+      `문의 종류: ${SUPPORT_CATEGORY_LABELS[ticket.category]}`,
       `작성자: ${ticket.username_snapshot || '알 수 없음'}`,
       `이메일: ${ticket.email_snapshot || '-'}`,
       `작성일: ${new Date(ticket.created_at).toLocaleString('ko-KR')}`,

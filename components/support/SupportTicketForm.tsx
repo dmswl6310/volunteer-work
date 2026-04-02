@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createSupportTicket, type SupportTicketCategory } from '@/actions/support';
+import { createSupportTicket } from '@/actions/support';
 import { useToast } from '@/components/ToastProvider';
+import { SUPPORT_CATEGORY_LABELS, type SupportTicketCategory } from '@/lib/support';
 
 const CATEGORY_OPTIONS: Array<{ value: SupportTicketCategory; label: string; description: string }> = [
-  { value: 'inquiry', label: '문의', description: '서비스 이용 중 궁금한 점을 남겨주세요.' },
-  { value: 'bug', label: '버그 제보', description: '오류나 예상과 다른 동작을 알려주세요.' },
-  { value: 'feedback', label: '의견 / 기능 제안', description: '추가되면 좋을 기능이나 개선 아이디어를 남겨주세요.' },
+  { value: 'inquiry', label: SUPPORT_CATEGORY_LABELS.inquiry, description: '서비스 이용 중 궁금한 점을 남겨주세요.' },
+  { value: 'bug', label: SUPPORT_CATEGORY_LABELS.bug, description: '오류나 예상과 다른 동작을 알려주세요.' },
+  { value: 'feedback', label: SUPPORT_CATEGORY_LABELS.feedback, description: '추가되면 좋을 기능이나 개선 아이디어를 남겨주세요.' },
 ];
 
 export default function SupportTicketForm() {
