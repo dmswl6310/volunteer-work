@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { approveUser, getAdminDashboardData } from '@/actions/admin';
+import { getAdminSupportTickets } from '@/actions/support';
 import IncomingRequestItem from '@/components/IncomingRequestItem';
+import SupportTicketAdminList from '@/components/support/SupportTicketAdminList';
 import { requireAdminUser } from '@/lib/server-auth';
 
 export default async function AdminPage() {
@@ -11,7 +13,10 @@ export default async function AdminPage() {
     redirect('/mypage');
   }
 
-  const { pendingUsers, pendingApplications } = await getAdminDashboardData();
+  const [{ pendingUsers, pendingApplications }, supportTickets] = await Promise.all([
+    getAdminDashboardData(),
+    getAdminSupportTickets(),
+  ]);
 
   return (
     <div className="container mx-auto px-4 py-8 pb-20">
@@ -86,6 +91,23 @@ export default async function AdminPage() {
                 <IncomingRequestItem key={application.id} application={{ ...application, post: application.post ?? { id: '', title: '알 수 없는 게시글' } }} />
               ))}
             </div>
+          )}
+        </section>
+
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">고객 문의</h2>
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">
+              {supportTickets.length}건
+            </span>
+          </div>
+
+          {supportTickets.length === 0 ? (
+            <div className="bg-white rounded-lg p-8 text-center text-gray-500 shadow-sm border border-gray-100">
+              접수된 고객 문의가 없습니다.
+            </div>
+          ) : (
+            <SupportTicketAdminList tickets={supportTickets} />
           )}
         </section>
       </div>
