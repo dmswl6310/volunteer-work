@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { confirmAttendanceAndAwardPoints } from '@/actions/attendance';
 import { useToast } from './ToastProvider';
 
@@ -38,6 +39,7 @@ export default function AttendanceConfirmationCard({
   volunteerHours,
   approvedApplications,
 }: Props) {
+  const router = useRouter();
   const { showToast, showConfirm } = useToast();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -78,7 +80,8 @@ export default function AttendanceConfirmationCard({
       } else {
         showToast(`총 ${result.awardedCount}명에게 ${result.awardedPoints}P씩 지급했습니다.`, 'success');
       }
-      window.location.reload();
+      router.refresh();
+      setLoading(false);
     } catch (error: unknown) {
       showToast(error instanceof Error ? error.message : '참여 확인 처리 중 오류가 발생했습니다.', 'error');
       setLoading(false);

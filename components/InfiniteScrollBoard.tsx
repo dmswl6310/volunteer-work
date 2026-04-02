@@ -44,7 +44,7 @@ export default function InfiniteScrollBoard({ initialPosts, initialNextId, sort 
     <>
       <div className="grid grid-cols-1 gap-4">
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard key={post.id} post={post} priorityImage={post.id === posts[0]?.id || post.id === posts[1]?.id} />
         ))}
       </div>
 

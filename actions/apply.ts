@@ -3,6 +3,30 @@
 import { revalidatePath } from 'next/cache';
 import { requireApprovedUser } from '@/lib/server-auth';
 
+async function syncApprovedParticipantCount(supabase: Awaited<ReturnType<typeof requireApprovedUser>>['supabase'], postId: string) {
+  const { count, error: countError } = await supabase
+    .from('applications')
+    .select('id', { count: 'exact', head: true })
+    .eq('post_id', postId)
+    .eq('status', 'approved');
+
+  if (countError) {
+    throw new Error(countError.message || '승인 인원 수를 다시 계산하지 못했습니다.');
+  }
+
+  const approvedCount = count ?? 0;
+  const { error: updateError } = await supabase
+    .from('posts')
+    .update({ current_participants: approvedCount })
+    .eq('id', postId);
+
+  if (updateError) {
+    throw new Error(updateError.message || '참여 인원 동기화 중 오류가 발생했습니다.');
+  }
+
+  return approvedCount;
+}
+
 /**
  * 봉사활동 게시글에 참여 신청을 합니다.
  * - 유저 존재 여부 확인 (없으면 자동 생성)
@@ -92,20 +116,19 @@ export async function updateApplicationStatus(applicationId: string, newStatus: 
   if (app.status === newStatus) return;
 
   if (newStatus === 'approved') {
-    if (post.current_participants >= post.max_participants) {
+    const { count: approvedCount, error: approvedCountError } = await supabase
+      .from('applications')
+      .select('id', { count: 'exact', head: true })
+      .eq('post_id', app.post_id)
+      .eq('status', 'approved');
+
+    if (approvedCountError) {
+      throw new Error(approvedCountError.message || '승인 현황을 확인하지 못했습니다.');
+    }
+
+    if ((approvedCount ?? post.current_participants) >= post.max_participants) {
       throw new Error('모집 인원이 초과되어 승인할 수 없습니다.');
     }
-    const { error: postError } = await supabase
-      .from('posts')
-      .update({ current_participants: post.current_participants + 1 })
-      .eq('id', app.post_id);
-    if (postError) throw new Error(postError.message);
-  } else if (app.status === 'approved') {
-    const { error: postError } = await supabase
-      .from('posts')
-      .update({ current_participants: Math.max(0, post.current_participants - 1) })
-      .eq('id', app.post_id);
-    if (postError) throw new Error(postError.message);
   }
 
   const { error } = await supabase
@@ -115,7 +138,12 @@ export async function updateApplicationStatus(applicationId: string, newStatus: 
 
   if (error) throw new Error(error.message || '상태 변경 중 오류가 발생했습니다.');
 
+  await syncApprovedParticipantCount(supabase, app.post_id);
+
   revalidatePath('/mypage');
+  revalidatePath('/mypage/hosting');
+  revalidatePath('/admin');
+  revalidatePath(`/board/${app.post_id}`);
 }
 
 export async function rejectRemainingApplications(postId: string) {

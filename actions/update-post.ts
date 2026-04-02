@@ -1,8 +1,8 @@
 'use server';
 
-import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 import { validateNoProfanity } from '@/lib/profanity';
+import { requireApprovedUser } from '@/lib/server-auth';
 
 /**
  * 기존 게시글을 수정합니다.
@@ -14,11 +14,7 @@ import { validateNoProfanity } from '@/lib/profanity';
  * @returns 성공 시 { success: true }, 욕설 감지 시 { error: string }
  */
 export async function updatePost(postId: string, formData: FormData) {
-  const supabase = await createServerSupabaseClient();
-
-  // 작성자 본인 확인
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('로그인이 필요합니다.');
+  const { supabase, user } = await requireApprovedUser();
 
   const { data: post } = await supabase
     .from('posts')

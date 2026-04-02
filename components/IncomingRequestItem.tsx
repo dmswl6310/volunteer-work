@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { rejectRemainingApplications, updateApplicationStatus } from '@/actions/apply';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useToast } from './ToastProvider';
 
 type RequestUser = {
@@ -29,6 +30,7 @@ export type IncomingRequestApplication = {
 
 /** 들어오는 신청 항목 컴포넌트 (승인/거절 버튼 포함) */
 export default function IncomingRequestItem({ application }: { application: IncomingRequestApplication }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [bulkRejectLoading, setBulkRejectLoading] = useState(false);
   const { showToast, showConfirm } = useToast();
@@ -52,7 +54,8 @@ export default function IncomingRequestItem({ application }: { application: Inco
     try {
       await updateApplicationStatus(application.id, status);
       showToast(`${status === 'approved' ? '승인' : '거절'}되었습니다.`, 'success');
-      window.location.reload();
+      router.refresh();
+      setLoading(false);
     } catch (error: unknown) {
       showToast(error instanceof Error ? error.message : '상태 변경 중 오류가 발생했습니다.', 'error');
       setLoading(false);
@@ -74,7 +77,8 @@ export default function IncomingRequestItem({ application }: { application: Inco
       } else {
         showToast(`남은 신청 ${result.rejectedCount}건을 일괄 거절했습니다.`, 'success');
       }
-      window.location.reload();
+      router.refresh();
+      setBulkRejectLoading(false);
     } catch (error: unknown) {
       showToast(error instanceof Error ? error.message : '일괄 거절 처리 중 오류가 발생했습니다.', 'error');
       setBulkRejectLoading(false);

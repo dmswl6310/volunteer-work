@@ -8,6 +8,7 @@ import ReviewList from '@/components/ReviewList';
 import ScrapButton from '@/components/ScrapButton';
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { ChevronLeft, Clock3, Phone } from 'lucide-react';
+import { getPostStatus } from '@/lib/post-status';
 
 export default async function PostDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -42,19 +43,12 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
     userApplicationStatus = applyRes.data?.status || null;
   }
 
-  // 마감일 확인
-  let isExpired = false;
-  let diffDays = 0;
-  if (post.due_date) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const dueDate = new Date(post.due_date);
-    dueDate.setHours(0, 0, 0, 0);
-    isExpired = dueDate < today;
-    diffDays = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  }
-
-  const isFull = post.current_participants >= post.max_participants;
+  const { isExpired, diffDays, isFull, isOpenRecruiting } = getPostStatus({
+    dueDate: post.due_date,
+    isRecruiting: post.is_recruiting,
+    currentParticipants: post.current_participants,
+    maxParticipants: post.max_participants,
+  });
 
   return (
     <div className="min-h-screen bg-slate-50/70 pb-24">
@@ -90,7 +84,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
               <span className="inline-block rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
                  {post.category}
                </span>
-            {post.due_date && post.is_recruiting && !isExpired && !isFull && (
+            {post.due_date && isOpenRecruiting && diffDays !== null && (
               <span className="inline-block rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-600">
                 {diffDays === 0 ? 'D-Day' : `D-${diffDays}`}
               </span>
@@ -189,12 +183,12 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
           />
         </div>
         <div className="flex-1 ml-4">
-          <ApplyButton
-            postId={post.id}
-            isRecruiting={post.is_recruiting && !isExpired && !isFull}
-            isAuthor={isAuthor}
-            userApplicationStatus={userApplicationStatus}
-            isFull={isFull}
+            <ApplyButton
+             postId={post.id}
+             isRecruiting={isOpenRecruiting}
+             isAuthor={isAuthor}
+             userApplicationStatus={userApplicationStatus}
+             isFull={isFull}
           />
         </div>
       </div>

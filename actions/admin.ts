@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { updateApplicationStatus } from '@/actions/apply';
 import { requireAdminUser } from '@/lib/server-auth';
 
 export type PendingAdminUser = {
@@ -58,42 +59,8 @@ export async function approveUser(userId: string) {
  * @param applicationId - 승인할 신청 ID
  */
 export async function approveApplication(applicationId: string) {
-  try {
-    const { supabase } = await requireAdminUser();
-
-    // 신청 정보 조회
-    const { data: app, error: fetchError } = await supabase
-      .from('applications')
-      .select('*, posts(*)')
-      .eq('id', applicationId)
-      .single();
-
-    if (fetchError || !app) throw new Error('신청 내역을 찾을 수 없습니다.');
-
-    const post = app.posts;
-    if (post.current_participants >= post.max_participants) {
-      throw new Error('모집 인원이 초과되었습니다.');
-    }
-
-    // 신청 상태 변경
-    const { error: appError } = await supabase
-      .from('applications')
-      .update({ status: 'approved' })
-      .eq('id', applicationId);
-    if (appError) throw appError;
-
-    // 참여자 수 증가
-    const { error: postError } = await supabase
-      .from('posts')
-      .update({ current_participants: post.current_participants + 1 })
-      .eq('id', app.post_id);
-    if (postError) throw postError;
-
-    revalidatePath('/admin');
-  } catch (error: unknown) {
-    console.error('Error approving application:', error);
-    throw new Error(error instanceof Error ? error.message : '신청 승인 중 오류가 발생했습니다.');
-  }
+  await requireAdminUser();
+  return updateApplicationStatus(applicationId, 'approved');
 }
 
 /**
@@ -101,19 +68,8 @@ export async function approveApplication(applicationId: string) {
  * @param applicationId - 거절할 신청 ID
  */
 export async function rejectApplication(applicationId: string) {
-  try {
-    const { supabase } = await requireAdminUser();
-    const { error } = await supabase
-      .from('applications')
-      .update({ status: 'rejected' })
-      .eq('id', applicationId);
-
-    if (error) throw error;
-    revalidatePath('/admin');
-  } catch (error) {
-    console.error('Error rejecting application:', error);
-    throw new Error('신청 거절 중 오류가 발생했습니다.');
-  }
+  await requireAdminUser();
+  return updateApplicationStatus(applicationId, 'rejected');
 }
 
 /**

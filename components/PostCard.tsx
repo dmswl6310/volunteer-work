@@ -2,20 +2,21 @@ import type { PostWithAuthor } from '@/actions/posts';
 import Link from 'next/link';
 import Image from 'next/image';
 import FallbackImage from '@/components/FallbackImage';
+import { getPostStatus } from '@/lib/post-status';
 
 interface PostCardProps {
   post: PostWithAuthor;
+  priorityImage?: boolean;
 }
 
 /** 봉사활동 게시글 카드 컴포넌트 (목록 페이지에서 사용) */
-export default function PostCard({ post }: PostCardProps) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const dueDate = post.due_date ? new Date(post.due_date) : null;
-  if (dueDate) dueDate.setHours(0, 0, 0, 0);
-  const isExpired = dueDate ? dueDate < today : false;
-  const isFull = post.current_participants >= post.max_participants;
-  const isClosed = !post.is_recruiting || isExpired;
+export default function PostCard({ post, priorityImage = false }: PostCardProps) {
+  const { dueDate, isClosed, isFull, isOpenRecruiting, diffDays } = getPostStatus({
+    dueDate: post.due_date,
+    isRecruiting: post.is_recruiting,
+    currentParticipants: post.current_participants,
+    maxParticipants: post.max_participants,
+  });
 
   return (
     <Link href={`/board/${post.id}`} className="block group touch-feedback">
@@ -30,6 +31,7 @@ export default function PostCard({ post }: PostCardProps) {
               fill
               className="object-cover"
               sizes="96px"
+              priority={priorityImage}
             />
           ) : (
             <FallbackImage category={post.category ?? undefined} className="rounded-lg" iconSize={24} />
@@ -63,7 +65,7 @@ export default function PostCard({ post }: PostCardProps) {
 
           <div className="flex items-center justify-between mt-2">
             <div className="flex items-center space-x-2 text-xs">
-              {!isClosed && !isFull && (
+              {isOpenRecruiting && (
                 <span className="font-semibold text-indigo-600">모집중</span>
               )}
               {!isClosed && isFull && (
@@ -75,9 +77,9 @@ export default function PostCard({ post }: PostCardProps) {
             </div>
 
             {/* D-day: 마감되지 않은 게시글만 표시 */}
-            {!isClosed && dueDate && (
+             {!isClosed && dueDate && diffDays !== null && (
               <span className="text-xs font-medium text-rose-500">
-                D-{Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))}
+                D-{diffDays}
               </span>
             )}
           </div>
