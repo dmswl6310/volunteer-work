@@ -40,7 +40,7 @@ export default function Header() {
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         {/* 로고 */}
         <Link href="/" className="text-xl font-semibold tracking-[-0.02em] text-indigo-600">
-          Together
+          사과
         </Link>
 
         {/* 데스크톱 네비게이션 */}
@@ -49,9 +49,9 @@ export default function Header() {
             봉사활동 찾기
           </Link>
           {session && (
-             <Link href="/board/write" className="transition hover:text-indigo-600">
-                봉사 모집하기
-             </Link>
+            <Link href="/board/write" className="transition hover:text-indigo-600">
+              봉사 모집하기
+            </Link>
           )}
         </div>
 
@@ -59,13 +59,13 @@ export default function Header() {
         <div className="flex space-x-3 text-sm font-medium">
           {session ? (
             <>
-              <Link 
-                href="/mypage" 
+              <Link
+                href="/mypage"
                 className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50/60 hover:text-indigo-700"
               >
                 마이페이지
               </Link>
-              <button 
+              <button
                 onClick={handleLogout}
                 className="px-3 py-1.5 text-slate-500 transition hover:text-rose-600"
               >
@@ -74,14 +74,14 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link 
-                href="/auth/login" 
+              <Link
+                href="/auth/login"
                 className="rounded-full px-4 py-1.5 text-indigo-600 transition hover:bg-indigo-50"
               >
                 로그인
               </Link>
-              <Link 
-                href="/auth/signup" 
+              <Link
+                href="/auth/signup"
                 className="rounded-full bg-indigo-600 px-4 py-1.5 text-white shadow-[0_8px_20px_rgba(79,70,229,0.18)] transition hover:bg-indigo-700"
               >
                 회원가입
