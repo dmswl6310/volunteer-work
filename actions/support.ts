@@ -130,22 +130,6 @@ export async function createSupportTicket(input: {
   revalidatePath('/admin');
 }
 
-export async function getMySupportTickets() {
-  const { supabase, user } = await requireApprovedUser();
-
-  const { data, error } = await supabase
-    .from('support_tickets')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    throw new Error(error.message || '문의 내역을 불러오지 못했습니다.');
-  }
-
-  return (data ?? []) as SupportTicket[];
-}
-
 export async function getAdminSupportTickets() {
   const { supabase } = await requireAdminUser();
 
