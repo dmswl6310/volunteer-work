@@ -17,12 +17,22 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Together | 봉사활동 플랫폼',
-  description: '함께하는 봉사활동 참여 및 관리 플랫폼',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  title: '사과 - 봉사활동 플랫폼',
+  description: '사과와 함께하는 봉사활동 참여 및 관리 플랫폼',
+  openGraph: {
+    title: '사과 - 봉사활동 플랫폼',
+    description: '사과와 함께하는 봉사활동 참여 및 관리 플랫폼',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '사과 - 봉사활동 플랫폼',
+    description: '사과와 함께하는 봉사활동 참여 및 관리 플랫폼',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Together',
+    title: '사과',
   },
 };
 
