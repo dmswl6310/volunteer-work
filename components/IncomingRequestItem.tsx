@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from './ToastProvider';
 
+let requestActionInFlight = false;
+
 type RequestUser = {
   username: string | null;
   contact: string | null;
@@ -40,6 +42,11 @@ export default function IncomingRequestItem({ application }: { application: Inco
     application.post.current_participants >= application.post.max_participants;
 
   const handleStatus = async (status: 'approved' | 'rejected') => {
+    if (requestActionInFlight) {
+      showToast('다른 승인/거절 요청을 처리 중입니다. 잠시만 기다려주세요.', 'warning');
+      return;
+    }
+
     if (status === 'approved' && isFull) {
       showToast('모집 인원이 모두 차서 더 이상 승인할 수 없습니다.', 'warning');
       return;
@@ -50,6 +57,8 @@ export default function IncomingRequestItem({ application }: { application: Inco
       confirmLabel: status === 'approved' ? '승인하기' : '거절하기',
     });
     if (!confirmed) return;
+
+    requestActionInFlight = true;
     setLoading(true);
     try {
       await updateApplicationStatus(application.id, status);
@@ -59,16 +68,24 @@ export default function IncomingRequestItem({ application }: { application: Inco
     } catch (error: unknown) {
       showToast(error instanceof Error ? error.message : '상태 변경 중 오류가 발생했습니다.', 'error');
       setLoading(false);
+    } finally {
+      requestActionInFlight = false;
     }
   };
 
   const handleBulkReject = async () => {
+    if (requestActionInFlight) {
+      showToast('다른 승인/거절 요청을 처리 중입니다. 잠시만 기다려주세요.', 'warning');
+      return;
+    }
+
     const confirmed = await showConfirm('이 게시글의 남은 승인 대기 신청을 모두 거절하시겠습니까?', {
       title: '남은 신청 일괄 거절',
       confirmLabel: '일괄 거절',
     });
     if (!confirmed) return;
 
+    requestActionInFlight = true;
     setBulkRejectLoading(true);
     try {
       const result = await rejectRemainingApplications(application.post.id);
@@ -82,6 +99,8 @@ export default function IncomingRequestItem({ application }: { application: Inco
     } catch (error: unknown) {
       showToast(error instanceof Error ? error.message : '일괄 거절 처리 중 오류가 발생했습니다.', 'error');
       setBulkRejectLoading(false);
+    } finally {
+      requestActionInFlight = false;
     }
   };
 

@@ -20,7 +20,7 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
   const initialData = await getPosts({ page: 1, limit: 10, sort, category, status, q });
 
   return (
-    <div className="relative min-h-screen bg-slate-50/70 pb-20">
+    <div className="relative min-h-screen bg-slate-50/70 pb-28">
       {/* Header with Search/Filter Title */}
       <div className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur">
         <div className="mb-2 flex items-center justify-between">
@@ -63,7 +63,7 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
       {/* Floating Action Button for Writing */}
       <Link
         href="/board/write"
-        className="fixed bottom-20 right-6 z-40 flex transform items-center justify-center rounded-full bg-indigo-600 p-4 text-white shadow-[0_14px_30px_rgba(79,70,229,0.28)] transition-transform hover:-translate-y-1 hover:bg-indigo-700 active:scale-95"
+        className="fixed bottom-[108px] right-6 z-40 flex transform items-center justify-center rounded-full bg-indigo-600 p-4 text-white shadow-[0_14px_30px_rgba(79,70,229,0.28)] transition-transform hover:-translate-y-1 hover:bg-indigo-700 active:scale-95"
         aria-label="글쓰기"
       >
         <Plus className="w-6 h-6" strokeWidth={3} />
