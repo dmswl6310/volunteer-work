@@ -170,16 +170,19 @@ function getEmailConflictMessage(publicUser: PublicUserLookup | null, authUser: 
 async function createPendingUserRecord(data: CreateUserParams) {
   const supabaseAdmin = getSupabaseAdmin();
 
-  const { error } = await supabaseAdmin.from('users').insert({
-    id: data.id,
-    email: normalizeEmail(data.email),
-    username: normalizeNickname(data.username),
-    contact: data.contact,
-    address: data.address,
-    job: data.job,
-    role: 'user',
-    is_approved: false,
-  });
+  const { error } = await supabaseAdmin.from('users').upsert(
+    {
+      id: data.id,
+      email: normalizeEmail(data.email),
+      username: normalizeNickname(data.username),
+      contact: data.contact,
+      address: data.address,
+      job: data.job,
+      role: 'user',
+      is_approved: false,
+    },
+    { onConflict: 'id' }
+  );
 
   if (error) {
     throw error;
@@ -359,13 +362,22 @@ export async function registerUser(input: RegisterUserParams): Promise<RegisterU
       email_confirm: true,
       user_metadata: {
         username: normalizedNickname,
+        contact: input.contact,
+        address: trimmedAddress,
+        job: trimmedJob,
+        role: 'user',
+        is_approved: false,
+        email: normalizedEmail,
       },
     });
 
     if (error || !data.user) {
       return {
         success: false,
-        error: '회원가입 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        error:
+          error?.message?.includes('Database error')
+            ? '회원가입 설정이 아직 완료되지 않았습니다. 관리자에게 문의해주세요.'
+            : '회원가입 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
       };
     }
 
