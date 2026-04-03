@@ -1,3 +1,5 @@
+import { getDateKstKey, getTodayKstKey } from '@/lib/date-kst';
+
 export type MyPageProfile = {
   id: string;
   username: string;
@@ -147,26 +149,13 @@ export type MyPagePointsData = {
   pointTransactions: MyPointTransaction[];
 };
 
-function normalizeDate(value?: string | null) {
-  if (!value) return null;
-  const date = new Date(value);
-  date.setHours(0, 0, 0, 0);
-  return date;
-}
-
-function getToday() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return today;
-}
-
 export function deriveCompletedActivities(applications: MyPageApplication[]) {
-  const today = getToday();
+  const todayKst = getTodayKstKey();
 
   return applications.filter((application) => {
     if (!application.attended_at) return false;
-    const dueDate = normalizeDate(application.posts?.due_date);
-    return Boolean(dueDate && dueDate <= today);
+    const dueDateKst = getDateKstKey(application.posts?.due_date);
+    return Boolean(dueDateKst && todayKst && dueDateKst <= todayKst);
   });
 }
 
@@ -232,11 +221,11 @@ export function deriveIncomingRequests(posts: MyPageHostingPost[]): MyPageIncomi
 }
 
 export function deriveAttendancePosts(posts: MyPageHostingPost[]) {
-  const today = getToday();
+  const todayKst = getTodayKstKey();
 
   return posts.filter((post) => {
-    const dueDate = normalizeDate(post.due_date);
-    if (!dueDate || dueDate > today) return false;
+    const dueDateKst = getDateKstKey(post.due_date);
+    if (!dueDateKst || !todayKst || dueDateKst > todayKst) return false;
     return post.applications.some(
       (application) =>
         application.status === 'approved' && !application.attended_at && !application.points_awarded_at
