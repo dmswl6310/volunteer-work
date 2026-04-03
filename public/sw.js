@@ -32,14 +32,25 @@ self.addEventListener('activate', (event) => {
 
 // 네트워크 우선, 실패 시 캐시 (Network First)
 self.addEventListener('fetch', (event) => {
-  // API 호출은 캐싱하지 않음
-  if (event.request.url.includes('/api/') || event.request.method !== 'GET') {
+  const requestUrl = new URL(event.request.url);
+
+  // API, auth, server action 계열은 캐싱하지 않음
+  if (
+    event.request.method !== 'GET' ||
+    requestUrl.pathname.startsWith('/api/') ||
+    requestUrl.pathname.startsWith('/auth/') ||
+    requestUrl.pathname.startsWith('/admin')
+  ) {
     return;
   }
 
   event.respondWith(
     fetch(event.request)
       .then((response) => {
+        if (!response || response.status >= 400) {
+          return response;
+        }
+
         // 성공 시 캐시에 저장
         const responseClone = response.clone();
         caches.open(CACHE_NAME).then((cache) => {
@@ -47,9 +58,21 @@ self.addEventListener('fetch', (event) => {
         });
         return response;
       })
-      .catch(() => {
+      .catch(async () => {
         // 오프라인 시 캐시에서 서빙
-        return caches.match(event.request);
+        const cachedResponse = await caches.match(event.request);
+
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        return new Response('Offline', {
+          status: 503,
+          statusText: 'Offline',
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+          },
+        });
       })
   );
 });
