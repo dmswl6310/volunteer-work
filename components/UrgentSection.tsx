@@ -2,6 +2,7 @@ import { getUrgentPosts } from '@/actions/posts';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getPostStatus, getUrgentStatusLabel } from '@/lib/post-status';
+import FallbackImage from '@/components/FallbackImage';
 
 /** 긴급 봉사활동 가로 스크롤 섹션 (서버 컴포넌트) */
 export default async function UrgentSection({ status = 'recruiting' }: { status?: 'recruiting' | 'closed' | 'all' }) {
@@ -49,9 +50,7 @@ export default async function UrgentSection({ status = 'recruiting' }: { status?
                         priority={post.id === urgentPosts[0]?.id}
                       />
                   ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-300">
-                        <span className="text-[10px]">No Img</span>
-                      </div>
+                      <FallbackImage category={post.category ?? undefined} className="rounded-2xl" iconSize={24} />
                   )}
                 </div>
 

@@ -51,7 +51,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
   });
 
   return (
-    <div className="min-h-screen bg-slate-50/70 pb-24">
+    <div className="min-h-screen bg-slate-50/70 pb-44">
       {/* 상단 네비게이션 (뒤로가기 버튼) */}
       <div className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur-md">
         <Link href="/board" className="-ml-2 rounded-full p-2 transition-colors hover:bg-slate-100">
@@ -174,7 +174,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
       </div>
 
       {/* 하단 고정 액션 바 */}
-      <div className="fixed bottom-[64px] left-0 right-0 z-40 mx-auto flex max-w-md items-center justify-between border-t border-slate-200 bg-white/95 p-4 pb-safe shadow-[0_-8px_20px_rgba(15,23,42,0.06)] backdrop-blur safe-area-bottom">
+      <div className="fixed bottom-[88px] left-0 right-0 z-40 mx-auto flex max-w-md items-center justify-between border-t border-slate-200 bg-white/95 p-4 pb-safe shadow-[0_-8px_20px_rgba(15,23,42,0.06)] backdrop-blur safe-area-bottom">
         <div className="flex items-center space-x-4">
           <ScrapButton
             postId={post.id}
