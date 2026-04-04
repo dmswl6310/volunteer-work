@@ -183,7 +183,7 @@ export async function getMyPointsPageData(limit = 20): Promise<MyPagePointsData>
 
   const { data, error } = await supabase
     .from('point_transactions')
-    .select('id, points, transaction_type, description, created_at, post_id, posts(id, title)')
+    .select('id, points, transaction_type, description, created_at, post_id')
     .eq('user_id', authUser.id)
     .order('created_at', { ascending: false })
     .range(0, limit - 1);
@@ -192,9 +192,30 @@ export async function getMyPointsPageData(limit = 20): Promise<MyPagePointsData>
     throw new Error(error.message || '포인트 내역을 불러오지 못했습니다.');
   }
 
+  const pointTransactions = (data ?? []) as MyPointTransaction[];
+  const postIds = Array.from(new Set(pointTransactions.map((transaction) => transaction.post_id).filter(Boolean))) as string[];
+
+  let postTitleMap = new Map<string, { id: string; title: string | null }>();
+
+  if (postIds.length > 0) {
+    const { data: postsData, error: postsError } = await supabase
+      .from('posts')
+      .select('id, title')
+      .in('id', postIds);
+
+    if (postsError) {
+      throw new Error(postsError.message || '포인트 내역에 연결된 게시글 정보를 불러오지 못했습니다.');
+    }
+
+    postTitleMap = new Map((postsData ?? []).map((post) => [post.id, { id: post.id, title: post.title }]));
+  }
+
   return {
     profile,
-    pointTransactions: (data ?? []) as MyPointTransaction[],
+    pointTransactions: pointTransactions.map((transaction) => ({
+      ...transaction,
+      posts: transaction.post_id ? postTitleMap.get(transaction.post_id) ?? null : null,
+    })),
   };
 }
 
