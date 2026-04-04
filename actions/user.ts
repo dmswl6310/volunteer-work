@@ -81,6 +81,23 @@ export async function getMyPageOverviewData(): Promise<MyPageOverviewData> {
   const attendancePosts = deriveAttendancePosts(hostedPosts);
   const activeApplications = deriveActiveApplications(applications);
   const completedActivities = deriveCompletedActivities(applications);
+  const completedPostIds = Array.from(new Set(completedActivities.map((application) => application.post_id || application.postId).filter(Boolean))) as string[];
+
+  let reviewedPostIds = new Set<string>();
+  if (completedPostIds.length > 0) {
+    const { data: reviewsData } = await supabase
+      .from('reviews')
+      .select('post_id')
+      .eq('author_id', authUser.id)
+      .in('post_id', completedPostIds);
+
+    reviewedPostIds = new Set((reviewsData ?? []).map((review) => review.post_id));
+  }
+
+  const completedActivitiesWithReviewState = completedActivities.map((application) => ({
+    ...application,
+    hasReview: reviewedPostIds.has((application.post_id || application.postId) ?? ''),
+  }));
 
   return {
     profile,
@@ -88,7 +105,7 @@ export async function getMyPageOverviewData(): Promise<MyPageOverviewData> {
       pendingIncomingRequests: incomingRequests.length,
       pendingApplications: activeApplications.filter((application) => application.status === 'pending').length,
       attendanceActions: attendancePosts.length,
-      completedActivities: completedActivities.length,
+      completedActivities: completedActivitiesWithReviewState.length,
       hostedPosts: hostedPosts.length,
       scraps: scrapsRes.data?.length ?? 0,
       reviews: reviewsRes.data?.length ?? 0,
@@ -97,7 +114,7 @@ export async function getMyPageOverviewData(): Promise<MyPageOverviewData> {
       incomingRequests: incomingRequests.slice(0, 3),
       applications: activeApplications.slice(0, 3),
       attendancePosts: attendancePosts.slice(0, 3),
-      completedActivities: completedActivities.slice(0, 3),
+      completedActivities: completedActivitiesWithReviewState.slice(0, 3),
     },
   };
 }
@@ -112,11 +129,27 @@ export async function getMyApplicationsPageData(): Promise<MyPageApplicationsDat
     .order('created_at', { ascending: false });
 
   const applications = (data ?? []) as MyPageApplication[];
+  const completedActivities = deriveCompletedActivities(applications);
+  const completedPostIds = Array.from(new Set(completedActivities.map((application) => application.post_id || application.postId).filter(Boolean))) as string[];
+
+  let reviewedPostIds = new Set<string>();
+  if (completedPostIds.length > 0) {
+    const { data: reviewsData } = await supabase
+      .from('reviews')
+      .select('post_id')
+      .eq('author_id', authUser.id)
+      .in('post_id', completedPostIds);
+
+    reviewedPostIds = new Set((reviewsData ?? []).map((review) => review.post_id));
+  }
 
   return {
     profile,
     activeApplications: deriveActiveApplications(applications),
-    completedActivities: deriveCompletedActivities(applications),
+    completedActivities: completedActivities.map((application) => ({
+      ...application,
+      hasReview: reviewedPostIds.has((application.post_id || application.postId) ?? ''),
+    })),
   };
 }
 

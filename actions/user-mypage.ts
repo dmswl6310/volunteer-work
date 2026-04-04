@@ -38,6 +38,7 @@ export type MyPageApplication = {
   createdAt?: string;
   attended_at?: string | null;
   points_awarded_at?: string | null;
+  hasReview?: boolean;
   posts?: {
     id?: string;
     title?: string | null;
