@@ -24,14 +24,14 @@ export default function MyPageNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`inline-flex flex-1 items-center justify-center gap-1.5 rounded-2xl px-4 py-2.5 text-sm font-semibold transition-colors ${
+              className={`inline-flex min-w-[104px] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
                 isActive
                   ? 'bg-indigo-600 text-white shadow-[0_8px_18px_rgba(79,70,229,0.22)]'
                   : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
               <Icon className="h-4 w-4" />
-              <span>{item.label}</span>
+              <span className="whitespace-nowrap">{item.label}</span>
             </Link>
           );
         })}
