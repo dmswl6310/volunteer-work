@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 import { checkProfanity } from '@/lib/profanity';
 import { requireApprovedUser } from '@/lib/server-auth';
+import { getDateKstKey, getTodayKstKey } from '@/lib/date-kst';
 
 type ReviewAuthor = {
   username?: string | null;
@@ -59,8 +60,9 @@ export async function createReview(postId: string, content: string) {
     return { error: '주최자가 실제 참여를 확인한 사용자만 후기를 작성할 수 있습니다.' };
   }
 
-  const dueDate = application.posts?.due_date ? new Date(application.posts.due_date) : null;
-  if (dueDate && dueDate > new Date()) {
+  const dueDateKey = getDateKstKey(application.posts?.due_date);
+  const todayKey = getTodayKstKey();
+  if (dueDateKey && todayKey && dueDateKey > todayKey) {
     return { error: '봉사활동 기간이 종료된 후에만 후기를 작성할 수 있습니다.' };
   }
 
