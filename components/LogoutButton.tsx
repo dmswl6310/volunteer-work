@@ -15,7 +15,7 @@ export default function LogoutButton({ variant = 'default' }: LogoutButtonProps)
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
-        router.push('/'); // 로그인 페이지로 이동
+        router.replace('/auth/login');
         router.refresh(); // 서버 캐시 초기화
     };
 

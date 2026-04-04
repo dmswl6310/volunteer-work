@@ -1,10 +1,18 @@
 const CACHE_NAME = 'together-v1';
 
-// 기본 캐싱할 페이지
-const PRECACHE_URLS = [
-  '/',
-  '/board',
-];
+// 정적 자산만 제한적으로 캐싱
+const PRECACHE_URLS = [];
+
+function shouldHandleRequest(requestUrl, request) {
+  if (request.method !== 'GET') return false;
+  if (requestUrl.origin !== self.location.origin) return false;
+  if (requestUrl.pathname.startsWith('/api/')) return false;
+  if (requestUrl.pathname.startsWith('/auth/')) return false;
+  if (requestUrl.pathname.startsWith('/admin')) return false;
+  if (request.mode === 'navigate') return false;
+
+  return ['style', 'script', 'image', 'font'].includes(request.destination);
+}
 
 // Service Worker 설치 시 기본 리소스 캐싱
 self.addEventListener('install', (event) => {
@@ -34,13 +42,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
 
-  // API, auth, server action 계열은 캐싱하지 않음
-  if (
-    event.request.method !== 'GET' ||
-    requestUrl.pathname.startsWith('/api/') ||
-    requestUrl.pathname.startsWith('/auth/') ||
-    requestUrl.pathname.startsWith('/admin')
-  ) {
+  // 인증/페이지 HTML은 건드리지 않고 정적 자산만 캐싱
+  if (!shouldHandleRequest(requestUrl, event.request)) {
     return;
   }
 
