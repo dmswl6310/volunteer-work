@@ -51,7 +51,8 @@ export default function LoginPage() {
         }
 
         // Success
-        router.push('/board');
+        router.replace('/board');
+        router.refresh();
       }
     } catch (err: unknown) {
       console.error(err);
