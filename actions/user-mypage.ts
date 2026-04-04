@@ -58,6 +58,7 @@ export type MyPageHostingPost = {
     id: string;
     status: string;
     created_at?: string;
+    attendance_marked_by?: string | null;
     attended_at?: string | null;
     points_awarded_at?: string | null;
     users: {
@@ -184,6 +185,7 @@ export function normalizeHostingPosts(rows: Array<Record<string, unknown>>): MyP
             id: String(applicationRow.id ?? ''),
             status: String(applicationRow.status ?? ''),
             created_at: (applicationRow.created_at as string | undefined) ?? undefined,
+            attendance_marked_by: (applicationRow.attendance_marked_by as string | null | undefined) ?? null,
             attended_at: (applicationRow.attended_at as string | null | undefined) ?? null,
             points_awarded_at: (applicationRow.points_awarded_at as string | null | undefined) ?? null,
             users: userRow
@@ -228,7 +230,7 @@ export function deriveAttendancePosts(posts: MyPageHostingPost[]) {
     if (!dueDateKst || !todayKst || dueDateKst > todayKst) return false;
     return post.applications.some(
       (application) =>
-        application.status === 'approved' && !application.attended_at && !application.points_awarded_at
+        application.status === 'approved' && !application.attendance_marked_by && !application.attended_at && !application.points_awarded_at
     );
   });
 }
