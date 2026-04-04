@@ -38,6 +38,6 @@ test.describe('authenticated role-based flows', () => {
     await page.goto('/admin');
     await expect(page.getByRole('heading', { name: '관리자 대시보드' })).toBeVisible();
     await expect(page.getByText('가입 승인 대기 회원')).toBeVisible();
-    await expect(page.getByText('봉사 신청 승인 대기')).toBeVisible();
+    await expect(page.getByRole('heading', { name: '고객 문의' })).toBeVisible();
   });
 });
