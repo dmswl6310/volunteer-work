@@ -15,6 +15,7 @@ export type AttendanceApplication = {
   id: string;
   status: string;
   created_at?: string;
+  attendance_marked_by?: string | null;
   attended_at?: string | null;
   points_awarded_at?: string | null;
   users: ParticipantUser | null;
@@ -46,7 +47,7 @@ export default function AttendanceConfirmationCard({
   const pointsPerParticipant = Math.max(volunteerHours, 1) * 2;
 
   const pendingApplications = useMemo(
-    () => approvedApplications.filter((application) => !application.attended_at && !application.points_awarded_at),
+    () => approvedApplications.filter((application) => !application.attendance_marked_by && !application.attended_at && !application.points_awarded_at),
     [approvedApplications]
   );
 
@@ -100,8 +101,9 @@ export default function AttendanceConfirmationCard({
 
       <div className="space-y-3">
         {approvedApplications.map((application) => {
-          const isCompleted = Boolean(application.attended_at || application.points_awarded_at);
+          const isCompleted = Boolean(application.attendance_marked_by || application.attended_at || application.points_awarded_at);
           const canSelect = !isCompleted;
+          const isUnattended = Boolean(application.attendance_marked_by && !application.attended_at && !application.points_awarded_at);
 
           return (
             <label
@@ -127,13 +129,14 @@ export default function AttendanceConfirmationCard({
                         isCompleted ? 'border border-emerald-200 bg-emerald-50 text-emerald-700' : 'border border-amber-200 bg-amber-50 text-amber-700'
                       }`}
                     >
-                      {isCompleted ? '참여 확인 완료' : '확인 대기'}
+                      {isCompleted ? (isUnattended ? '미참석 처리' : '참여 확인 완료') : '확인 대기'}
                     </span>
                   </div>
                 {application.users?.contact && <p className="mt-1 text-sm text-slate-600">연락처: {application.users.contact}</p>}
-                {isCompleted && (
-                  <p className="mt-1 text-xs text-slate-500">처리 시각: {formatDateTime(application.attended_at || application.points_awarded_at)}</p>
+                {!isUnattended && isCompleted && (
+                  <p className="mt-1 text-xs text-slate-500">처리 시각: {formatDateTime(application.attended_at || application.points_awarded_at || application.attendance_marked_by)}</p>
                 )}
+                {isUnattended && <p className="mt-1 text-xs text-slate-500">이번 참여 확인에서 미참석으로 처리되었습니다.</p>}
               </div>
             </label>
           );
@@ -149,8 +152,8 @@ export default function AttendanceConfirmationCard({
         >
           {loading ? '처리 중...' : `선택한 참여자 확인 및 포인트 지급 (${selectedIds.length}명)`}
         </button>
-      ) : (
-        <p className="mt-4 text-center text-sm text-slate-500">이 게시글은 참석 확인이 모두 끝났습니다.</p>
+        ) : (
+        <p className="mt-4 text-center text-sm text-slate-500">이 게시글은 참석 확인 처리가 끝났습니다.</p>
       )}
     </section>
   );

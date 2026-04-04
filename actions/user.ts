@@ -62,7 +62,7 @@ export async function getMyPageOverviewData(): Promise<MyPageOverviewData> {
       .order('created_at', { ascending: false }),
     supabase
       .from('posts')
-      .select('id, title, due_date, volunteer_hours, current_participants, max_participants, is_recruiting, applications(id, status, created_at, attended_at, points_awarded_at, users(username, contact, email, job, address))')
+      .select('id, title, due_date, volunteer_hours, current_participants, max_participants, is_recruiting, applications(id, status, created_at, attendance_marked_by, attended_at, points_awarded_at, users(username, contact, email, job, address))')
       .eq('author_id', authUser.id)
       .order('created_at', { ascending: false }),
     supabase
@@ -125,7 +125,7 @@ export async function getMyHostingPageData(): Promise<MyPageHostingData> {
 
   const { data } = await supabase
     .from('posts')
-    .select('id, title, due_date, volunteer_hours, current_participants, max_participants, is_recruiting, applications(id, status, created_at, attended_at, points_awarded_at, users(username, contact, email, job, address))')
+    .select('id, title, due_date, volunteer_hours, current_participants, max_participants, is_recruiting, applications(id, status, created_at, attendance_marked_by, attended_at, points_awarded_at, users(username, contact, email, job, address))')
     .eq('author_id', authUser.id)
     .order('created_at', { ascending: false });
 

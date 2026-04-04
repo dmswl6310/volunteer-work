@@ -1,0 +1,120 @@
+-- 참여 확인을 한 번 처리하면, 선택하지 않은 승인자도 이번 회차 처리 완료로 간주
+-- 목적:
+-- 1) 선택 인원은 참석 확정 + 포인트 지급
+-- 2) 미선택 승인자는 미참석 처리로 attendance queue에서 제거
+
+create or replace function public.confirm_attendance_and_award_points(
+  target_post_id text,
+  target_application_ids text[]
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  caller_id uuid := auth.uid();
+  caller_is_admin boolean := false;
+  post_record posts%rowtype;
+  award_points integer := 0;
+  processed_application_ids text[];
+  awarded_count integer := 0;
+begin
+  if caller_id is null then
+    raise exception '로그인이 필요합니다.';
+  end if;
+
+  select exists(
+    select 1
+    from users
+    where id::uuid = caller_id and role = 'admin'
+  ) into caller_is_admin;
+
+  select *
+  into post_record
+  from posts
+  where id = target_post_id;
+
+  if not found then
+    raise exception '게시글 정보를 찾을 수 없습니다.';
+  end if;
+
+  if post_record.author_id::uuid <> caller_id and not caller_is_admin then
+    raise exception '참여 확인 권한이 없습니다.';
+  end if;
+
+  if post_record.due_date is null then
+    raise exception '봉사 진행일이 설정되지 않았습니다.';
+  end if;
+
+  if (post_record.due_date at time zone 'Asia/Seoul')::date > (now() at time zone 'Asia/Seoul')::date then
+    raise exception '봉사 진행일 이후에만 참여 확인할 수 있습니다.';
+  end if;
+
+  if target_application_ids is null or array_length(target_application_ids, 1) is null then
+    raise exception '참여 확인할 신청자를 선택해 주세요.';
+  end if;
+
+  if post_record.volunteer_hours is null or post_record.volunteer_hours < 1 then
+    raise exception '봉사 시간이 올바르지 않습니다.';
+  end if;
+
+  award_points := post_record.volunteer_hours * 2;
+
+  update applications
+  set attendance_marked_by = caller_id::text
+  where post_id = target_post_id
+    and status = 'approved'
+    and attendance_marked_by is null
+    and attended_at is null
+    and points_awarded_at is null;
+
+  with updated_applications as (
+    update applications
+    set
+      attended_at = now(),
+      points_awarded_at = now()
+    where post_id = target_post_id
+      and id = any(target_application_ids)
+      and status = 'approved'
+      and attendance_marked_by = caller_id::text
+      and attended_at is null
+      and points_awarded_at is null
+    returning id, user_id, post_id
+  ), inserted_transactions as (
+    insert into point_transactions (id, user_id, application_id, post_id, points, transaction_type, description)
+    select
+      gen_random_uuid()::text,
+      user_id,
+      id,
+      post_id,
+      award_points,
+      'earned',
+      format('봉사활동 참여 확인 (%s시간 × 2P)', post_record.volunteer_hours)
+    from updated_applications
+    returning id
+  ), updated_users as (
+    update users
+    set points = coalesce(points, 0) + award_points
+    where id in (select user_id from updated_applications)
+    returning id
+  )
+  select array_agg(id), count(*)
+  into processed_application_ids, awarded_count
+  from updated_applications;
+
+  if processed_application_ids is null or array_length(processed_application_ids, 1) is null then
+    return jsonb_build_object(
+      'awardedCount', 0,
+      'awardedPoints', award_points
+    );
+  end if;
+
+  return jsonb_build_object(
+    'awardedCount', awarded_count,
+    'awardedPoints', award_points
+  );
+end;
+$$;
+
+grant execute on function public.confirm_attendance_and_award_points(text, text[]) to authenticated;
