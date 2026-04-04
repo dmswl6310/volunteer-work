@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { approveUser, getAdminDashboardData } from '@/actions/admin';
 import { getAdminSupportTickets } from '@/actions/support';
-import IncomingRequestItem from '@/components/IncomingRequestItem';
 import SupportTicketAdminList from '@/components/support/SupportTicketAdminList';
 import { requireAdminUser } from '@/lib/server-auth';
 
@@ -13,7 +12,7 @@ export default async function AdminPage() {
     redirect('/mypage');
   }
 
-  const [{ pendingUsers, pendingApplications }, supportTickets] = await Promise.all([
+  const [{ pendingUsers }, supportTickets] = await Promise.all([
     getAdminDashboardData(),
     getAdminSupportTickets(),
   ]);
@@ -23,7 +22,7 @@ export default async function AdminPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">관리자 대시보드</h1>
-          <p className="mt-1 text-sm text-gray-500">회원 승인과 봉사 신청 현황을 한 곳에서 관리합니다.</p>
+          <p className="mt-1 text-sm text-gray-500">회원 승인과 고객 문의를 한 곳에서 관리합니다.</p>
         </div>
         <Link href="/mypage" className="text-sm text-gray-500 hover:underline">
           &larr; 내 정보로 돌아가기
@@ -69,27 +68,6 @@ export default async function AdminPage() {
                   </li>
                 ))}
               </ul>
-            </div>
-          )}
-        </section>
-
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-semibold text-gray-900">봉사 신청 승인 대기</h2>
-            <span className="rounded-full bg-red-50 px-3 py-1 text-sm font-semibold text-red-500">
-              {pendingApplications.length}건
-            </span>
-          </div>
-
-          {pendingApplications.length === 0 ? (
-            <div className="bg-white rounded-lg p-8 text-center text-gray-500 shadow-sm border border-gray-100">
-              대기 중인 봉사 신청이 없습니다.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {pendingApplications.map((application) => (
-                <IncomingRequestItem key={application.id} application={{ ...application, post: application.post ?? { id: '', title: '알 수 없는 게시글' } }} />
-              ))}
             </div>
           )}
         </section>
