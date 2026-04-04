@@ -1,3 +1,5 @@
+import { getDateKstKey, getTodayKstKey } from '@/lib/date-kst';
+
 export type PostStatusInput = {
   dueDate?: string | null;
   isRecruiting: boolean;
@@ -5,25 +7,18 @@ export type PostStatusInput = {
   maxParticipants: number;
 };
 
-function normalizeDate(value?: string | null) {
-  if (!value) return null;
-  const date = new Date(value);
-  date.setHours(0, 0, 0, 0);
-  return date;
-}
-
 export function getPostStatus({ dueDate, isRecruiting, currentParticipants, maxParticipants }: PostStatusInput) {
-  const today = normalizeDate(new Date().toISOString())!;
-  const normalizedDueDate = normalizeDate(dueDate);
-  const isExpired = normalizedDueDate ? normalizedDueDate < today : false;
+  const todayKey = getTodayKstKey();
+  const dueDateKey = getDateKstKey(dueDate);
+  const isExpired = Boolean(dueDateKey && todayKey && dueDateKey < todayKey);
   const isFull = currentParticipants >= maxParticipants;
   const isClosed = !isRecruiting || isExpired;
-  const diffDays = normalizedDueDate
-    ? Math.ceil((normalizedDueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+  const diffDays = dueDateKey && todayKey
+    ? Math.round((new Date(`${dueDateKey}T00:00:00+09:00`).getTime() - new Date(`${todayKey}T00:00:00+09:00`).getTime()) / (1000 * 60 * 60 * 24))
     : null;
 
   return {
-    dueDate: normalizedDueDate,
+    dueDate: dueDateKey ? new Date(`${dueDateKey}T00:00:00+09:00`) : null,
     isExpired,
     isFull,
     isClosed,
