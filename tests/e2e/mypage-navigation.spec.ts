@@ -8,7 +8,7 @@ test.describe('mypage navigation smoke', () => {
     await login(page, testCredentials.userEmail!, testCredentials.userPassword!);
 
     await page.goto('/mypage');
-    await expect(page.getByRole('heading', { name: '내 신청' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '신청 관리' })).toBeVisible();
 
     await page.getByRole('link', { name: '관심/기록' }).click();
     await expect(page).toHaveURL(/\/mypage\/history/);
@@ -18,8 +18,8 @@ test.describe('mypage navigation smoke', () => {
     await expect(page).toHaveURL(/\/mypage\/profile/);
     await expect(page.getByRole('heading', { name: '내 정보' })).toBeVisible();
 
-    await page.getByRole('link', { name: '내 신청' }).click();
+    await page.getByRole('link', { name: '신청 관리' }).click();
     await expect(page).toHaveURL(/\/mypage$/);
-    await expect(page.getByRole('heading', { name: '내 신청' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '신청 관리' })).toBeVisible();
   });
 });

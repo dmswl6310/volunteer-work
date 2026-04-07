@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { ClipboardList, FolderOpen, ShieldCheck } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { href: '/mypage', label: '내 신청', icon: ClipboardList, match: ['/mypage', '/mypage/applications'] },
+  { href: '/mypage', label: '신청 관리', icon: ClipboardList, match: ['/mypage', '/mypage/applications'] },
   { href: '/mypage/hosting', label: '주최 관리', icon: ShieldCheck },
   { href: '/mypage/history', label: '관심/기록', icon: FolderOpen },
 ];
