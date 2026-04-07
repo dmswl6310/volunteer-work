@@ -18,7 +18,7 @@ export default async function MyPagePage() {
         <div className="mb-5 flex items-end justify-between gap-3">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Applications</p>
-            <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">내 신청</h2>
+            <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">신청 관리</h2>
           </div>
         </div>
 

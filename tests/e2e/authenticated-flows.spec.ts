@@ -24,7 +24,7 @@ test.describe('authenticated role-based flows', () => {
 
     await page.goto('/admin');
     await expect(page).toHaveURL(/\/mypage/);
-    await expect(page.getByRole('heading', { name: '내 신청' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '신청 관리' })).toBeVisible();
   });
 
   test('admin can log in and access admin dashboard', async ({ page }) => {
