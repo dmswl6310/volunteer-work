@@ -145,7 +145,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
             </p>
           </div>
           <div className="rounded-3xl border border-slate-200 bg-white p-4 text-center shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
-            <p className="mb-1 text-xs text-slate-500">마감 기한</p>
+            <p className="mb-1 text-xs text-slate-500">모집 마감 기한</p>
             <p className="text-sm font-semibold text-slate-900">
               {post.due_date ? new Date(post.due_date).toLocaleDateString() : '상시 모집'}
             </p>

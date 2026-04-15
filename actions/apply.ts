@@ -55,7 +55,7 @@ export async function applyForPost(postId: string) {
     const dueDate = new Date(post.due_date);
     dueDate.setHours(0, 0, 0, 0);
     if (dueDate < today) {
-      throw new Error('마감 기한이 지났습니다.');
+      throw new Error('모집 마감 기한이 지났습니다.');
     }
   }
 
