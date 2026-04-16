@@ -87,15 +87,24 @@ export default async function MyApplicationsPage({ searchParams }: { searchParam
                     </div>
                     <span className="text-slate-400">›</span>
                   </div>
-                  <div className="mt-3 flex justify-end">
+                  <div className="mt-3">
                     {application.hasReview ? (
-                      <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
-                        후기 작성 완료
-                      </span>
+                      <div className="flex justify-end">
+                        <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+                          후기 작성 완료
+                        </span>
+                      </div>
                     ) : (
-                      <Link href={`/reviews/write/${application.post_id || application.postId}`} className="rounded-full bg-teal-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-teal-600">
-                        후기쓰기
-                      </Link>
+                      <>
+                        <div className="flex justify-end">
+                          <Link href={`/reviews/write/${application.post_id || application.postId}`} className="rounded-full bg-teal-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-teal-600">
+                            후기쓰기
+                          </Link>
+                        </div>
+                        <p className="mt-2 text-right text-[11px] text-slate-400">
+                          참여가 확인된 활동만 후기를 작성할 수 있습니다.
+                        </p>
+                      </>
                     )}
                   </div>
                 </div>
