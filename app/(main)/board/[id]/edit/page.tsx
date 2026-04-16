@@ -199,7 +199,7 @@ export default function EditPage() {
         {/* 마감일 & 긴급 */}
         <div className="flex gap-4">
           <div className="flex-1">
-            <label className="mb-1 block text-sm font-medium text-slate-700">마감 기한</label>
+            <label className="mb-1 block text-sm font-medium text-slate-700">모집 마감 기한</label>
             <input
               type="date"
               value={formData.dueDate}

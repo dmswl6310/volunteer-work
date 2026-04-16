@@ -9,7 +9,7 @@ export default async function ReviewList({ postId, userId }: { postId: string; u
     return (
       <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50/70 py-10 text-center text-slate-500">
         <p>아직 작성된 후기가 없습니다.</p>
-        <p className="mt-2 text-sm">첫 후기의 주인공이 되어보세요!</p>
+        <p className="mt-2 text-sm">후기는 참여 완료 후 작성할 수 있습니다.</p>
       </div>
     );
   }

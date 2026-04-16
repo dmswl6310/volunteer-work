@@ -21,7 +21,8 @@ export default async function ReviewPage() {
             <div className="p-4 space-y-4">
                 {reviews.length === 0 ? (
                     <div className="rounded-3xl border border-dashed border-slate-200 bg-white py-20 text-center text-slate-400">
-                        등록된 후기가 없습니다.
+                        <p>등록된 후기가 없습니다.</p>
+                        <p className="mt-2 text-sm">후기는 참여 완료 후 작성할 수 있습니다.</p>
                     </div>
                 ) : (
                     reviews.map((review) => (
