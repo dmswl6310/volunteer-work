@@ -1,10 +1,7 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { ToastProvider } from '@/components/ToastProvider';
 import OfflineIndicator from '@/components/OfflineIndicator';
-
-const inter = Inter({ subsets: ['latin'] });
 
 /** 모바일 viewport 최적화 (확대 방지, iOS safe-area 대응) */
 export const viewport: Viewport = {
@@ -50,7 +47,7 @@ export default function RootLayout({
         <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icons/icon.svg" />
       </head>
-      <body className={inter.className}>
+      <body>
         <NextTopLoader
           color="#4f46e5"
           initialPosition={0.08}
