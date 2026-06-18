@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getMyHostingPageData } from '@/actions/user';
 import AttendanceConfirmationCard from '@/components/AttendanceConfirmationCard';
 import IncomingRequestItem from '@/components/IncomingRequestItem';
+import { getPostStatus } from '@/lib/post-status';
 
 function parseLimit(limit?: string) {
   const parsed = Number(limit);
@@ -129,15 +130,31 @@ export default async function MyHostingPage({ searchParams }: { searchParams?: P
             <div className="rounded-3xl border border-dashed border-slate-200 bg-white p-6 text-center text-sm text-slate-400 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">작성한 게시글이 없습니다.</div>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2">
-              {visibleHostedPosts.map((post) => (
-                <Link key={post.id} href={`/board/${post.id}`} className="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_26px_rgba(15,23,42,0.04)] transition-all hover:border-slate-300 hover:bg-slate-50/40">
-                  <h4 className="truncate font-semibold text-slate-900">{post.title}</h4>
-                  <div className="mt-3 flex items-center justify-between text-sm text-slate-500">
-                    <span>{post.current_participants}/{post.max_participants}명</span>
-                    <span>{post.is_recruiting ? '모집중' : '마감'}</span>
-                  </div>
-                </Link>
-              ))}
+              {visibleHostedPosts.map((post) => {
+                const status = getPostStatus({
+                  dueDate: post.due_date,
+                  isRecruiting: post.is_recruiting,
+                  currentParticipants: post.current_participants,
+                  maxParticipants: post.max_participants,
+                });
+                const statusLabel = status.isOpenRecruiting
+                  ? '모집중'
+                  : status.isFull && !status.isExpired && post.is_recruiting
+                    ? '모집 완료'
+                    : '마감';
+
+                return (
+                  <Link key={post.id} href={`/board/${post.id}`} className="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_26px_rgba(15,23,42,0.04)] transition-all hover:border-slate-300 hover:bg-slate-50/40">
+                    <h4 className="truncate font-semibold text-slate-900">{post.title}</h4>
+                    <div className="mt-3 flex items-center justify-between text-sm text-slate-500">
+                      <span>{post.current_participants}/{post.max_participants}명</span>
+                      <span className={status.isOpenRecruiting ? 'font-semibold text-amber-600' : 'font-semibold text-slate-500'}>
+                        {statusLabel}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           )}
           {hostedPosts.length > limit && (
