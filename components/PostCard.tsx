@@ -1,4 +1,4 @@
-import type { PostWithAuthor } from '@/actions/posts';
+﻿import type { PostWithAuthor } from '@/actions/posts';
 import Link from 'next/link';
 import Image from 'next/image';
 import FallbackImage from '@/components/FallbackImage';
@@ -52,7 +52,7 @@ export default function PostCard({ post, priorityImage = false }: PostCardProps)
         <div className="flex-1 flex flex-col justify-between py-0.5">
           <div>
             <div className="mb-1 flex justify-between items-start">
-              <h3 className="line-clamp-2 text-base font-semibold leading-tight text-slate-900 transition-colors group-hover:text-indigo-700">
+              <h3 className="line-clamp-2 text-base font-semibold leading-tight text-slate-900 transition-colors group-hover:text-amber-700">
                 {post.title}
               </h3>
             </div>
@@ -66,7 +66,7 @@ export default function PostCard({ post, priorityImage = false }: PostCardProps)
           <div className="flex items-center justify-between mt-2">
             <div className="flex items-center space-x-2 text-xs">
               {isOpenRecruiting && (
-                <span className="font-semibold text-indigo-600">모집중</span>
+                <span className="font-semibold text-amber-600">모집중</span>
               )}
               {!isClosed && isFull && (
                 <span className="font-semibold text-slate-500">모집 완료</span>

@@ -120,7 +120,7 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplic
     <button
       onClick={handleApply}
       disabled={loading}
-      className="w-full rounded-2xl bg-indigo-600 py-3 font-semibold text-white transition-colors shadow-[0_14px_30px_rgba(79,70,229,0.22)] hover:bg-indigo-700 disabled:opacity-70"
+      className="w-full rounded-2xl bg-amber-600 py-3 font-semibold text-white transition-colors shadow-[0_14px_30px_rgba(217,119,6,0.22)] hover:bg-amber-700 disabled:opacity-70"
     >
       {loading ? '처리 중...' : '참여하기'}
     </button>

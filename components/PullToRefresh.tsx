@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -68,7 +68,7 @@ export default function PullToRefresh({ children }: { children: React.ReactNode 
       >
         <div className={`${refreshing ? 'animate-spin' : ''}`}>
           <Loader2
-            className="w-6 h-6 text-indigo-500"
+            className="w-6 h-6 text-amber-500"
             style={{ transform: `rotate(${Math.min(pullDistance * 3, 360)}deg)` }}
           />
         </div>

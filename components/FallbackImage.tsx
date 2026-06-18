@@ -1,4 +1,4 @@
-import { 
+﻿import { 
   AlertTriangle, 
   Cross, 
   HeartHandshake, 
@@ -30,7 +30,7 @@ export default function FallbackImage({ category, className = "", iconSize = 32 
       case '이주민':
         return { bg: 'bg-gradient-to-br from-teal-400 to-emerald-500', Icon: Globe, color: 'text-white' };
       case '청소년':
-        return { bg: 'bg-gradient-to-br from-blue-400 to-indigo-500', Icon: Smile, color: 'text-white' };
+        return { bg: 'bg-gradient-to-br from-lime-400 to-amber-500', Icon: Smile, color: 'text-white' };
       case '환경':
         return { bg: 'bg-gradient-to-br from-green-400 to-emerald-600', Icon: Leaf, color: 'text-white' };
       case '어린이 밥상':

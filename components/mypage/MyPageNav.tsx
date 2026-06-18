@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -27,7 +27,7 @@ export default function MyPageNav() {
               href={item.href}
               className={`flex min-w-0 items-center justify-center gap-1 rounded-2xl px-2 py-2.5 text-[13px] font-semibold transition-colors ${
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-[0_8px_18px_rgba(79,70,229,0.22)]'
+                  ? 'bg-amber-600 text-white shadow-[0_8px_18px_rgba(217,119,6,0.22)]'
                   : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >

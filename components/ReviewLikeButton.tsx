@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { toggleReviewLike } from '@/actions/review';
@@ -65,8 +65,8 @@ export default function ReviewLikeButton({ reviewId, initialIsLiked, initialLike
       disabled={isLoading}
       className={`flex items-center space-x-1 rounded-full px-2 py-1 text-sm transition-colors ${
         isLiked
-          ? 'bg-indigo-50 text-indigo-600'
-          : 'text-slate-400 hover:bg-slate-100 hover:text-indigo-500'
+          ? 'bg-amber-50 text-amber-600'
+          : 'text-slate-400 hover:bg-slate-100 hover:text-amber-500'
       } ${isLoading ? 'opacity-50' : ''}`}
     >
       <ThumbsUp

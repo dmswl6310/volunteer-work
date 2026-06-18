@@ -57,7 +57,7 @@ export default function WriteReviewPage() {
           <textarea
             id="content"
             rows={6}
-            className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
             placeholder="봉사활동은 어떠셨나요? 솔직한 후기를 남겨주세요."
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -68,7 +68,7 @@ export default function WriteReviewPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
         >
           {isSubmitting ? (
             <>

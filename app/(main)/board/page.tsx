@@ -1,4 +1,4 @@
-import { getPosts } from '@/actions/posts';
+﻿import { getPosts } from '@/actions/posts';
 import UrgentSection from '@/components/UrgentSection';
 import InfiniteScrollBoard from '@/components/InfiniteScrollBoard';
 import StatusFilter from '@/components/StatusFilter';
@@ -63,7 +63,7 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
       {/* Floating Action Button for Writing */}
       <Link
         href="/board/write"
-        className="fixed bottom-[108px] right-6 z-40 flex transform items-center justify-center rounded-full bg-indigo-600 p-4 text-white shadow-[0_14px_30px_rgba(79,70,229,0.28)] transition-transform hover:-translate-y-1 hover:bg-indigo-700 active:scale-95"
+        className="fixed bottom-[108px] right-6 z-40 flex transform items-center justify-center rounded-full bg-amber-600 p-4 text-white shadow-[0_14px_30px_rgba(217,119,6,0.28)] transition-transform hover:-translate-y-1 hover:bg-amber-700 active:scale-95"
         aria-label="글쓰기"
       >
         <Plus className="w-6 h-6" strokeWidth={3} />

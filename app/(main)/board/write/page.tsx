@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -144,7 +144,7 @@ export default function WritePage() {
             <p className="text-sm font-semibold text-slate-700">프로필 전화번호를 확인하고 있습니다...</p>
           </div>
         ) : (
-          <div className={`rounded-3xl border px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.04)] ${authorContact ? 'border-indigo-100 bg-white' : 'border-rose-200 bg-rose-50/70'}`}>
+          <div className={`rounded-3xl border px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.04)] ${authorContact ? 'border-amber-100 bg-white' : 'border-rose-200 bg-rose-50/70'}`}>
             <p className={`text-sm font-semibold ${authorContact ? 'text-slate-800' : 'text-rose-700'}`}>
               게시글 등록 시 프로필에 저장된 전화번호가 게시글에 공개됩니다.
             </p>
@@ -161,7 +161,7 @@ export default function WritePage() {
 
         {/* Image Upload */}
         <div className="flex flex-col items-center">
-          <label htmlFor="image-upload" className="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-3xl border border-dashed border-slate-300 bg-white transition-colors hover:border-indigo-300 hover:bg-indigo-50/40">
+          <label htmlFor="image-upload" className="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-3xl border border-dashed border-slate-300 bg-white transition-colors hover:border-amber-300 hover:bg-amber-50/40">
             {previewUrl ? (
               <Image src={previewUrl} alt="Preview" fill unoptimized className="object-cover" sizes="(max-width: 768px) 100vw, 768px" />
             ) : (
@@ -177,7 +177,7 @@ export default function WritePage() {
         {/* Title */}
         <div>
           <label className="mb-1 block text-sm font-medium text-slate-700">제목</label>
-          <input name="title" required placeholder="봉사활동 제목을 입력하세요" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" />
+          <input name="title" required placeholder="봉사활동 제목을 입력하세요" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:border-amber-500 focus:ring-2 focus:ring-amber-500 outline-none transition-all" />
         </div>
 
         {/* Urgent & Due Date */}
@@ -189,12 +189,12 @@ export default function WritePage() {
               name="dueDate"
               required
               min={minimumDueDate}
-               className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+               className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:border-amber-500 focus:ring-2 focus:ring-amber-500 outline-none transition-all"
              />
           </div>
           <div className="flex items-center pt-6">
             <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" name="isUrgent" value="true" className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300" />
+              <input type="checkbox" name="isUrgent" value="true" className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500 border-gray-300" />
               <span className="font-semibold text-rose-600">긴급 모집</span>
             </label>
           </div>
@@ -208,7 +208,7 @@ export default function WritePage() {
               <label key={cat} className="cursor-pointer" onClick={() => { setSelectedCategory(cat); setCategoryError(null); }}>
                 <input type="radio" name="category" value={cat} className="peer hidden" readOnly checked={selectedCategory === cat} />
                 <div className={`rounded-full border px-4 py-2 text-sm transition-all ${selectedCategory === cat
-                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  ? 'bg-amber-600 text-white border-amber-600'
                   : 'border-slate-200 bg-white text-slate-600'
                   }`}>
                   {cat}
@@ -222,7 +222,7 @@ export default function WritePage() {
         {/* Content */}
         <div>
           <label className="mb-1 block text-sm font-medium text-slate-700">내용</label>
-          <textarea name="content" required rows={10} defaultValue={POST_CONTENT_TEMPLATE} className="w-full resize-none whitespace-pre-wrap rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"></textarea>
+          <textarea name="content" required rows={10} defaultValue={POST_CONTENT_TEMPLATE} className="w-full resize-none whitespace-pre-wrap rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:border-amber-500 focus:ring-2 focus:ring-amber-500 outline-none transition-all"></textarea>
           <p className="mt-1 text-xs text-slate-500">템플릿을 참고해서 일정, 장소, 준비물, 참고사항을 채워주세요.</p>
         </div>
 
@@ -231,12 +231,12 @@ export default function WritePage() {
           <label className="mb-1 block text-sm font-medium text-slate-700">모집 인원</label>
           <div className="flex items-center space-x-4">
             <input type="range" name="maxParticipants" min="1" max="50" defaultValue="10"
-              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-indigo-600"
+              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-amber-600"
               onChange={(e) => {
                 e.target.nextElementSibling!.textContent = `${e.target.value}명`;
               }}
             />
-            <span className="text-lg font-bold text-indigo-600 min-w-[3rem]">10명</span>
+            <span className="text-lg font-bold text-amber-600 min-w-[3rem]">10명</span>
           </div>
         </div>
 
@@ -246,7 +246,7 @@ export default function WritePage() {
             name="volunteerHours"
             defaultValue="1"
             required
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:border-amber-500 focus:ring-2 focus:ring-amber-500 outline-none transition-all"
           >
             {VOLUNTEER_HOUR_OPTIONS.map((hour) => (
               <option key={hour} value={hour}>
@@ -258,7 +258,7 @@ export default function WritePage() {
         </div>
 
         {/* Submit */}
-        <button type="submit" disabled={loading || !authorContact} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 py-4 text-sm font-semibold text-white transition-colors shadow-[0_14px_30px_rgba(79,70,229,0.22)] hover:bg-indigo-700 disabled:opacity-50">
+        <button type="submit" disabled={loading || !authorContact} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-600 py-4 text-sm font-semibold text-white transition-colors shadow-[0_14px_30px_rgba(217,119,6,0.22)] hover:bg-amber-700 disabled:opacity-50">
           {loading ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />

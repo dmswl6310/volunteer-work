@@ -39,17 +39,17 @@ export default function Header() {
     <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         {/* 로고 */}
-        <Link href="/" className="text-xl font-semibold tracking-[-0.02em] text-indigo-600">
-          사과
+        <Link href="/" className="text-xl font-semibold tracking-[-0.02em] text-amber-700">
+          라자봉
         </Link>
 
         {/* 데스크톱 네비게이션 */}
         <div className="hidden space-x-6 text-sm font-medium text-slate-600 md:flex">
-          <Link href="/board" className="transition hover:text-indigo-600">
+          <Link href="/board" className="transition hover:text-amber-600">
             봉사활동 찾기
           </Link>
           {session && (
-            <Link href="/board/write" className="transition hover:text-indigo-600">
+            <Link href="/board/write" className="transition hover:text-amber-600">
               봉사 모집하기
             </Link>
           )}
@@ -61,7 +61,7 @@ export default function Header() {
             <>
               <Link
                 href="/mypage"
-                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50/60 hover:text-indigo-700"
+                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-700 transition hover:border-amber-200 hover:bg-amber-50/60 hover:text-amber-700"
               >
                 마이페이지
               </Link>
@@ -76,13 +76,13 @@ export default function Header() {
             <>
               <Link
                 href="/auth/login"
-                className="rounded-full px-4 py-1.5 text-indigo-600 transition hover:bg-indigo-50"
+                className="rounded-full px-4 py-1.5 text-amber-600 transition hover:bg-amber-50"
               >
                 로그인
               </Link>
               <Link
                 href="/auth/signup"
-                className="rounded-full bg-indigo-600 px-4 py-1.5 text-white shadow-[0_8px_20px_rgba(79,70,229,0.18)] transition hover:bg-indigo-700"
+                className="rounded-full bg-amber-600 px-4 py-1.5 text-white shadow-[0_8px_20px_rgba(217,119,6,0.18)] transition hover:bg-amber-700"
               >
                 회원가입
               </Link>

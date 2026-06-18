@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -50,7 +50,7 @@ export default function SupportTicketForm() {
                 key={option.value}
                 type="button"
                 onClick={() => setForm((current) => ({ ...current, category: option.value }))}
-                className={`rounded-2xl border px-4 py-3 text-left transition-colors ${selected ? 'border-indigo-200 bg-indigo-50 text-indigo-700' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
+                className={`rounded-2xl border px-4 py-3 text-left transition-colors ${selected ? 'border-amber-200 bg-amber-50 text-amber-700' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}
               >
                 <p className="text-sm font-semibold">{option.label}</p>
                 <p className="mt-1 text-xs leading-5 text-slate-500">{option.description}</p>
@@ -66,7 +66,7 @@ export default function SupportTicketForm() {
           id="support-title"
           value={form.title}
           onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-          className="mt-2 block w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="mt-2 block w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
           placeholder="문의 제목을 입력해 주세요"
           maxLength={100}
           required
@@ -79,7 +79,7 @@ export default function SupportTicketForm() {
           id="support-content"
           value={form.content}
           onChange={(event) => setForm((current) => ({ ...current, content: event.target.value }))}
-          className="mt-2 block min-h-[220px] w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="mt-2 block min-h-[220px] w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
           placeholder="문의 내용을 자세히 적어주세요. 버그 제보라면 재현 방법을 같이 남겨주시면 더 빨리 확인할 수 있어요."
           required
         />
@@ -88,7 +88,7 @@ export default function SupportTicketForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+        className="w-full rounded-2xl bg-amber-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
       >
         {loading ? '접수 중...' : '문의 보내기'}
       </button>

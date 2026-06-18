@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -50,7 +50,7 @@ export default function InfiniteScrollBoard({ initialPosts, initialNextId, sort 
 
       {nextId !== null && (
         <div ref={ref} className="flex justify-center p-4 mt-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-600"></div>
         </div>
       )}
 

@@ -1,4 +1,4 @@
-import { getAllReviews } from '@/actions/review';
+﻿import { getAllReviews } from '@/actions/review';
 import { createServerSupabaseClient } from '@/lib/supabase';
 import Link from 'next/link';
 import ReviewLikeButton from '@/components/ReviewLikeButton';
@@ -28,7 +28,7 @@ export default async function ReviewPage() {
                     reviews.map((review) => (
                         <div key={review.id} className="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
                             <Link href={`/board/${review.post_id}`} className="block mb-2">
-                                <span className="inline-block rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700">
+                                <span className="inline-block rounded-full border border-amber-100 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700">
                                     {review.posts?.title || '삭제된 활동'}
                                 </span>
                             </Link>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { updateSupportTicketStatus } from '@/actions/support';
@@ -39,7 +39,7 @@ export default function SupportTicketAdminList({ tickets }: { tickets: SupportTi
             <div>
               <div className="flex items-center gap-2">
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">{SUPPORT_CATEGORY_LABELS[ticket.category]}</span>
-                <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-600">{SUPPORT_STATUS_LABELS[ticket.status]}</span>
+                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-600">{SUPPORT_STATUS_LABELS[ticket.status]}</span>
               </div>
               <h3 className="mt-2 text-base font-bold text-slate-900">{ticket.title}</h3>
               <p className="mt-1 text-xs text-slate-500">{ticket.username_snapshot || '알 수 없음'} · {ticket.email_snapshot || '-'} · {new Date(ticket.created_at).toLocaleDateString()}</p>
@@ -53,7 +53,7 @@ export default function SupportTicketAdminList({ tickets }: { tickets: SupportTi
           <textarea
             value={notes[ticket.id] ?? ticket.admin_note ?? ''}
             onChange={(event) => setNotes((current) => ({ ...current, [ticket.id]: event.target.value }))}
-            className="mt-3 block min-h-[96px] w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="mt-3 block min-h-[96px] w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
             placeholder="관리자 메모를 남길 수 있습니다."
           />
 
@@ -64,7 +64,7 @@ export default function SupportTicketAdminList({ tickets }: { tickets: SupportTi
                 type="button"
                 onClick={() => void handleStatusChange(ticket.id, status)}
                 disabled={loadingTicketId === ticket.id}
-                className={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${ticket.status === status ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                className={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${ticket.status === status ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
               >
                 {SUPPORT_STATUS_LABELS[status]}
               </button>

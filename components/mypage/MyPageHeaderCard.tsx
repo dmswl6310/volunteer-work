@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { CircleUserRound } from 'lucide-react';
 import { getMyProfileData } from '@/actions/user';
 
@@ -15,11 +15,11 @@ export default async function MyPageHeaderCard() {
           <div className="min-w-0 min-h-[56px]">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Account</p>
             <p className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">{profile.username}</p>
-            <Link href="/mypage/points" className="mt-2 inline-flex items-center gap-2.5 text-base font-semibold text-slate-600 transition-colors hover:text-indigo-700">
+            <Link href="/mypage/points" className="mt-2 inline-flex items-center gap-2.5 text-base font-semibold text-slate-600 transition-colors hover:text-amber-700">
               <span className="inline-block h-2 w-2 rounded-full bg-amber-400" />
               <span className="text-[15px] font-semibold text-slate-600">내 포인트</span>
               <span className="text-slate-300">·</span>
-              <span className="text-[18px] font-bold tracking-[-0.02em] text-indigo-700">{profile.points.toLocaleString()} P</span>
+              <span className="text-[18px] font-bold tracking-[-0.02em] text-amber-700">{profile.points.toLocaleString()} P</span>
             </Link>
           </div>
 
@@ -29,7 +29,7 @@ export default async function MyPageHeaderCard() {
       {profile.role === 'admin' && (
         <Link
           href="/admin"
-          className="mt-2.5 block rounded-2xl bg-indigo-600 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
+          className="mt-2.5 block rounded-2xl bg-amber-600 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-amber-700"
         >
           관리자 대시보드
         </Link>

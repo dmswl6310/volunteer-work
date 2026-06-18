@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
@@ -114,7 +114,7 @@ export default function AttendanceConfirmationCard({
             >
               <input
                 type="checkbox"
-                className="mt-1 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                className="mt-1 h-4 w-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500"
                 checked={selectedIds.includes(application.id)}
                 disabled={!canSelect || loading}
                 onChange={() => toggleSelection(application.id)}
@@ -148,7 +148,7 @@ export default function AttendanceConfirmationCard({
           type="button"
           onClick={handleConfirm}
           disabled={loading || selectedIds.length === 0}
-          className="mt-4 w-full rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(79,70,229,0.22)] transition-colors hover:bg-indigo-700 disabled:opacity-50"
+          className="mt-4 w-full rounded-2xl bg-amber-600 px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(217,119,6,0.22)] transition-colors hover:bg-amber-700 disabled:opacity-50"
         >
           {loading ? '처리 중...' : `선택한 참여자 확인 및 포인트 지급 (${selectedIds.length}명)`}
         </button>

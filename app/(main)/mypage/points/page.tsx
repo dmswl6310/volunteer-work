@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { getMyPointsPageData } from '@/actions/user';
 
 function parseLimit(limit?: string) {
@@ -24,7 +24,7 @@ export default async function MyPointsPage({ searchParams }: { searchParams?: Pr
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Points</p>
             <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">포인트 내역</h2>
           </div>
-          <span className="rounded-full bg-indigo-50 px-3 py-1 text-sm font-bold text-indigo-700">
+          <span className="rounded-full bg-amber-50 px-3 py-1 text-sm font-bold text-amber-700">
             {profile.points.toLocaleString()} P
           </span>
         </div>

@@ -1,11 +1,11 @@
 {
-  "name": "사과 - 봉사활동 플랫폼",
-  "short_name": "사과",
-  "description": "함께하는 봉사활동 참여 및 관리 플랫폼",
+  "name": "라자봉 - 게릴라 자원봉사",
+  "short_name": "라자봉",
+  "description": "라자봉과 함께하는 게릴라 자원봉사 참여 및 관리 플랫폼",
   "start_url": "/board",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#4f46e5",
+  "theme_color": "#d97706",
   "orientation": "portrait",
   "icons": [
     {
