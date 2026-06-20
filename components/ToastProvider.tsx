@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
@@ -79,7 +79,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const typeStyles: Record<ToastType, string> = {
     success: 'border border-emerald-200 bg-white text-slate-900',
     error: 'border border-rose-200 bg-white text-slate-900',
-    info: 'border border-indigo-200 bg-white text-slate-900',
+    info: 'border border-amber-200 bg-white text-slate-900',
     warning: 'border border-amber-200 bg-white text-slate-900',
   };
 
@@ -110,7 +110,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => handleConfirmClose(true)}
-                className="flex-1 rounded-2xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
+                className="flex-1 rounded-2xl bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-700"
               >
                 {confirmState.confirmLabel}
               </button>
@@ -128,7 +128,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             onClick={() => removeToast(toast.id)}
             role="alert"
           >
-            <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${toast.type === 'success' ? 'bg-emerald-50 text-emerald-600' : toast.type === 'error' ? 'bg-rose-50 text-rose-600' : toast.type === 'warning' ? 'bg-amber-50 text-amber-600' : 'bg-indigo-50 text-indigo-600'}`}>{typeIcons[toast.type]}</span>
+            <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${toast.type === 'success' ? 'bg-emerald-50 text-emerald-600' : toast.type === 'error' ? 'bg-rose-50 text-rose-600' : toast.type === 'warning' ? 'bg-amber-50 text-amber-600' : 'bg-amber-50 text-amber-600'}`}>{typeIcons[toast.type]}</span>
             <span>{toast.message}</span>
           </div>
         ))}

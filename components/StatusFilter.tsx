@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -36,7 +36,7 @@ export default function StatusFilter() {
       <select
         value={activeStatus}
         onChange={handleChange}
-        className="cursor-pointer appearance-none rounded-full border border-slate-200 bg-white py-2 pl-3.5 pr-8 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="cursor-pointer appearance-none rounded-full border border-slate-200 bg-white py-2 pl-3.5 pr-8 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500"
       >
         <option value="recruiting">모집중</option>
         <option value="closed">마감</option>

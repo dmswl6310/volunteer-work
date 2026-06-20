@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect } from 'react';
 import Link from 'next/link'; // 홈으로 가기용 링크
@@ -36,7 +36,7 @@ export default function Error({
         <div className="flex flex-col gap-3">
           <button
             onClick={reset}
-            className="w-full bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors"
+            className="w-full bg-amber-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-amber-700 transition-colors"
           >
             다시 시도
           </button>

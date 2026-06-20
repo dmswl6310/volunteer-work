@@ -1,4 +1,4 @@
-import type { ChangeEvent } from 'react';
+﻿import type { ChangeEvent } from 'react';
 import type { SignupFormData, ValidationState } from '@/app/auth/signup/form-helpers';
 
 type SignupAccountStepProps = {
@@ -47,7 +47,7 @@ export default function SignupAccountStep({
             type="button"
             onClick={onValidateEmail}
             disabled={isEmailFormatValid !== true || isCheckingEmail}
-            className="shrink-0 rounded-lg border border-indigo-200 px-3 py-2 text-sm font-semibold text-indigo-600 transition-colors hover:bg-indigo-50 disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-300"
+            className="shrink-0 rounded-lg border border-amber-200 px-3 py-2 text-sm font-semibold text-amber-600 transition-colors hover:bg-amber-50 disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-300"
           >
             {isCheckingEmail ? '확인 중' : '중복확인'}
           </button>

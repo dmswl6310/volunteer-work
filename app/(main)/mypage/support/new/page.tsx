@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import SupportTicketForm from '@/components/support/SupportTicketForm';
 
 export default function NewSupportTicketPage() {
@@ -10,7 +10,7 @@ export default function NewSupportTicketPage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Support</p>
             <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-900">문의하기</h2>
           </div>
-          <Link href="/mypage" className="text-xs font-semibold text-indigo-600 hover:underline">
+          <Link href="/mypage" className="text-xs font-semibold text-amber-600 hover:underline">
             내 정보로 돌아가기
           </Link>
         </div>

@@ -150,7 +150,7 @@ export default function EditPage() {
   if (initialLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50/70">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600" />
       </div>
     );
   }
@@ -171,7 +171,7 @@ export default function EditPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* 이미지 업로드 */}
         <div className="flex flex-col items-center">
-          <label htmlFor="image-upload" className="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-3xl border border-dashed border-slate-300 bg-white transition-colors hover:border-indigo-300 hover:bg-indigo-50/40">
+          <label htmlFor="image-upload" className="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-3xl border border-dashed border-slate-300 bg-white transition-colors hover:border-amber-300 hover:bg-amber-50/40">
             {previewUrl ? (
               <Image src={previewUrl} alt="Preview" fill unoptimized className="object-cover" sizes="(max-width: 768px) 100vw, 768px" />
             ) : (
@@ -192,7 +192,7 @@ export default function EditPage() {
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             required
             placeholder="봉사활동 제목을 입력하세요"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
           />
         </div>
 
@@ -206,7 +206,7 @@ export default function EditPage() {
               onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
               required
               min={minimumDueDate}
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
             />
           </div>
           <div className="flex items-center pt-6">
@@ -215,7 +215,7 @@ export default function EditPage() {
                 type="checkbox"
                 checked={formData.isUrgent}
                 onChange={(e) => setFormData({ ...formData, isUrgent: e.target.checked })}
-                className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300"
+                className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500 border-gray-300"
               />
               <span className="font-semibold text-rose-600">긴급 모집</span>
             </label>
@@ -230,7 +230,7 @@ export default function EditPage() {
               <label key={cat} className="cursor-pointer" onClick={() => { setSelectedCategory(cat); setCategoryError(null); }}>
                 <input type="radio" name="category" value={cat} className="peer hidden" readOnly checked={selectedCategory === cat} />
                 <div className={`rounded-full border px-4 py-2 text-sm transition-all ${selectedCategory === cat
-                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  ? 'bg-amber-600 text-white border-amber-600'
                   : 'border-slate-200 bg-white text-slate-600'
                   }`}>
                   {cat}
@@ -250,7 +250,7 @@ export default function EditPage() {
             required
             rows={8}
             placeholder="상세 활동 내용을 입력하세요"
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
           />
         </div>
 
@@ -264,9 +264,9 @@ export default function EditPage() {
               max="50"
               value={formData.maxParticipants}
               onChange={(e) => setFormData({ ...formData, maxParticipants: parseInt(e.target.value) })}
-              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-indigo-600"
+              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-amber-600"
             />
-            <span className="text-lg font-bold text-indigo-600 min-w-[3rem]">{formData.maxParticipants}명</span>
+            <span className="text-lg font-bold text-amber-600 min-w-[3rem]">{formData.maxParticipants}명</span>
           </div>
         </div>
 
@@ -275,7 +275,7 @@ export default function EditPage() {
           <select
             value={formData.volunteerHours}
             onChange={(e) => setFormData({ ...formData, volunteerHours: parseInt(e.target.value) })}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
           >
             {Array.from({ length: 100 }, (_, index) => index + 1).map((hour) => (
               <option key={hour} value={hour}>
@@ -312,7 +312,7 @@ export default function EditPage() {
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 py-4 text-sm font-semibold text-white transition-colors shadow-[0_14px_30px_rgba(79,70,229,0.22)] hover:bg-indigo-700 disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-600 py-4 text-sm font-semibold text-white transition-colors shadow-[0_14px_30px_rgba(217,119,6,0.22)] hover:bg-amber-700 disabled:opacity-50"
         >
           {loading ? (
             <>

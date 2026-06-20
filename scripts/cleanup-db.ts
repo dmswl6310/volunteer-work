@@ -35,18 +35,43 @@ async function main() {
         .in('author_id', userIds);
     const postIds = (posts ?? []).map((p) => p.id);
 
+    const { data: userApplications } = await supabase
+        .from('applications')
+        .select('id')
+        .in('user_id', userIds);
+
+    const postApplications = postIds.length > 0
+        ? await supabase
+            .from('applications')
+            .select('id')
+            .in('post_id', postIds)
+        : { data: [] };
+
+    const applicationIds = Array.from(
+        new Set([
+            ...((userApplications ?? []).map((application) => application.id)),
+            ...((postApplications.data ?? []).map((application) => application.id)),
+        ])
+    );
+
     // 3. Delete all dependencies
     console.log('Deleting dependent data...');
 
     if (reviewIds.length > 0) {
         await supabase.from('review_likes').delete().in('review_id', reviewIds);
     }
+    if (applicationIds.length > 0) {
+        await supabase.from('point_transactions').delete().in('application_id', applicationIds);
+    }
     await supabase.from('review_likes').delete().in('user_id', userIds);
     await supabase.from('post_scraps').delete().in('user_id', userIds);
+    await supabase.from('point_transactions').delete().in('user_id', userIds);
+    await supabase.from('support_tickets').delete().in('user_id', userIds);
     await supabase.from('applications').delete().in('user_id', userIds);
     await supabase.from('reviews').delete().in('author_id', userIds);
 
     if (postIds.length > 0) {
+        await supabase.from('point_transactions').delete().in('post_id', postIds);
         await supabase.from('applications').delete().in('post_id', postIds);
         await supabase.from('post_scraps').delete().in('post_id', postIds);
         await supabase.from('reviews').delete().in('post_id', postIds);

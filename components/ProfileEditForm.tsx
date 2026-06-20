@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { updateUserProfile } from '@/actions/user-update';
@@ -63,7 +63,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
         return (
             <>
                 <div className="mb-7 flex items-start space-x-4">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-2xl font-semibold text-indigo-600">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-2xl font-semibold text-amber-600">
                         {user.username?.[0] || 'U'}
                     </div>
                     <div className="flex-1">
@@ -75,7 +75,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                     </div>
                     <button
                         onClick={() => setIsEditing(true)}
-                        className="rounded-2xl border border-slate-200 p-2.5 text-slate-500 transition-colors hover:border-indigo-200 hover:bg-indigo-50/60 hover:text-indigo-700"
+                        className="rounded-2xl border border-slate-200 p-2.5 text-slate-500 transition-colors hover:border-amber-200 hover:bg-amber-50/60 hover:text-amber-700"
                         title="프로필 수정"
                     >
                         <Pencil className="w-5 h-5" />
@@ -103,7 +103,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
     return (
         <>
             <div className="mb-7 flex items-start space-x-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-2xl font-semibold text-indigo-600">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-2xl font-semibold text-amber-600">
                     {user.username?.[0] || 'U'}
                 </div>
                 <div className="flex-1">
@@ -120,7 +120,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                         type="text"
                         value={editForm.contact}
                         onChange={(e) => setEditForm({ ...editForm, contact: e.target.value })}
-                        className="block w-full rounded-2xl border-slate-200 bg-white px-4 py-3 shadow-none focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        className="block w-full rounded-2xl border-slate-200 bg-white px-4 py-3 shadow-none focus:border-amber-500 focus:ring-amber-500 sm:text-sm"
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -130,7 +130,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                             type="text"
                             value={editForm.job}
                             onChange={(e) => setEditForm({ ...editForm, job: e.target.value })}
-                            className="block w-full rounded-2xl border-slate-200 bg-white px-4 py-3 shadow-none focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            className="block w-full rounded-2xl border-slate-200 bg-white px-4 py-3 shadow-none focus:border-amber-500 focus:ring-amber-500 sm:text-sm"
                         />
                     </div>
                     <div className="col-span-2">
@@ -146,7 +146,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                             <button
                                 type="button"
                                 onClick={() => setIsPostcodeOpen(true)}
-                                className="whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:border-indigo-200 hover:bg-indigo-50/60 hover:text-indigo-700 focus:outline-none"
+                                className="whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:border-amber-200 hover:bg-amber-50/60 hover:text-amber-700 focus:outline-none"
                             >
                                 주소 검색
                             </button>
@@ -155,13 +155,13 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                             type="text"
                             value={editForm.detailAddress}
                             onChange={(e) => setEditForm({ ...editForm, detailAddress: e.target.value })}
-                            className="mt-2 block w-full rounded-2xl border-slate-200 bg-white px-4 py-3 shadow-none focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            className="mt-2 block w-full rounded-2xl border-slate-200 bg-white px-4 py-3 shadow-none focus:border-amber-500 focus:ring-amber-500 sm:text-sm"
                             placeholder="상세 주소 (예: 101동 202호)"
                         />
                     </div>
                 </div>
                 <div className="flex space-x-2 pt-2">
-                    <button type="submit" disabled={loading} className="flex-1 rounded-2xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50">
+                    <button type="submit" disabled={loading} className="flex-1 rounded-2xl bg-amber-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-700 disabled:opacity-50">
                         {loading ? '저장 중...' : '저장'}
                     </button>
                     <button type="button" onClick={() => setIsEditing(false)} disabled={loading} className="flex-1 rounded-2xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50">

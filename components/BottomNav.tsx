@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -48,7 +48,7 @@ export default function BottomNav() {
               key={tab.name} 
               href={tab.href}
               className={`touch-feedback flex flex-col items-center space-y-1 rounded-2xl px-3 py-1.5 transition-colors ${
-                active ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:text-slate-900'
+                active ? 'bg-amber-50 text-amber-600' : 'text-slate-500 hover:text-slate-900'
               }`}
             >
               <Icon size={24} strokeWidth={active ? 2.5 : 2} />

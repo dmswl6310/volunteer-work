@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -52,7 +52,7 @@ export default function SearchInput() {
                 <div className="flex items-center space-x-2">
                     {displayedQuery && (
                         <div
-                            className="flex cursor-pointer items-center rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 transition-colors hover:bg-indigo-100"
+                            className="flex cursor-pointer items-center rounded-full border border-amber-100 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-700 transition-colors hover:bg-amber-100"
                             onClick={toggleSearch}
                         >
                             <span className="truncate max-w-[120px]">{displayedQuery}</span>
@@ -66,7 +66,7 @@ export default function SearchInput() {
                                     setQuery('');
                                     router.push(`/board?${params.toString()}`);
                                 }}
-                                className="ml-1.5 rounded-full p-0.5 text-indigo-400 transition-colors hover:bg-indigo-200 hover:text-indigo-700"
+                                className="ml-1.5 rounded-full p-0.5 text-amber-400 transition-colors hover:bg-amber-200 hover:text-amber-700"
                                 aria-label="검색어 초기화"
                             >
                                 <X className="h-3.5 w-3.5" />
@@ -75,7 +75,7 @@ export default function SearchInput() {
                     )}
                     <button
                         onClick={toggleSearch}
-                        className="rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-indigo-600"
+                        className="rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-amber-600"
                         aria-label="검색 열기"
                     >
                         <Search className="h-5 w-5" />
@@ -95,7 +95,7 @@ export default function SearchInput() {
                         <input
                             autoFocus
                             type="text"
-                            className="flex-1 rounded-2xl border-none bg-slate-100 py-2.5 pl-4 pr-10 text-sm text-slate-900 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="flex-1 rounded-2xl border-none bg-slate-100 py-2.5 pl-4 pr-10 text-sm text-slate-900 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500"
                             placeholder="봉사활동 검색..."
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}

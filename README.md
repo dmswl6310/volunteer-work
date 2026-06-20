@@ -1,4 +1,4 @@
-# 🤝 사과 - 봉사활동 플랫폼
+# 🤝 라자봉 - 게릴라 자원봉사
 
 관리자 승인 기반으로 운영되는 모바일 중심 봉사활동 매칭 플랫폼입니다.  
 봉사활동 모집글 등록, 신청/승인, 참여 확인, 포인트 적립, 후기, 고객 문의까지 한 흐름으로 연결되어 있습니다.
@@ -10,6 +10,13 @@
 | 게시판 | 게시글 상세 | 마이페이지 | 관리자 |
 |:---:|:---:|:---:|:---:|
 | ![board](public/screenshots/board.png) | ![detail](public/screenshots/detail.png) | ![mypage](public/screenshots/mypage.png) | ![admin](public/screenshots/admin.png) |
+
+---
+
+## 참고 문서
+
+- [AGENTS.md](AGENTS.md): 저장소 구조, 개발 명령어, 테스트, 커밋/PR 규칙을 정리한 기여자 가이드
+- [LAUNCH_DEMO_PLAN.md](LAUNCH_DEMO_PLAN.md): 발대식 시연 동선, 데모 데이터, 리스크 대응 체크리스트
 
 ---
 

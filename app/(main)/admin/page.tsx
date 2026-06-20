@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { approveUser, getAdminDashboardData } from '@/actions/admin';
 import { getAdminSupportTickets } from '@/actions/support';
@@ -33,7 +33,7 @@ export default async function AdminPage() {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-semibold text-gray-900">가입 승인 대기 회원</h2>
-            <span className="rounded-full bg-indigo-50 px-3 py-1 text-sm font-semibold text-indigo-600">
+            <span className="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-600">
               {pendingUsers.length}명
             </span>
           </div>

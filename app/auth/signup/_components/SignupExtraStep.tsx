@@ -1,4 +1,4 @@
-import type { ChangeEvent } from 'react';
+﻿import type { ChangeEvent } from 'react';
 import type { SignupAgreements, SignupFormData } from '@/app/auth/signup/form-helpers';
 
 type SignupExtraStepProps = {
@@ -70,7 +70,7 @@ export default function SignupExtraStep({
               type="checkbox"
               checked={agreements.terms}
               onChange={(event) => onAgreementChange('terms', event.target.checked)}
-              className="h-5 w-5 rounded border-gray-300 text-indigo-600 transition-colors focus:ring-indigo-500"
+              className="h-5 w-5 rounded border-gray-300 text-amber-600 transition-colors focus:ring-amber-500"
               required
             />
             <span className="text-sm font-medium text-gray-700">[필수] 서비스 이용약관 동의</span>
@@ -80,7 +80,7 @@ export default function SignupExtraStep({
               type="checkbox"
               checked={agreements.privacy}
               onChange={(event) => onAgreementChange('privacy', event.target.checked)}
-              className="h-5 w-5 rounded border-gray-300 text-indigo-600 transition-colors focus:ring-indigo-500"
+              className="h-5 w-5 rounded border-gray-300 text-amber-600 transition-colors focus:ring-amber-500"
               required
             />
             <span className="text-sm font-medium text-gray-700">[필수] 개인정보 수집 및 이용 동의</span>

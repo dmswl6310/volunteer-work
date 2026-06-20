@@ -81,7 +81,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
         {/* 제목 및 카테고리 */}
         <div className="mb-6">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-              <span className="inline-block rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+              <span className="inline-block rounded-full border border-amber-100 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
                  {post.category}
                </span>
             {post.due_date && isOpenRecruiting && diffDays !== null && (
@@ -108,7 +108,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
 
         {/* 주최자 프로필 */}
         <div className="mb-8 flex items-center rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
-          <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-lg font-semibold text-indigo-600">
+          <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-lg font-semibold text-amber-600">
             {post.author.username?.[0] || 'A'}
           </div>
           <div>
@@ -116,7 +116,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
               {post.author.username || '익명'}
             </p>
             <div className="mt-2 flex items-center gap-1.5 text-sm text-slate-700">
-              <Phone className="h-4 w-4 text-indigo-500" />
+              <Phone className="h-4 w-4 text-amber-500" />
               <span>{post.author.contact || '연락처 미등록'}</span>
             </div>
           </div>
@@ -124,7 +124,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
 
         {/* 본문 */}
         <div className="mb-10 rounded-3xl border border-slate-200 bg-white px-5 py-6 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
-          <div className="prose prose-indigo max-w-none whitespace-pre-wrap leading-relaxed text-slate-800">
+          <div className="prose prose-amber max-w-none whitespace-pre-wrap leading-relaxed text-slate-800">
             {post.content}
           </div>
         </div>
@@ -133,13 +133,13 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
         <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="rounded-3xl border border-slate-200 bg-white p-4 text-center shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
             <p className="mb-1 text-xs text-slate-500">참여 인원</p>
-            <p className="text-lg font-semibold text-indigo-600">
+            <p className="text-lg font-semibold text-amber-600">
               {post.current_participants} / {post.max_participants}명
             </p>
           </div>
           <div className="rounded-3xl border border-slate-200 bg-white p-4 text-center shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
             <p className="mb-1 text-xs text-slate-500">봉사 시간</p>
-            <p className="inline-flex items-center gap-1 text-lg font-semibold text-indigo-600">
+            <p className="inline-flex items-center gap-1 text-lg font-semibold text-amber-600">
               <Clock3 className="h-4 w-4" />
               <span>{post.volunteer_hours ?? 1}시간</span>
             </p>

@@ -1,10 +1,7 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { ToastProvider } from '@/components/ToastProvider';
 import OfflineIndicator from '@/components/OfflineIndicator';
-
-const inter = Inter({ subsets: ['latin'] });
 
 /** 모바일 viewport 최적화 (확대 방지, iOS safe-area 대응) */
 export const viewport: Viewport = {
@@ -13,26 +10,26 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: 'cover',
-  themeColor: '#4f46e5',
+  themeColor: '#d97706',
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
-  title: '사과 - 봉사활동 플랫폼',
-  description: '사과와 함께하는 봉사활동 참여 및 관리 플랫폼',
+  title: '라자봉 - 게릴라 자원봉사',
+  description: '라자봉과 함께하는 게릴라 자원봉사 참여 및 관리 플랫폼',
   openGraph: {
-    title: '사과 - 봉사활동 플랫폼',
-    description: '사과와 함께하는 봉사활동 참여 및 관리 플랫폼',
+    title: '라자봉 - 게릴라 자원봉사',
+    description: '라자봉과 함께하는 게릴라 자원봉사 참여 및 관리 플랫폼',
   },
   twitter: {
     card: 'summary_large_image',
-    title: '사과 - 봉사활동 플랫폼',
-    description: '사과와 함께하는 봉사활동 참여 및 관리 플랫폼',
+    title: '라자봉 - 게릴라 자원봉사',
+    description: '라자봉과 함께하는 게릴라 자원봉사 참여 및 관리 플랫폼',
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: '사과',
+    title: '라자봉',
   },
 };
 
@@ -50,9 +47,9 @@ export default function RootLayout({
         <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icons/icon.svg" />
       </head>
-      <body className={inter.className}>
+      <body>
         <NextTopLoader
-          color="#4f46e5"
+          color="#d97706"
           initialPosition={0.08}
           crawlSpeed={200}
           height={3}
@@ -60,7 +57,7 @@ export default function RootLayout({
           showSpinner={false}
           easing="ease"
           speed={200}
-          shadow="0 0 10px #4f46e5,0 0 5px #4f46e5"
+          shadow="0 0 10px #d97706,0 0 5px #d97706"
         />
         <ToastProvider>
           <OfflineIndicator />

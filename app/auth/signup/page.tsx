@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -256,7 +256,7 @@ export default function SignupPage() {
   };
 
   // 인풋 공통 스타일
-  const inputBase = 'mt-1 block w-full px-3 py-2.5 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors';
+  const inputBase = 'mt-1 block w-full px-3 py-2.5 border rounded-lg shadow-sm focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors';
   const inputNormal = `${inputBase} border-gray-300`;
 
   const getValidationInputClass = (status: { isValid: boolean | null }) => {
@@ -342,7 +342,7 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={handlePrev}
-                  className="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
+                  className="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all"
                 >
                   이전
                 </button>
@@ -352,7 +352,7 @@ export default function SignupPage() {
                   type="button"
                   disabled={!isCurrentStepValid}
                   onClick={() => void handleNext()}
-                  className="flex-1 py-3 px-4 border border-transparent rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                  className="flex-1 py-3 px-4 border border-transparent rounded-lg text-sm font-bold text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 >
                   다음
                 </button>
@@ -360,7 +360,7 @@ export default function SignupPage() {
                 <button
                   type="submit"
                   disabled={loading || !isStep3Valid}
-                  className="flex-1 py-3 px-4 border border-transparent rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                  className="flex-1 py-3 px-4 border border-transparent rounded-lg text-sm font-bold text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 >
                   {loading ? '가입 처리 중...' : '가입하기'}
                 </button>
@@ -368,7 +368,7 @@ export default function SignupPage() {
             </div>
 
             <div className="text-center text-sm pt-1">
-              <Link href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
+              <Link href="/" className="font-medium text-amber-600 hover:text-amber-500">
                 이미 계정이 있으신가요? 로그인
               </Link>
             </div>

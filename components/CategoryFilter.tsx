@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -51,7 +51,7 @@ export default function CategoryFilter() {
             onClick={() => handleClick(cat.id)}
             className={`touch-feedback whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-indigo-600 text-white shadow-[0_8px_18px_rgba(79,70,229,0.22)]'
+                ? 'bg-amber-600 text-white shadow-[0_8px_18px_rgba(217,119,6,0.22)]'
                 : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
             }`}
           >

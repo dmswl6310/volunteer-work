@@ -84,7 +84,7 @@ export default function PostDetailLoading() {
         <div className="flex items-center space-x-4">
            <div className="h-10 w-10 rounded-2xl bg-slate-200"></div>
         </div>
-        <div className="ml-4 h-12 flex-1 rounded-2xl bg-indigo-100"></div>
+        <div className="ml-4 h-12 flex-1 rounded-2xl bg-amber-100"></div>
       </div>
     </div>
   );

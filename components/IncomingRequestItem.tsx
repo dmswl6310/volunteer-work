@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { rejectRemainingApplications, updateApplicationStatus } from '@/actions/apply';
@@ -139,7 +139,7 @@ export default function IncomingRequestItem({ application }: { application: Inco
           <button
             onClick={() => handleStatus('approved')}
             disabled={loading || isFull}
-            className="rounded-2xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+            className="rounded-2xl bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
           >
             {isFull ? '모집 완료' : '승인하기'}
           </button>
