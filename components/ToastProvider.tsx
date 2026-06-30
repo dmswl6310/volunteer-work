@@ -120,16 +120,16 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       )}
 
       {/* Toast 컨테이너 */}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 pointer-events-none">
+      <div className="pointer-events-none fixed left-1/2 top-4 z-[100] flex w-full max-w-[calc(100vw-32px)] -translate-x-1/2 flex-col items-center gap-2 px-4">
         {toasts.map(toast => (
           <div
             key={toast.id}
-            className={`pointer-events-auto animate-slide-down flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium shadow-[0_14px_30px_rgba(15,23,42,0.12)] ${typeStyles[toast.type]}`}
+            className={`pointer-events-auto flex w-fit max-w-sm animate-slide-down items-start gap-2 rounded-2xl px-4 py-3 text-sm font-medium shadow-[0_14px_30px_rgba(15,23,42,0.12)] ${typeStyles[toast.type]}`}
             onClick={() => removeToast(toast.id)}
             role="alert"
           >
-            <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${toast.type === 'success' ? 'bg-emerald-50 text-emerald-600' : toast.type === 'error' ? 'bg-rose-50 text-rose-600' : toast.type === 'warning' ? 'bg-amber-50 text-amber-600' : 'bg-amber-50 text-amber-600'}`}>{typeIcons[toast.type]}</span>
-            <span>{toast.message}</span>
+            <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${toast.type === 'success' ? 'bg-emerald-50 text-emerald-600' : toast.type === 'error' ? 'bg-rose-50 text-rose-600' : toast.type === 'warning' ? 'bg-amber-50 text-amber-600' : 'bg-amber-50 text-amber-600'}`}>{typeIcons[toast.type]}</span>
+            <span className="whitespace-pre-line break-words leading-5 [word-break:keep-all]">{toast.message}</span>
           </div>
         ))}
       </div>

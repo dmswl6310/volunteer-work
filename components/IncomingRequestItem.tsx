@@ -43,12 +43,12 @@ export default function IncomingRequestItem({ application }: { application: Inco
 
   const handleStatus = async (status: 'approved' | 'rejected') => {
     if (requestActionInFlight) {
-      showToast('다른 승인/거절 요청을 처리 중입니다. 잠시만 기다려주세요.', 'warning');
+      showToast('다른 승인/거절 요청을 처리 중입니다.\n잠시만 기다려주세요.', 'warning');
       return;
     }
 
     if (status === 'approved' && isFull) {
-      showToast('모집 인원이 모두 차서 더 이상 승인할 수 없습니다.', 'warning');
+      showToast('모집 인원이 모두 찼습니다.\n더 이상 승인할 수 없습니다.', 'warning');
       return;
     }
 
@@ -75,7 +75,7 @@ export default function IncomingRequestItem({ application }: { application: Inco
 
   const handleBulkReject = async () => {
     if (requestActionInFlight) {
-      showToast('다른 승인/거절 요청을 처리 중입니다. 잠시만 기다려주세요.', 'warning');
+      showToast('다른 승인/거절 요청을 처리 중입니다.\n잠시만 기다려주세요.', 'warning');
       return;
     }
 
