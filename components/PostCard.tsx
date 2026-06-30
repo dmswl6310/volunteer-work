@@ -49,10 +49,10 @@ export default function PostCard({ post, priorityImage = false }: PostCardProps)
         </div>
 
         {/* 컨텐츠 - 오른쪽 */}
-        <div className="flex-1 flex flex-col justify-between py-0.5">
+        <div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
           <div>
             <div className="mb-1 flex justify-between items-start">
-              <h3 className="line-clamp-2 text-base font-semibold leading-tight text-slate-900 transition-colors group-hover:text-amber-700">
+              <h3 className="whitespace-normal break-words text-base font-semibold leading-tight text-slate-900 transition-colors group-hover:text-amber-700 [word-break:keep-all]">
                 {post.title}
               </h3>
             </div>

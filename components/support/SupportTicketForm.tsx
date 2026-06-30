@@ -28,7 +28,7 @@ export default function SupportTicketForm() {
 
     try {
       await createSupportTicket(form);
-      showToast('문의가 접수되었습니다. 확인 후 답변드릴게요.', 'success');
+      showToast('문의가 접수되었습니다.\n확인 후 답변드릴게요.', 'success');
       router.push('/mypage');
       router.refresh();
     } catch (error: unknown) {

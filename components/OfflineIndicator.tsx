@@ -18,7 +18,7 @@ export default function OfflineIndicator() {
       // 바로 띄우지 않고 2초(2000ms) 대기
       offlineTimeoutiza = setTimeout(() => {
         isOfflineToastShown = true;
-        showToast('인터넷 연결이 끊겼습니다. 오프라인 상태입니다.', 'error');
+        showToast('인터넷 연결이 끊겼습니다.\n오프라인 상태입니다.', 'error');
       }, 2000);
     };
 
