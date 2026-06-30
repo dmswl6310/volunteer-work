@@ -45,7 +45,7 @@ export default async function MyHistoryPage({
           <div className="rounded-3xl border border-slate-200/80 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.04)] divide-y divide-slate-100">
             {completedActivities.map((application) => (
               <Link key={application.id} href={`/board/${application.post_id || application.postId}`} className="block p-4 transition-colors hover:bg-slate-50/70">
-                <p className="font-semibold text-slate-900">{application.posts?.title || '알 수 없는 게시글'}</p>
+                <p className="whitespace-normal break-words font-semibold leading-snug text-slate-900 [word-break:keep-all]">{application.posts?.title || '알 수 없는 게시글'}</p>
                 <p className="mt-1 text-xs text-slate-500">진행일 · {formatDate(application.posts?.due_date)}</p>
               </Link>
             ))}
@@ -71,7 +71,7 @@ export default async function MyHistoryPage({
           <div className="rounded-3xl border border-slate-200/80 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.04)] divide-y divide-slate-100">
             {scraps.map((scrap) => (
               <Link key={scrap.id} href={`/board/${scrap.post_id || scrap.posts?.id}`} className="block p-4 transition-colors hover:bg-slate-50/70">
-                <p className="font-semibold text-slate-900">{scrap.posts?.title || '알 수 없는 게시글'}</p>
+                <p className="whitespace-normal break-words font-semibold leading-snug text-slate-900 [word-break:keep-all]">{scrap.posts?.title || '알 수 없는 게시글'}</p>
                 <p className="mt-1 text-xs text-slate-500">찜한 날짜 · {formatDate(scrap.created_at || scrap.createdAt)}</p>
               </Link>
             ))}
@@ -97,8 +97,8 @@ export default async function MyHistoryPage({
           <div className="rounded-3xl border border-slate-200/80 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.04)] divide-y divide-slate-100">
             {reviews.map((review) => (
               <div key={review.id} className="p-4">
-                <p className="font-semibold text-slate-900">{review.posts?.title || '삭제된 게시글'}</p>
-                <p className="mt-2 line-clamp-3 text-sm text-slate-600">{review.content}</p>
+                <p className="whitespace-normal break-words font-semibold leading-snug text-slate-900 [word-break:keep-all]">{review.posts?.title || '삭제된 게시글'}</p>
+                <p className="mt-2 whitespace-pre-wrap break-words text-sm text-slate-600 [word-break:keep-all]">{review.content}</p>
                 <p className="mt-2 text-xs text-slate-500">작성일 · {formatDate(review.created_at || review.createdAt)}</p>
               </div>
             ))}

@@ -121,7 +121,7 @@ export default function AttendanceConfirmationCard({
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                    <p className="truncate font-semibold text-slate-900">
+                    <p className="whitespace-normal break-words font-semibold leading-snug text-slate-900 [word-break:keep-all]">
                       {application.users?.username || '이름 없음'}
                     </p>
                     <span

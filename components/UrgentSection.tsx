@@ -55,14 +55,14 @@ export default async function UrgentSection({ status = 'recruiting' }: { status?
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 flex flex-col justify-between py-1">
+                <div className="flex min-w-0 flex-1 flex-col justify-between py-1">
                   <div>
                     <div className="flex items-center justify-between mb-1">
                       <span className={`inline-block rounded-full px-2 py-1 text-[10px] font-semibold ${status.isFull && !status.isExpired ? 'border border-slate-200 bg-slate-100 text-slate-600' : 'border border-rose-200 bg-rose-50 text-rose-700'}`}>
                         {dDayText}
                       </span>
                     </div>
-                    <h3 className="mb-1 line-clamp-2 text-sm font-semibold leading-tight text-slate-900">{post.title}</h3>
+                    <h3 className="mb-1 whitespace-normal break-words text-sm font-semibold leading-tight text-slate-900 [word-break:keep-all]">{post.title}</h3>
                     <p className="text-xs text-slate-500">{post.category || '기타'}</p>
                   </div>
 

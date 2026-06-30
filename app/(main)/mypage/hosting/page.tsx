@@ -145,7 +145,7 @@ export default async function MyHostingPage({ searchParams }: { searchParams?: P
 
                 return (
                   <Link key={post.id} href={`/board/${post.id}`} className="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_26px_rgba(15,23,42,0.04)] transition-all hover:border-slate-300 hover:bg-slate-50/40">
-                    <h4 className="truncate font-semibold text-slate-900">{post.title}</h4>
+                    <h4 className="whitespace-normal break-words font-semibold leading-snug text-slate-900 [word-break:keep-all]">{post.title}</h4>
                     <div className="mt-3 flex items-center justify-between text-sm text-slate-500">
                       <span>{post.current_participants}/{post.max_participants}명</span>
                       <span className={status.isOpenRecruiting ? 'font-semibold text-amber-600' : 'font-semibold text-slate-500'}>

@@ -93,7 +93,7 @@ export default function ProfileEditForm({ user }: ProfileEditFormProps) {
                     </div>
                     <div className="col-span-2 rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
                         <span className="mb-1 block text-[11px] font-medium uppercase tracking-[0.08em] text-slate-400">주소</span>
-                        <span className="block truncate font-semibold text-slate-900">{user.address || '-'}</span>
+                        <span className="block whitespace-normal break-words font-semibold leading-snug text-slate-900 [word-break:keep-all]">{user.address || '-'}</span>
                     </div>
                 </div>
             </>

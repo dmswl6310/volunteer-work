@@ -57,7 +57,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
         <Link href="/board" className="-ml-2 rounded-full p-2 transition-colors hover:bg-slate-100">
           <ChevronLeft className="h-6 w-6 text-slate-700" />
         </Link>
-        <h2 className="max-w-[200px] truncate text-sm font-semibold text-slate-900">{post.title}</h2>
+        <h2 className="flex-1 whitespace-normal break-words px-2 text-center text-sm font-semibold leading-snug text-slate-900 [word-break:keep-all]">{post.title}</h2>
         <div className="w-8"></div> {/* 레이아웃 여백 */}
       </div>
 

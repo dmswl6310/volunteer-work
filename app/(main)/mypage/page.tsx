@@ -43,7 +43,7 @@ export default async function MyPagePage() {
                   <div key={application.id} className="rounded-2xl border border-slate-200 bg-slate-50/40 p-4 transition-colors hover:border-slate-300 hover:bg-white">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <Link href={`/board/${application.post_id || application.postId}`} className="block truncate text-[15px] font-semibold text-slate-900 transition-colors hover:text-amber-700">
+                        <Link href={`/board/${application.post_id || application.postId}`} className="block whitespace-normal break-words text-[15px] font-semibold leading-snug text-slate-900 transition-colors hover:text-amber-700 [word-break:keep-all]">
                           {application.posts?.title || '알 수 없는 게시글'}
                         </Link>
                         <p className="mt-1 text-xs text-slate-500">신청일 · {formatDate(application.created_at || application.createdAt)}</p>
@@ -79,9 +79,9 @@ export default async function MyPagePage() {
               <div className="space-y-2.5">
                 {visibleCompletedActivities.map((application) => (
                   <div key={application.id} className="rounded-2xl border border-slate-200 bg-white p-4 transition-colors hover:border-amber-200 hover:bg-slate-50/40">
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <Link href={`/board/${application.post_id || application.postId}`} className="block truncate text-[15px] font-semibold text-slate-900 transition-colors hover:text-amber-700">
+                        <Link href={`/board/${application.post_id || application.postId}`} className="block whitespace-normal break-words text-[15px] font-semibold leading-snug text-slate-900 transition-colors hover:text-amber-700 [word-break:keep-all]">
                           {application.posts?.title || '알 수 없는 게시글'}
                         </Link>
                         <p className="mt-1 text-xs text-slate-500">진행일 · {formatDate(application.posts?.due_date)}</p>
