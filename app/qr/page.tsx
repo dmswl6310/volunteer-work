@@ -97,20 +97,22 @@ export default function QrPage() {
             </h2>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="mx-auto grid w-full max-w-4xl gap-5 sm:grid-cols-2">
             {androidScreenshots.map((screenshot) => (
               <figure
                 key={screenshot.src}
                 className="overflow-hidden rounded-2xl border-2 border-orange-200 bg-white shadow-lg shadow-orange-100"
               >
-                <Image
-                  src={screenshot.src}
-                  alt={screenshot.alt}
-                  width={921}
-                  height={2048}
-                  className="h-auto w-full"
-                />
-                <figcaption className="px-5 py-4 text-center text-xl font-black text-stone-900">
+                <div className="flex h-[360px] items-start justify-center overflow-hidden bg-stone-100 sm:h-[430px] lg:h-[500px]">
+                  <Image
+                    src={screenshot.src}
+                    alt={screenshot.alt}
+                    width={921}
+                    height={2048}
+                    className="h-full w-auto"
+                  />
+                </div>
+                <figcaption className="px-4 py-3 text-center text-lg font-black text-stone-900">
                   {screenshot.caption}
                 </figcaption>
               </figure>
