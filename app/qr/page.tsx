@@ -10,12 +10,25 @@ const installSteps = [
   {
     platform: 'Android',
     browser: 'Chrome',
-    steps: ['QR 스캔 후 사이트 열기', '화면의 앱 설치 버튼 누르기', '설치 완료 후 홈 화면에서 라자봉 실행'],
+    steps: ['QR 스캔 후 Chrome으로 사이트 열기', '오른쪽 상단 점 세 개 메뉴 누르기', '홈 화면에 추가 선택하기'],
   },
   {
     platform: 'iPhone',
     browser: 'Safari',
     steps: ['QR 스캔 후 Safari로 열기', '공유 버튼 누르기', '홈 화면에 추가 선택'],
+  },
+];
+
+const androidScreenshots = [
+  {
+    src: '/images/android-add-home-menu-button.jpg',
+    alt: 'Chrome 오른쪽 상단 점 세 개 메뉴 위치',
+    caption: '오른쪽 상단 점 세 개 메뉴',
+  },
+  {
+    src: '/images/android-add-home-menu-item.jpg',
+    alt: 'Chrome 메뉴의 홈 화면에 추가 항목',
+    caption: '홈 화면에 추가',
   },
 ];
 
@@ -70,6 +83,39 @@ export default function QrPage() {
                   ))}
                 </ol>
               </section>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-7xl px-5 pb-10 sm:px-8 lg:pb-14">
+        <div className="border-t-2 border-orange-200 pt-8">
+          <div className="mb-5 flex flex-col gap-2 text-center sm:text-left">
+            <p className="text-xl font-black text-orange-700">Android 설치 화면</p>
+            <h2 className="text-3xl font-black leading-tight text-stone-950 sm:text-4xl">
+              Chrome 메뉴에서 홈 화면에 추가해요
+            </h2>
+          </div>
+
+          <div className="mx-auto grid w-full max-w-4xl gap-5 sm:grid-cols-2">
+            {androidScreenshots.map((screenshot) => (
+              <figure
+                key={screenshot.src}
+                className="overflow-hidden rounded-2xl border-2 border-orange-200 bg-white shadow-lg shadow-orange-100"
+              >
+                <div className="flex h-[360px] items-start justify-center overflow-hidden bg-stone-100 sm:h-[430px] lg:h-[500px]">
+                  <Image
+                    src={screenshot.src}
+                    alt={screenshot.alt}
+                    width={921}
+                    height={2048}
+                    className="h-full w-auto"
+                  />
+                </div>
+                <figcaption className="px-4 py-3 text-center text-lg font-black text-stone-900">
+                  {screenshot.caption}
+                </figcaption>
+              </figure>
             ))}
           </div>
         </div>
