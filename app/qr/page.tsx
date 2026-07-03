@@ -10,12 +10,26 @@ const installSteps = [
   {
     platform: 'Android',
     browser: 'Chrome',
-    steps: ['QR 스캔 후 사이트 열기', '화면의 앱 설치 버튼 누르기', '설치 완료 후 홈 화면에서 라자봉 실행'],
+    steps: ['QR 스캔 후 Chrome으로 사이트 열기', '오른쪽 상단 점 세 개 메뉴 누르기', '홈 화면에 추가 선택하기'],
+    note: 'Android에서는 화면 안의 앱 설치 버튼이 아니라 Chrome 메뉴에서 홈 화면에 추가를 눌러주세요.',
+    screenshots: [
+      {
+        src: '/images/android-add-home-menu-button.jpg',
+        alt: 'Chrome 오른쪽 상단 점 세 개 메뉴 위치',
+        caption: '1. 오른쪽 상단 점 세 개 메뉴를 눌러요.',
+      },
+      {
+        src: '/images/android-add-home-menu-item.jpg',
+        alt: 'Chrome 메뉴의 홈 화면에 추가 항목',
+        caption: '2. 메뉴에서 홈 화면에 추가를 선택해요.',
+      },
+    ],
   },
   {
     platform: 'iPhone',
     browser: 'Safari',
     steps: ['QR 스캔 후 Safari로 열기', '공유 버튼 누르기', '홈 화면에 추가 선택'],
+    screenshots: [],
   },
 ];
 
@@ -69,6 +83,29 @@ export default function QrPage() {
                     </li>
                   ))}
                 </ol>
+                {'note' in item ? (
+                  <p className="mt-4 rounded-xl bg-orange-50 px-4 py-3 text-lg font-bold leading-snug text-orange-800">
+                    {item.note}
+                  </p>
+                ) : null}
+                {item.screenshots.length > 0 ? (
+                  <div className="mt-4 grid gap-3">
+                    {item.screenshots.map((screenshot) => (
+                      <figure key={screenshot.src} className="overflow-hidden rounded-xl border border-orange-100 bg-orange-50">
+                        <Image
+                          src={screenshot.src}
+                          alt={screenshot.alt}
+                          width={921}
+                          height={2048}
+                          className="h-auto w-full"
+                        />
+                        <figcaption className="px-3 py-2 text-base font-bold leading-snug text-stone-800">
+                          {screenshot.caption}
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                ) : null}
               </section>
             ))}
           </div>
