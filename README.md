@@ -16,7 +16,24 @@
 ## 참고 문서
 
 - [AGENTS.md](AGENTS.md): 저장소 구조, 개발 명령어, 테스트, 커밋/PR 규칙을 정리한 기여자 가이드
+- [.agents/skills/volunteer-platform-maintenance/SKILL.md](.agents/skills/volunteer-platform-maintenance/SKILL.md): 인증·공개 범위·RLS 변경 시 사용하는 프로젝트 전용 안전 절차
 - [LAUNCH_DEMO_PLAN.md](LAUNCH_DEMO_PLAN.md): 발대식 시연 동선, 데모 데이터, 리스크 대응 체크리스트
+
+---
+
+## 로그인 상태별 접근 범위
+
+| 기능 | 비로그인 | 승인된 로그인 사용자 |
+|------|---------|----------------------|
+| 봉사활동 목록·검색·상세 | 가능 | 가능 |
+| 후기 목록 | 가능 | 가능 |
+| 주최자 연락처 | 숨김 | 주최자 본인·관리자·해당 활동 승인 참여자만 가능 |
+| 봉사활동 신청·스크랩·후기 좋아요 | 로그인 페이지로 이동 | 가능 |
+| 모집글·후기 작성 및 게시글 수정 | 로그인 페이지로 이동 | 권한 조건 충족 시 가능 |
+| 내 정보·주최 관리·고객 문의 | 로그인 페이지로 이동 | 가능 |
+| 관리자 화면 | 로그인 페이지로 이동 | 승인된 관리자만 가능 |
+
+로그인이 필요한 화면으로 이동한 비회원은 `/auth/login?next=...`로 안내하며, 로그인 성공 후 검증된 앱 내부 경로로 돌아옵니다.
 
 ---
 
@@ -25,15 +42,18 @@
 ### 1. 인증 / 회원가입 / 관리자 승인
 - 이메일·비밀번호 기반 회원가입
 - 3단계 회원가입 폼과 이메일/닉네임 중복 확인
-- 가입 직후 바로 서비스 이용이 아니라 **관리자 승인 후 접근 가능**
-- 보호 라우트는 `app/(main)/layout.tsx`에서 서버 사이드로 일괄 차단
+- 가입 직후에는 신청·작성·마이페이지 등 보호 기능을 사용할 수 없으며 **관리자 승인 후 이용 가능**
+- 비회원도 봉사활동 목록·상세와 후기 목록은 탐색 가능
+- 작성·수정·마이페이지 등 보호 화면은 각 하위 레이아웃에서 서버 사이드로 차단
+- 로그인 후 `next`에 저장된 원래 목적지로 복귀
 
 ### 2. 봉사활동 게시판
 - 모집글 목록 조회
 - 검색, 카테고리 필터, 모집 상태 필터, 최신순/마감순 정렬
 - 긴급 모집 섹션 분리 노출
 - Intersection Observer 기반 무한 스크롤
-- 게시글 상세에서 작성자 연락처, 모집 현황, 스크랩 상태 확인
+- 게시글 상세에서 공개 모집 정보와 작성자 닉네임 확인
+- 주최자 연락처는 주최자 본인·관리자·해당 활동 승인 참여자에게만 표시
 
 ### 3. 신청 / 승인 / 모집 관리
 - 사용자는 게시글에 신청 가능
@@ -108,9 +128,10 @@ Supabase Auth + PostgreSQL
 
 ### 설계 포인트
 
-#### 1) 보호 라우트 일괄 제어
-- `app/(main)/layout.tsx`에서 로그인 여부와 `users.is_approved`를 검사합니다.
-- 승인되지 않은 사용자는 `/auth/login?error=approval_pending`으로 리다이렉트됩니다.
+#### 1) 공개 셸과 보호 라우트 분리
+- `app/(main)/layout.tsx`는 비회원도 접근할 수 있는 공통 셸과 하단 내비게이션을 제공합니다.
+- 목록·상세·후기 목록은 공개하고, 작성·수정·마이페이지는 해당 하위 레이아웃에서 로그인 및 승인 상태를 검사합니다.
+- 보호 화면으로 이동한 비회원은 목적지를 포함한 `/auth/login?next=...`로 리다이렉트됩니다.
 
 #### 2) DB 접근의 중심은 Server Actions
 - `actions/` 폴더에 게시글, 신청, 후기, 관리자, 지원 문의, 포인트 관련 로직이 모여 있습니다.
@@ -124,21 +145,22 @@ Supabase Auth + PostgreSQL
 #### 4) 운영성 보강
 - `scripts/*.sql`에 기능 추가/운영 보정용 SQL이 정리되어 있습니다.
 - 이 저장소에서는 `supabase/migrations`보다 `scripts/`가 실제 운영 변경 이력을 더 많이 담고 있습니다.
+- RLS 변경 전에는 원격 정책과 컬럼 타입을 확인하고, 적용 후 `npm run verify:public-access`로 익명 공개 범위와 개인정보 차단을 검사합니다.
 
 ---
 
 ## 전체 기능 흐름
 
 ### 사용자 흐름
-1. 회원가입 요청
-2. 관리자 승인 대기
-3. 승인 후 로그인
-4. 게시글 탐색 / 검색 / 스크랩
-5. 봉사활동 신청
+1. 로그인 없이 게시글·후기 탐색
+2. 신청·작성·내 정보 기능 선택 시 로그인
+3. 계정이 없다면 회원가입 후 관리자 승인 대기
+4. 승인된 계정으로 로그인 후 원래 목적지로 복귀
+5. 게시글 스크랩 또는 봉사활동 신청
 6. 주최자 또는 관리자가 신청 승인
-7. 활동 종료 후 주최자가 참석 확인
-8. 포인트 지급
-9. 후기 작성 및 좋아요
+7. 승인된 참여자에게 주최자 연락처 표시
+8. 활동 종료 후 주최자가 참석 확인
+9. 포인트 지급 및 후기 작성
 
 ### 주최자 흐름
 1. 모집글 작성
@@ -185,6 +207,9 @@ applications
 
 RPC
   confirm_attendance_and_award_points(post_id, application_ids)
+  get_public_profiles(profile_ids)
+  get_public_review_like_counts(review_ids)
+  get_organizer_contact(target_post_id)
 ```
 
 ### 테이블별 역할
@@ -293,6 +318,11 @@ RPC
 - 활동 종료 후 참석자를 확정하고 포인트를 적립하는 PostgreSQL 함수입니다.
 - 권한 체크, 활동 종료일 검증, 신청 상태 확인, 포인트 이력 생성, 사용자 포인트 누적까지 한 번에 수행합니다.
 
+#### 공개 조회 및 개인정보 보호 RPC
+- `get_public_profiles`: 공개 화면에 필요한 `id`, `username`만 반환
+- `get_public_review_like_counts`: `review_likes` 원본 행 대신 후기별 합계만 반환
+- `get_organizer_contact`: 주최자 본인·승인된 관리자·해당 활동 승인 참여자에게만 연락처 반환
+
 ---
 
 ## DB 관련 운영 SQL 스크립트
@@ -311,8 +341,29 @@ RPC
   - 고객 문의 테이블 및 정책 추가
 - `reconcile-post-counters.sql`
   - `posts.current_participants`, `posts.scraps` 카운터 재동기화
+- `inspect-public-access-policies.sql`
+  - 사용자 데이터를 읽지 않고 관련 컬럼 타입, RLS 활성화 여부, 정책 정의, RPC 존재 여부 점검
+- `enable-public-browsing-with-private-contacts.sql`
+  - 게시글·후기 공개 조회, 공개 닉네임/좋아요 합계 RPC, `users` 개인정보 제한, 관계 기반 주최자 연락처 RPC 적용
 - `allow-post-author-contact.sql`
-  - 게시글 상세에서 작성자 연락처 노출을 위한 정책 보정
+  - 더 이상 사용하지 않는 이전 정책 안내 파일. 인증 사용자 전체에게 연락처를 열 수 있으므로 적용 금지
+
+### 공개 조회 RLS 적용 및 검증
+
+먼저 읽기 전용 `inspect-public-access-policies.sql`로 현재 정책을 확인한 다음 `enable-public-browsing-with-private-contacts.sql`을 적용합니다. 두 SQL은 익명 키나 서비스 역할 키만으로 실행할 수 없습니다. Supabase SQL Editor, Management API 토큰이 설정된 CLI, 또는 PostgreSQL 연결 URL 중 하나를 사용합니다. 비밀 값은 저장소에 커밋하지 않습니다.
+
+적용 후 아래 명령으로 실제 공개 범위를 검증합니다.
+
+```bash
+npm run verify:public-access
+```
+
+검증 항목:
+
+- 비회원에게 전체 게시글·후기 조회 허용
+- 비회원의 `public.users` 원본 조회 차단
+- 공개 닉네임과 후기 좋아요 합계 RPC 동작
+- 비회원의 주최자 연락처 RPC 차단
 
 ---
 
@@ -326,11 +377,11 @@ app/
 │  ├─ login/page.tsx              # 로그인
 │  └─ signup/                     # 3단계 회원가입
 ├─ (main)/
-│  ├─ layout.tsx                  # 보호 라우트 레이아웃 (로그인 + 승인 체크)
+│  ├─ layout.tsx                  # 공개 공통 셸과 선택적 로그인 상태
 │  ├─ page.tsx                    # 루트 진입 시 /board 리다이렉트
-│  ├─ board/                      # 게시판 목록/상세/작성/수정
-│  ├─ reviews/                    # 후기 목록/작성
-│  ├─ mypage/                     # 내 정보, 신청, 기록, 포인트, 주최관리, 문의
+│  ├─ board/                      # 공개 목록·상세, 보호된 작성·수정
+│  ├─ reviews/                    # 공개 후기 목록, 보호된 후기 작성
+│  ├─ mypage/                     # 로그인·승인이 필요한 내 정보 영역
 │  └─ admin/                      # 관리자 대시보드
 │
 actions/
@@ -357,6 +408,7 @@ components/
 ├─ AttendanceConfirmationCard.tsx
 ├─ ToastProvider.tsx
 ├─ BottomNav.tsx
+├─ LoginGateLink.tsx
 ├─ PullToRefresh.tsx
 └─ support/
    ├─ SupportTicketForm.tsx
@@ -365,6 +417,9 @@ components/
 lib/
 ├─ supabase.ts                    # 브라우저/서버 Supabase 클라이언트
 ├─ server-auth.ts                 # 인증/승인/관리자 권한 검증 헬퍼
+├─ auth-navigation.ts             # 안전한 로그인 후 복귀 경로 처리
+├─ page-auth.ts                   # 보호 페이지 리다이렉트
+├─ public-data.ts                 # 공개 프로필/후기 집계 RPC 헬퍼
 ├─ support.ts                     # 문의 타입/상태 정의
 ├─ post-status.ts
 ├─ date-kst.ts
@@ -374,6 +429,7 @@ scripts/
 ├─ create-admin.ts                # 관리자 계정 부트스트랩
 ├─ seed-posts.ts                  # 더미 게시글 시드
 ├─ cleanup-db.ts                  # 비관리자 데이터 정리
+├─ verify-public-access.mjs       # 원격 공개 범위·개인정보 차단 검증
 └─ *.sql                          # 운영용 SQL 스크립트
 
 tests/
@@ -446,11 +502,13 @@ npm run lint
 npm run typecheck
 npm run test:e2e
 npm run test:e2e:headed
+npm run verify:public-access
 ```
 
 ### 참고
 - E2E 테스트는 Playwright 설정을 사용합니다.
 - `playwright.config.ts` 기준으로 개발 서버는 `127.0.0.1:3001`에서 실행됩니다.
+- `verify:public-access`는 `.env.local`의 Supabase URL, 익명 키, 서비스 역할 키를 사용하지만 키나 개인정보를 출력하지 않습니다.
 
 ---
 

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getMyApplicationsPageData } from '@/actions/user';
 import CancelApplicationButton from '@/components/CancelApplicationButton';
 import StatusBadge from '@/components/StatusBadge';
+import { requireApprovedPageUser } from '@/lib/page-auth';
 
 function parseLimit(limit?: string) {
   const parsed = Number(limit);
@@ -14,6 +15,7 @@ function formatDate(dateValue?: string | null) {
 }
 
 export default async function MyApplicationsPage({ searchParams }: { searchParams?: Promise<{ section?: string; limit?: string }> }) {
+  await requireApprovedPageUser('/mypage/applications');
   const params = await searchParams;
   const section = params?.section === 'completed' ? 'completed' : 'active';
   const limit = parseLimit(params?.limit);

@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, ClipboardList, User } from 'lucide-react';
+import { buildLoginHref } from '@/lib/auth-navigation';
 
 /** 하단 탭 네비게이션 컴포넌트 (모바일 하단 고정) */
-export default function BottomNav() {
+export default function BottomNav({ isAuthenticated }: { isAuthenticated: boolean }) {
   const pathname = usePathname();
 
   // 로그인/회원가입/루트 페이지에서는 숨김
@@ -21,18 +22,21 @@ export default function BottomNav() {
       name: '봉사활동',
       href: '/board',
       icon: Home,
+      ariaLabel: '봉사활동',
       isActive: pathname.startsWith('/board')
     },
     {
       name: '후기',
       href: '/reviews',
       icon: ClipboardList,
+      ariaLabel: '후기',
       isActive: pathname.startsWith('/reviews')
     },
     {
       name: '내 정보',
-      href: '/mypage',
+      href: isAuthenticated ? '/mypage' : buildLoginHref('/mypage'),
       icon: User,
+      ariaLabel: isAuthenticated ? '내 정보' : '내 정보, 로그인 필요',
       isActive: pathname.startsWith('/mypage')
     }
   ];
@@ -47,6 +51,7 @@ export default function BottomNav() {
             <Link 
               key={tab.name} 
               href={tab.href}
+              aria-label={tab.ariaLabel}
               className={`touch-feedback flex flex-col items-center space-y-1 rounded-2xl px-3 py-1.5 transition-colors ${
                 active ? 'bg-amber-50 text-amber-600' : 'text-slate-500 hover:text-slate-900'
               }`}

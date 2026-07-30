@@ -1,14 +1,13 @@
 ﻿import { getAllReviews } from '@/actions/review';
-import { createServerSupabaseClient } from '@/lib/supabase';
+import { getOptionalApprovedUser } from '@/lib/server-auth';
 import Link from 'next/link';
 import ReviewLikeButton from '@/components/ReviewLikeButton';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ReviewPage() {
-    const supabase = await createServerSupabaseClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    const reviews = await getAllReviews(user?.id);
+    const viewer = await getOptionalApprovedUser();
+    const reviews = await getAllReviews(viewer?.user.id);
 
     return (
         <div className="min-h-screen bg-slate-50/70 pb-24">
@@ -47,6 +46,8 @@ export default async function ReviewPage() {
                                         reviewId={review.id}
                                         initialIsLiked={review.is_liked}
                                         initialLikeCount={review.like_count}
+                                        canInteract={Boolean(viewer)}
+                                        returnTo="/reviews"
                                     />
                                     <span>{new Date(review.created_at).toLocaleDateString()}</span>
                                 </div>

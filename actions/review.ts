@@ -5,27 +5,55 @@ import { revalidatePath } from 'next/cache';
 import { checkProfanity } from '@/lib/profanity';
 import { requireApprovedUser } from '@/lib/server-auth';
 import { getDateKstKey, getTodayKstKey } from '@/lib/date-kst';
+import { getPublicProfileMap, getPublicReviewLikeCountMap } from '@/lib/public-data';
 
 type ReviewAuthor = {
   username?: string | null;
-};
-
-type ReviewLikeAggregate = {
-  count: number | null;
 };
 
 type ReviewRow = {
   id: string;
   content: string;
   post_id: string;
+  author_id: string;
   created_at: string;
-  author: ReviewAuthor | null;
+  author?: ReviewAuthor | null;
   posts?: {
     id: string;
     title: string | null;
   } | null;
-  review_likes?: ReviewLikeAggregate[] | null;
 };
+
+async function attachPublicReviewData(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  reviews: ReviewRow[],
+  userId?: string
+) {
+  const reviewIds = reviews.map((review) => review.id);
+  const [profiles, likeCounts] = await Promise.all([
+    getPublicProfileMap(supabase, reviews.map((review) => review.author_id)),
+    getPublicReviewLikeCountMap(supabase, reviewIds),
+  ]);
+
+  const likedSet = new Set<string>();
+  if (userId && reviewIds.length > 0) {
+    const { data: myLikes } = await supabase
+      .from('review_likes')
+      .select('review_id')
+      .eq('user_id', userId)
+      .in('review_id', reviewIds);
+    (myLikes ?? []).forEach((like) => likedSet.add(like.review_id));
+  }
+
+  return reviews.map((review) => ({
+    ...review,
+    author: profiles.has(review.author_id)
+      ? { username: profiles.get(review.author_id)?.username ?? '익명' }
+      : null,
+    like_count: likeCounts.get(review.id) ?? 0,
+    is_liked: likedSet.has(review.id),
+  }));
+}
 
 /**
  * 봉사활동 후기를 작성합니다.
@@ -148,33 +176,12 @@ export async function getReviews(postId: string, userId?: string) {
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase
     .from('reviews')
-    .select('*, author:users(username), review_likes(count)')
+    .select('id, content, post_id, author_id, created_at')
     .eq('post_id', postId)
     .order('created_at', { ascending: false });
 
   const reviews = (data ?? []) as ReviewRow[];
-
-  // 현재 유저의 좋아요 여부를 각 후기에 추가
-  if (userId && reviews.length > 0) {
-    const { data: myLikes } = await supabase
-      .from('review_likes')
-      .select('review_id')
-      .eq('user_id', userId)
-      .in('review_id', reviews.map((review) => review.id));
-
-    const likedSet = new Set((myLikes ?? []).map((like) => like.review_id));
-    return reviews.map((review) => ({
-      ...review,
-      like_count: review.review_likes?.[0]?.count ?? 0,
-      is_liked: likedSet.has(review.id),
-    }));
-  }
-
-  return reviews.map((review) => ({
-    ...review,
-    like_count: review.review_likes?.[0]?.count ?? 0,
-    is_liked: false,
-  }));
+  return attachPublicReviewData(supabase, reviews, userId);
 }
 
 /**
@@ -187,33 +194,13 @@ export async function getAllReviews(userId?: string) {
     const supabase = await createServerSupabaseClient();
     const { data, error } = await supabase
       .from('reviews')
-      .select('*, author:users(username), posts(title, id), review_likes(count)')
+      .select('id, content, post_id, author_id, created_at, posts(title, id)')
       .order('created_at', { ascending: false })
       .limit(20);
 
     if (error) throw error;
-    const reviews = (data ?? []) as ReviewRow[];
-
-    if (userId && reviews.length > 0) {
-      const { data: myLikes } = await supabase
-        .from('review_likes')
-        .select('review_id')
-        .eq('user_id', userId)
-        .in('review_id', reviews.map((review) => review.id));
-
-      const likedSet = new Set((myLikes ?? []).map((like) => like.review_id));
-      return reviews.map((review) => ({
-        ...review,
-        like_count: review.review_likes?.[0]?.count ?? 0,
-        is_liked: likedSet.has(review.id),
-      }));
-    }
-
-    return reviews.map((review) => ({
-      ...review,
-      like_count: review.review_likes?.[0]?.count ?? 0,
-      is_liked: false,
-    }));
+    const reviews = (data ?? []) as unknown as ReviewRow[];
+    return attachPublicReviewData(supabase, reviews, userId);
   } catch (error) {
     console.error('Error fetching all reviews:', error);
     return [];

@@ -2,19 +2,21 @@
 
 import { useState } from 'react';
 import { toggleReviewLike } from '@/actions/review';
-import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { useToast } from './ToastProvider';
 import { ThumbsUp } from 'lucide-react';
+import { buildLoginHref } from '@/lib/auth-navigation';
 
 interface ReviewLikeButtonProps {
   reviewId: string;
   initialIsLiked: boolean;
   initialLikeCount: number;
+  canInteract: boolean;
+  returnTo: string;
 }
 
 /** 후기 좋아요 토글 버튼 (낙관적 UI 업데이트 적용) */
-export default function ReviewLikeButton({ reviewId, initialIsLiked, initialLikeCount }: ReviewLikeButtonProps) {
+export default function ReviewLikeButton({ reviewId, initialIsLiked, initialLikeCount, canInteract, returnTo }: ReviewLikeButtonProps) {
   const [isLiked, setIsLiked] = useState(initialIsLiked);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +25,17 @@ export default function ReviewLikeButton({ reviewId, initialIsLiked, initialLike
 
   const handleToggle = async () => {
     if (isLoading) return;
+
+    if (!canInteract) {
+      const shouldMoveToLogin = await showConfirm('후기에 공감하려면 로그인이 필요해요. 로그인 페이지로 이동할까요?', {
+        title: '로그인 필요',
+        confirmLabel: '로그인하기',
+      });
+      if (shouldMoveToLogin) {
+        router.push(buildLoginHref(returnTo));
+      }
+      return;
+    }
 
     // 낙관적 UI 업데이트
     const previousIsLiked = isLiked;
@@ -33,20 +46,6 @@ export default function ReviewLikeButton({ reviewId, initialIsLiked, initialLike
     setIsLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setIsLiked(previousIsLiked);
-        setLikeCount(previousCount);
-        const shouldMoveToLogin = await showConfirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?', {
-          title: '로그인 필요',
-          confirmLabel: '로그인하러 가기',
-        });
-        if (shouldMoveToLogin) {
-          router.push('/auth/login');
-        }
-        return;
-      }
-
       await toggleReviewLike(reviewId);
       router.refresh();
     } catch (error) {

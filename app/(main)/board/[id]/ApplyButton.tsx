@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ToastProvider';
 import { applyForPost } from '@/actions/apply';
+import { buildLoginHref } from '@/lib/auth-navigation';
 
 interface ApplyButtonProps {
   postId: string;
@@ -12,9 +12,10 @@ interface ApplyButtonProps {
   isAuthor: boolean;
   userApplicationStatus: string | null;
   isFull?: boolean;
+  isAuthenticated: boolean;
 }
 
-export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplicationStatus, isFull }: ApplyButtonProps) {
+export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplicationStatus, isFull, isAuthenticated }: ApplyButtonProps) {
   const router = useRouter();
   const { showToast, showConfirm } = useToast();
   const [loading, setLoading] = useState(false);
@@ -85,21 +86,19 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplic
   }
 
   const handleApply = async () => {
+    if (!isAuthenticated) {
+      const shouldMoveToLogin = await showConfirm('참여를 신청하려면 로그인이 필요해요. 로그인 페이지로 이동할까요?', {
+        title: '로그인 필요',
+        confirmLabel: '로그인하기',
+      });
+      if (shouldMoveToLogin) {
+        router.push(buildLoginHref(`/board/${postId}`));
+      }
+      return;
+    }
+
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        const shouldMoveToLogin = await showConfirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?', {
-          title: '로그인 필요',
-          confirmLabel: '로그인하러 가기',
-        });
-        if (shouldMoveToLogin) {
-          router.push('/auth/login');
-        }
-        setLoading(false);
-        return;
-      }
-
       await applyForPost(postId);
       setApplicationStatus('pending'); // 성공 시 상태를 대기중으로 변경
       showToast('봉사활동 참여 신청이 완료되었습니다.\n관리자 승인 후 최종 확정됩니다.', 'success');
@@ -122,7 +121,7 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplic
       disabled={loading}
       className="w-full rounded-2xl bg-amber-600 py-3 font-semibold text-white transition-colors shadow-[0_14px_30px_rgba(217,119,6,0.22)] hover:bg-amber-700 disabled:opacity-70"
     >
-      {loading ? '처리 중...' : '참여하기'}
+      {loading ? '처리 중...' : isAuthenticated ? '참여 신청하기' : '로그인하고 신청하기'}
     </button>
   );
 }

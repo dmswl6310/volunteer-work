@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('public auth and privacy guards', () => {
+test.describe('public browsing and privacy guards', () => {
   test('login page renders', async ({ page }) => {
     await page.goto('/auth/login');
 
     await expect(page.getByRole('heading', { name: '로그인' })).toBeVisible();
     await expect(page.getByRole('button', { name: '로그인' })).toBeVisible();
+    await expect(page.getByRole('link', { name: '로그인 없이 봉사활동 둘러보기' })).toHaveAttribute('href', '/board');
   });
 
   test('signup page renders onboarding steps', async ({ page }) => {
@@ -19,11 +20,33 @@ test.describe('public auth and privacy guards', () => {
     await expect(page.getByPlaceholder('비밀번호를 한번 더 입력해주세요')).toBeVisible();
   });
 
-  test('protected board redirects unauthenticated users to login', async ({ page }) => {
-    await page.goto('/board');
+  test('root and board are publicly browseable', async ({ page }) => {
+    await page.goto('/');
 
-    await expect(page).toHaveURL(/\/auth\/login/);
+    await expect(page).toHaveURL(/\/board/);
+    await expect(page.getByRole('heading', { name: '봉사활동 찾기' })).toBeVisible();
+    await expect(page.getByRole('link', { name: '내 정보, 로그인 필요' })).toHaveAttribute('href', '/auth/login?next=%2Fmypage');
+    await expect(page.getByRole('link', { name: '로그인', exact: true })).toHaveCount(0);
+  });
+
+  test('reviews are publicly browseable', async ({ page }) => {
+    await page.goto('/reviews');
+
+    await expect(page).toHaveURL(/\/reviews/);
+    await expect(page.getByRole('heading', { name: '봉사활동 후기' })).toBeVisible();
+  });
+
+  test('activity creation redirects guests to login and preserves destination', async ({ page }) => {
+    await page.goto('/board/write');
+
+    await expect(page).toHaveURL((url) => url.pathname === '/auth/login' && url.searchParams.get('next') === '/board/write');
     await expect(page.getByRole('heading', { name: '로그인' })).toBeVisible();
+  });
+
+  test('mypage redirects guests to login', async ({ page }) => {
+    await page.goto('/mypage');
+
+    await expect(page).toHaveURL((url) => url.pathname === '/auth/login' && url.searchParams.get('next') === '/mypage');
   });
 
   test('admin route is not publicly reachable', async ({ page }) => {

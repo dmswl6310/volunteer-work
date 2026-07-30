@@ -1,4 +1,4 @@
-import { getPost } from '@/actions/get-post';
+import { getOrganizerContactForViewer, getPost } from '@/actions/get-post';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -6,41 +6,33 @@ import FallbackImage from '@/components/FallbackImage';
 import ApplyButton from './ApplyButton';
 import ReviewList from '@/components/ReviewList';
 import ScrapButton from '@/components/ScrapButton';
-import { createServerSupabaseClient } from '@/lib/supabase';
-import { ChevronLeft, Clock3, Phone } from 'lucide-react';
+import { ChevronLeft, Clock3, LockKeyhole, Phone } from 'lucide-react';
 import { getPostStatus } from '@/lib/post-status';
+import { getOptionalApprovedUser } from '@/lib/server-auth';
 
 export default async function PostDetailPage(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const post = await getPost(params.id);
+  const { id: postId } = await props.params;
+  const post = await getPost(postId);
 
   if (!post) {
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-
-  // 승인된 참여자 목록 조회
-  const { data: approvedApps } = await supabase
-    .from('applications')
-    .select('id')
-    .eq('post_id', post.id)
-    .eq('status', 'approved');
-  const approvedCount = approvedApps?.length ?? 0;
-
-  // 현재 유저의 스크랩 여부 확인
-  const { data: { user } } = await supabase.auth.getUser();
+  const viewer = await getOptionalApprovedUser();
   let isScraped = false;
   let userApplicationStatus: string | null = null;
-  const isAuthor = !!user && user.id === post.author_id;
+  let organizerContactAccess = { canView: false, contact: null as string | null };
+  const isAuthor = Boolean(viewer && viewer.user.id === post.author_id);
 
-  if (user) {
-    const [scrapRes, applyRes] = await Promise.all([
-      supabase.from('post_scraps').select('id').eq('post_id', post.id).eq('user_id', user.id).maybeSingle(),
-      supabase.from('applications').select('id, status').eq('post_id', post.id).eq('user_id', user.id).maybeSingle(),
+  if (viewer) {
+    const [scrapRes, applyRes, contactAccess] = await Promise.all([
+      viewer.supabase.from('post_scraps').select('id').eq('post_id', post.id).eq('user_id', viewer.user.id).maybeSingle(),
+      viewer.supabase.from('applications').select('id, status').eq('post_id', post.id).eq('user_id', viewer.user.id).maybeSingle(),
+      getOrganizerContactForViewer(post.id),
     ]);
     isScraped = !!scrapRes.data;
     userApplicationStatus = applyRes.data?.status || null;
+    organizerContactAccess = contactAccess;
   }
 
   const { isExpired, diffDays, isFull, isOpenRecruiting } = getPostStatus({
@@ -109,15 +101,23 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
         {/* 주최자 프로필 */}
         <div className="mb-8 flex items-center rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
           <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-lg font-semibold text-amber-600">
-            {post.author.username?.[0] || 'A'}
+            {post.author?.username?.[0] || 'A'}
           </div>
           <div>
             <p className="font-semibold text-slate-900">
-              {post.author.username || '익명'}
+              {post.author?.username || '익명'}
             </p>
-            <div className="mt-2 flex items-center gap-1.5 text-sm text-slate-700">
-              <Phone className="h-4 w-4 text-amber-500" />
-              <span>{post.author.contact || '연락처 미등록'}</span>
+            <div className={`mt-2 flex items-center gap-1.5 text-sm ${organizerContactAccess.canView ? 'text-slate-700' : 'text-slate-500'}`}>
+              {organizerContactAccess.canView ? (
+                <Phone className="h-4 w-4 text-amber-500" />
+              ) : (
+                <LockKeyhole className="h-4 w-4 text-slate-400" />
+              )}
+              <span>
+                {organizerContactAccess.canView
+                  ? organizerContactAccess.contact || '연락처 미등록'
+                  : '참여 승인 후 연락처를 확인할 수 있어요'}
+              </span>
             </div>
           </div>
         </div>
@@ -155,21 +155,21 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
         {/* 참여 확정 명단 */}
         <div className="mb-10">
           <h3 className="mb-3 text-lg font-semibold text-slate-900">참여 확정 현황</h3>
-          {approvedCount === 0 ? (
+          {post.current_participants === 0 ? (
             <div className="rounded-3xl border border-dashed border-slate-200 bg-white p-5 text-center text-sm text-slate-500">
               아직 승인된 참여자가 없습니다.
             </div>
           ) : (
             <div className="rounded-3xl border border-emerald-200 bg-emerald-50/70 p-5 text-center">
               <p className="text-sm text-emerald-700">현재 승인된 참여자</p>
-              <p className="mt-1 text-2xl font-semibold text-emerald-600">{approvedCount}명</p>
+              <p className="mt-1 text-2xl font-semibold text-emerald-600">{post.current_participants}명</p>
             </div>
           )}
         </div>
 
         {/* 후기 섹션 */}
         <div className="mb-8">
-          <ReviewList postId={post.id} userId={user?.id} />
+          <ReviewList postId={post.id} userId={viewer?.user.id} canInteract={Boolean(viewer)} />
         </div>
       </div>
 
@@ -180,6 +180,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
             postId={post.id}
             initialIsScraped={isScraped}
             initialScrapCount={post.scraps}
+            canInteract={Boolean(viewer)}
           />
         </div>
         <div className="flex-1 ml-4">
@@ -189,6 +190,7 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
              isAuthor={isAuthor}
              userApplicationStatus={userApplicationStatus}
              isFull={isFull}
+             isAuthenticated={Boolean(viewer)}
           />
         </div>
       </div>

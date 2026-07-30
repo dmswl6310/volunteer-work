@@ -3,10 +3,11 @@ import UrgentSection from '@/components/UrgentSection';
 import InfiniteScrollBoard from '@/components/InfiniteScrollBoard';
 import StatusFilter from '@/components/StatusFilter';
 import SearchInput from '@/components/SearchInput';
-import Link from 'next/link';
 import CategoryFilter from '@/components/CategoryFilter';
 import SortFilter from '@/components/SortFilter';
 import { Plus } from 'lucide-react';
+import { getOptionalApprovedUser } from '@/lib/server-auth';
+import LoginGateLink from '@/components/LoginGateLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,10 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
   const status = searchParams.status || 'recruiting';
   const q = searchParams.q;
 
-  const initialData = await getPosts({ page: 1, limit: 10, sort, category, status, q });
+  const [initialData, viewer] = await Promise.all([
+    getPosts({ page: 1, limit: 10, sort, category, status, q }),
+    getOptionalApprovedUser(),
+  ]);
 
   return (
     <div className="relative min-h-screen bg-slate-50/70 pb-28">
@@ -30,7 +34,7 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
               <h1 className="text-xl font-semibold tracking-[-0.02em] text-slate-900">봉사활동 찾기</h1>
             </div>
           </div>
-          <div className="flex space-x-3 items-center">
+          <div className="flex items-center">
             <SearchInput />
           </div>
         </div>
@@ -61,13 +65,15 @@ export default async function BoardPage(props: { searchParams: Promise<{ sort?: 
       </div>
 
       {/* Floating Action Button for Writing */}
-      <Link
+      <LoginGateLink
         href="/board/write"
+        isAuthenticated={Boolean(viewer)}
         className="fixed bottom-[108px] right-6 z-40 flex transform items-center justify-center rounded-full bg-amber-600 p-4 text-white shadow-[0_14px_30px_rgba(217,119,6,0.28)] transition-transform hover:-translate-y-1 hover:bg-amber-700 active:scale-95"
-        aria-label="글쓰기"
+        ariaLabel={viewer ? '글쓰기' : '로그인 후 봉사활동 등록하기'}
+        message="봉사활동을 등록하려면 로그인이 필요해요. 로그인 페이지로 이동할까요?"
       >
         <Plus className="w-6 h-6" strokeWidth={3} />
-      </Link>
+      </LoginGateLink>
     </div>
   );
 }

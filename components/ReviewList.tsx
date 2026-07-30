@@ -2,7 +2,7 @@ import { getReviews } from '@/actions/review';
 import ReviewLikeButton from './ReviewLikeButton';
 
 /** 게시글 후기 목록 컴포넌트 (서버 컴포넌트) */
-export default async function ReviewList({ postId, userId }: { postId: string; userId?: string }) {
+export default async function ReviewList({ postId, userId, canInteract }: { postId: string; userId?: string; canInteract: boolean }) {
   const reviews = await getReviews(postId, userId);
 
   if (reviews.length === 0) {
@@ -41,6 +41,8 @@ export default async function ReviewList({ postId, userId }: { postId: string; u
                 reviewId={review.id}
                 initialIsLiked={review.is_liked}
                 initialLikeCount={review.like_count}
+                canInteract={canInteract}
+                returnTo={`/board/${postId}`}
               />
             </div>
           </li>

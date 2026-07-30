@@ -1,5 +1,6 @@
 ﻿import Link from 'next/link';
 import { getMyPointsPageData } from '@/actions/user';
+import { requireApprovedPageUser } from '@/lib/page-auth';
 
 function parseLimit(limit?: string) {
   const parsed = Number(limit);
@@ -12,6 +13,7 @@ function formatDate(dateValue?: string | null) {
 }
 
 export default async function MyPointsPage({ searchParams }: { searchParams?: Promise<{ limit?: string }> }) {
+  await requireApprovedPageUser('/mypage/points');
   const params = await searchParams;
   const limit = parseLimit(params?.limit);
   const { profile, pointTransactions } = await getMyPointsPageData(limit);

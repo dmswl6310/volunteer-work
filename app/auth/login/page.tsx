@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import PromoCarousel from '@/components/PromoCarousel';
+import { getSafeReturnTo } from '@/lib/auth-navigation';
 
 
 export default function LoginPage() {
@@ -50,8 +51,8 @@ export default function LoginPage() {
           return;
         }
 
-        // Success
-        router.replace('/board');
+        const requestedPath = new URLSearchParams(window.location.search).get('next');
+        router.replace(getSafeReturnTo(requestedPath));
         router.refresh();
       }
     } catch (err: unknown) {
@@ -71,7 +72,7 @@ export default function LoginPage() {
           </div>
           <h2 className="mt-2 text-3xl font-extrabold text-gray-900">로그인</h2>
           <p className="mt-2 text-sm text-gray-600">
-            서비스 이용을 위해 로그인해주세요.
+            신청과 활동 등록은 로그인 후 이용할 수 있어요.
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
@@ -123,6 +124,15 @@ export default function LoginPage() {
           <div className="text-center text-sm">
             <Link href="/auth/signup" className="font-medium text-amber-600 hover:text-amber-500">
               계정이 없으신가요? 회원가입
+            </Link>
+          </div>
+
+          <div className="border-t border-slate-200 pt-5 text-center">
+            <Link
+              href="/board"
+              className="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700"
+            >
+              로그인 없이 봉사활동 둘러보기
             </Link>
           </div>
         </form>

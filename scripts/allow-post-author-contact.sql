@@ -1,11 +1,3 @@
--- 게시글 상세에서 작성자 연락처를 표시하려면,
--- 인증된 사용자가 users 테이블의 작성자 정보를 조회할 수 있어야 합니다.
--- 현재 정책이 더 좁게 바뀌어 있었다면 아래 SQL을 다시 적용하세요.
-
-alter table public.users enable row level security;
-
-drop policy if exists "users_select" on public.users;
-
-create policy "users_select" on public.users
-  for select to authenticated
-  using (true);
+-- 더 이상 사용하지 마세요.
+-- 인증 사용자 전체에게 연락처를 공개하는 이전 정책은 개인정보를 과도하게 노출합니다.
+-- 대신 scripts/enable-public-browsing-with-private-contacts.sql을 적용하세요.
