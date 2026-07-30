@@ -9,6 +9,6 @@ export default async function ReviewWriteLayout({
   params: Promise<{ postId: string }>;
 }) {
   const { postId } = await params;
-  await requireApprovedPageUser(`/reviews/write/${postId}`);
+  await requireApprovedPageUser(`/reviews/write/${postId}`, `/board/${postId}`);
   return children;
 }

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ToastProvider';
 import { applyForPost } from '@/actions/apply';
-import { buildLoginHref } from '@/lib/auth-navigation';
+import { buildLoginHref, LOGIN_REQUIRED_CONFIRM_OPTIONS } from '@/lib/auth-navigation';
 
 interface ApplyButtonProps {
   postId: string;
@@ -87,12 +87,12 @@ export default function ApplyButton({ postId, isRecruiting, isAuthor, userApplic
 
   const handleApply = async () => {
     if (!isAuthenticated) {
-      const shouldMoveToLogin = await showConfirm('참여를 신청하려면 로그인이 필요해요. 로그인 페이지로 이동할까요?', {
-        title: '로그인 필요',
-        confirmLabel: '로그인하기',
-      });
+      const shouldMoveToLogin = await showConfirm(
+        '참여를 신청하려면 로그인이 필요해요. 로그인 페이지로 이동할까요?',
+        LOGIN_REQUIRED_CONFIRM_OPTIONS
+      );
       if (shouldMoveToLogin) {
-        router.push(buildLoginHref(`/board/${postId}`));
+        router.push(buildLoginHref(`/board/${postId}`, `/board/${postId}`));
       }
       return;
     }

@@ -5,7 +5,7 @@ import { toggleScrap } from '@/actions/scrap';
 import { useRouter } from 'next/navigation';
 import { useToast } from './ToastProvider';
 import { Heart } from 'lucide-react';
-import { buildLoginHref } from '@/lib/auth-navigation';
+import { buildLoginHref, LOGIN_REQUIRED_CONFIRM_OPTIONS } from '@/lib/auth-navigation';
 
 interface ScrapButtonProps {
   postId: string;
@@ -14,7 +14,7 @@ interface ScrapButtonProps {
   canInteract: boolean;
 }
 
-/** 게시글 스크랩 토글 버튼 (냙관적 UI 업데이트 적용) */
+/** 게시글 스크랩 토글 버튼 (낙관적 UI 업데이트 적용) */
 export default function ScrapButton({ postId, initialIsScraped, initialScrapCount, canInteract }: ScrapButtonProps) {
   const [isScraped, setIsScraped] = useState(initialIsScraped);
   const [scrapCount, setScrapCount] = useState(initialScrapCount);
@@ -23,17 +23,17 @@ export default function ScrapButton({ postId, initialIsScraped, initialScrapCoun
 
   const handleToggle = async () => {
     if (!canInteract) {
-      const shouldMoveToLogin = await showConfirm('로그인하면 관심 활동을 저장할 수 있어요. 로그인 페이지로 이동할까요?', {
-        title: '로그인 필요',
-        confirmLabel: '로그인하기',
-      });
+      const shouldMoveToLogin = await showConfirm(
+        '로그인하면 관심 활동을 저장할 수 있어요. 로그인 페이지로 이동할까요?',
+        LOGIN_REQUIRED_CONFIRM_OPTIONS
+      );
       if (shouldMoveToLogin) {
-        router.push(buildLoginHref(`/board/${postId}`));
+        router.push(buildLoginHref(`/board/${postId}`, `/board/${postId}`));
       }
       return;
     }
 
-    // 냙관적 UI 업데이트
+    // 낙관적 UI 업데이트
     const previousIsScraped = isScraped;
     const previousCount = scrapCount;
 

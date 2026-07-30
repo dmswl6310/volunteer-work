@@ -35,6 +35,9 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
     organizerContactAccess = contactAccess;
   }
 
+  const shouldShowContactStatus =
+    organizerContactAccess.canView || userApplicationStatus === 'pending';
+
   const { isExpired, diffDays, isFull, isOpenRecruiting } = getPostStatus({
     dueDate: post.due_date,
     isRecruiting: post.is_recruiting,
@@ -107,18 +110,20 @@ export default async function PostDetailPage(props: { params: Promise<{ id: stri
             <p className="font-semibold text-slate-900">
               {post.author?.username || '익명'}
             </p>
-            <div className={`mt-2 flex items-center gap-1.5 text-sm ${organizerContactAccess.canView ? 'text-slate-700' : 'text-slate-500'}`}>
-              {organizerContactAccess.canView ? (
-                <Phone className="h-4 w-4 text-amber-500" />
-              ) : (
-                <LockKeyhole className="h-4 w-4 text-slate-400" />
-              )}
-              <span>
-                {organizerContactAccess.canView
-                  ? organizerContactAccess.contact || '연락처 미등록'
-                  : '참여 승인 후 연락처를 확인할 수 있어요'}
-              </span>
-            </div>
+            {shouldShowContactStatus && (
+              <div className={`mt-2 flex items-center gap-1.5 text-sm ${organizerContactAccess.canView ? 'text-slate-700' : 'text-slate-500'}`}>
+                {organizerContactAccess.canView ? (
+                  <Phone className="h-4 w-4 text-amber-500" />
+                ) : (
+                  <LockKeyhole className="h-4 w-4 text-slate-400" />
+                )}
+                <span>
+                  {organizerContactAccess.canView
+                    ? organizerContactAccess.contact || '연락처 미등록'
+                    : '승인되면 주최자 연락 방법을 확인할 수 있어요'}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

@@ -34,7 +34,7 @@ export default function BottomNav({ isAuthenticated }: { isAuthenticated: boolea
     },
     {
       name: '내 정보',
-      href: isAuthenticated ? '/mypage' : buildLoginHref('/mypage'),
+      href: isAuthenticated ? '/mypage' : buildLoginHref('/mypage', pathname),
       icon: User,
       ariaLabel: isAuthenticated ? '내 정보' : '내 정보, 로그인 필요',
       isActive: pathname.startsWith('/mypage')

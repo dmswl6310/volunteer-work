@@ -5,7 +5,7 @@ import { toggleReviewLike } from '@/actions/review';
 import { useRouter } from 'next/navigation';
 import { useToast } from './ToastProvider';
 import { ThumbsUp } from 'lucide-react';
-import { buildLoginHref } from '@/lib/auth-navigation';
+import { buildLoginHref, LOGIN_REQUIRED_CONFIRM_OPTIONS } from '@/lib/auth-navigation';
 
 interface ReviewLikeButtonProps {
   reviewId: string;
@@ -27,12 +27,12 @@ export default function ReviewLikeButton({ reviewId, initialIsLiked, initialLike
     if (isLoading) return;
 
     if (!canInteract) {
-      const shouldMoveToLogin = await showConfirm('후기에 공감하려면 로그인이 필요해요. 로그인 페이지로 이동할까요?', {
-        title: '로그인 필요',
-        confirmLabel: '로그인하기',
-      });
+      const shouldMoveToLogin = await showConfirm(
+        '후기에 공감하려면 로그인이 필요해요. 로그인 페이지로 이동할까요?',
+        LOGIN_REQUIRED_CONFIRM_OPTIONS
+      );
       if (shouldMoveToLogin) {
-        router.push(buildLoginHref(returnTo));
+        router.push(buildLoginHref(returnTo, returnTo));
       }
       return;
     }

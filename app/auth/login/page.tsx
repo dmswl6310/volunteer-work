@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import PromoCarousel from '@/components/PromoCarousel';
 import { getSafeReturnTo } from '@/lib/auth-navigation';
+import { ArrowLeft } from 'lucide-react';
 
 
 export default function LoginPage() {
@@ -14,6 +15,11 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  const handleBack = () => {
+    const requestedBackPath = new URLSearchParams(window.location.search).get('back');
+    router.push(getSafeReturnTo(requestedBackPath));
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,8 +70,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
+      <div className="relative max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-lg">
+        <button
+          type="button"
+          onClick={handleBack}
+          aria-label="이전 화면으로 돌아가기"
+          className="absolute left-5 top-5 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-slate-600 shadow-sm backdrop-blur-sm transition-colors hover:bg-white hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
         <div className="text-center">
           <div className="mb-6">
             <PromoCarousel />
@@ -130,9 +144,9 @@ export default function LoginPage() {
           <div className="border-t border-slate-200 pt-5 text-center">
             <Link
               href="/board"
-              className="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700"
+              className="text-sm font-medium text-slate-500 underline decoration-slate-300 underline-offset-4 transition-colors hover:text-amber-700"
             >
-              로그인 없이 봉사활동 둘러보기
+              로그인 없이 둘러보기
             </Link>
           </div>
         </form>

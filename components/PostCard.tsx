@@ -19,7 +19,7 @@ export default function PostCard({ post, priorityImage = false }: PostCardProps)
   });
 
   return (
-    <Link href={`/board/${post.id}`} className="block group touch-feedback">
+    <Link href={`/board/${post.id}`} data-testid="post-card" className="block group touch-feedback">
       <div className={`flex gap-4 rounded-3xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_26px_rgba(15,23,42,0.04)] transition-colors ${isClosed ? 'opacity-55 grayscale' : 'hover:border-slate-300 hover:bg-slate-50/40'
         }`}>
         {/* 이미지 - 왼쪽 */}

@@ -9,6 +9,6 @@ export default async function BoardEditLayout({
   params: Promise<{ id: string }>;
 }) {
   const { id: postId } = await params;
-  await requireApprovedPageUser(`/board/${postId}/edit`);
+  await requireApprovedPageUser(`/board/${postId}/edit`, `/board/${postId}`);
   return children;
 }
