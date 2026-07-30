@@ -19,10 +19,12 @@ description: Safely maintain the volunteer-work Next.js and Supabase application
 - Allow anonymous users to read volunteer posts, post details, and reviews.
 - Require an approved authenticated user for applications, hosting, writing, editing, likes, scraps, mypage, and support actions.
 - Preserve the intended destination with a validated relative `next` parameter when redirecting guests to login.
+- Preserve a separate validated `back` path so guests can leave login without entering a protected-route redirect loop.
 - Keep bottom navigation labels stable. Send a guest who selects `내 정보` to `/auth/login?next=%2Fmypage`.
 - Expose public profile data through narrow RPCs that return only the required fields.
 - Return organizer contact details only to the organizer, an approved participant for that post, or an approved admin.
 - Do not solve contact display by granting every authenticated user direct access to all `public.users` rows.
+- Never allow ordinary authenticated users to insert profile rows or update `users.role` and `users.is_approved`; use the approved-admin-only `approve_user` RPC.
 
 ## Change RLS safely
 

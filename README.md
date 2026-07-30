@@ -33,7 +33,7 @@
 | 내 정보·주최 관리·고객 문의 | 로그인 페이지로 이동 | 가능 |
 | 관리자 화면 | 로그인 페이지로 이동 | 승인된 관리자만 가능 |
 
-로그인이 필요한 화면으로 이동한 비회원은 `/auth/login?next=...`로 안내하며, 로그인 성공 후 검증된 앱 내부 경로로 돌아옵니다.
+로그인이 필요한 화면으로 이동한 비회원은 `/auth/login?next=...&back=...`으로 안내합니다. 로그인 성공 후에는 검증된 `next` 경로로 이동하고, 로그인하지 않고 뒤로 갈 때는 검증된 `back` 경로 또는 봉사활동 목록으로 돌아갑니다.
 
 ---
 
@@ -210,6 +210,7 @@ RPC
   get_public_profiles(profile_ids)
   get_public_review_like_counts(review_ids)
   get_organizer_contact(target_post_id)
+  approve_user(target_user_id)
 ```
 
 ### 테이블별 역할
@@ -322,6 +323,7 @@ RPC
 - `get_public_profiles`: 공개 화면에 필요한 `id`, `username`만 반환
 - `get_public_review_like_counts`: `review_likes` 원본 행 대신 후기별 합계만 반환
 - `get_organizer_contact`: 주최자 본인·승인된 관리자·해당 활동 승인 참여자에게만 연락처 반환
+- `approve_user`: 승인된 관리자만 대상 사용자의 `is_approved`를 변경
 
 ---
 
@@ -345,6 +347,7 @@ RPC
   - 사용자 데이터를 읽지 않고 관련 컬럼 타입, RLS 활성화 여부, 정책 정의, RPC 존재 여부 점검
 - `enable-public-browsing-with-private-contacts.sql`
   - 게시글·후기 공개 조회, 공개 닉네임/좋아요 합계 RPC, `users` 개인정보 제한, 관계 기반 주최자 연락처 RPC 적용
+  - 일반 사용자의 `role`·`is_approved` 변경과 직접 프로필 행 생성을 차단하고 관리자 승인 RPC 적용
 - `allow-post-author-contact.sql`
   - 더 이상 사용하지 않는 이전 정책 안내 파일. 인증 사용자 전체에게 연락처를 열 수 있으므로 적용 금지
 
@@ -364,6 +367,8 @@ npm run verify:public-access
 - 비회원의 `public.users` 원본 조회 차단
 - 공개 닉네임과 후기 좋아요 합계 RPC 동작
 - 비회원의 주최자 연락처 RPC 차단
+- 비회원의 사용자 승인 RPC 차단
+- `authenticated` 역할의 `users.role`, `users.is_approved` 수정 권한 제거
 
 ---
 
