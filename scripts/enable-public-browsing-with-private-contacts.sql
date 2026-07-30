@@ -189,4 +189,53 @@ $function$;
 revoke all on function public.get_organizer_contact(text) from public, anon, authenticated;
 grant execute on function public.get_organizer_contact(text) to authenticated;
 
+-- 일반 사용자는 자신의 프로필 연락 정보만 수정할 수 있고,
+-- role/is_approved는 승인된 관리자 전용 RPC에서만 변경합니다.
+drop policy if exists "users_insert" on public.users;
+drop policy if exists "users_update_admin" on public.users;
+
+revoke insert on public.users from public, anon, authenticated;
+revoke update on public.users from public, anon, authenticated;
+grant update (contact, address, job) on public.users to authenticated;
+
+create or replace function public.approve_user(target_user_id text)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $function$
+declare
+  updated_user_count integer;
+begin
+  if not public.is_approved_admin() then
+    raise exception '승인된 관리자만 사용자를 승인할 수 있습니다.'
+      using errcode = '42501';
+  end if;
+
+  update public.users
+  set is_approved = true
+  where id = target_user_id
+    and is_approved = false;
+
+  get diagnostics updated_user_count = row_count;
+  return updated_user_count > 0;
+end;
+$function$;
+
+revoke all on function public.approve_user(text) from public, anon, authenticated;
+grant execute on function public.approve_user(text) to authenticated;
+
+do $block$
+begin
+  if has_table_privilege('authenticated', 'public.users', 'INSERT')
+    or has_column_privilege('authenticated', 'public.users', 'role', 'UPDATE')
+    or has_column_privilege('authenticated', 'public.users', 'is_approved', 'UPDATE')
+    or has_column_privilege('authenticated', 'public.users', 'email', 'UPDATE')
+    or not has_column_privilege('authenticated', 'public.users', 'contact', 'UPDATE')
+  then
+    raise exception 'users 민감 권한 잠금 검증에 실패했습니다.';
+  end if;
+end;
+$block$;
+
 commit;

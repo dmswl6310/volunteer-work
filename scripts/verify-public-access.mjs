@@ -119,11 +119,23 @@ const anonymousContact = await request(anonKey, '/rest/v1/rpc/get_organizer_cont
   body: JSON.stringify({ target_post_id: firstPost?.id ?? '__verification__' }),
 });
 
+const anonymousApproval = await request(anonKey, '/rest/v1/rpc/approve_user', {
+  method: 'POST',
+  body: JSON.stringify({ target_user_id: '__verification__' }),
+});
+
 assert(
   anonymousContact.status === 401 ||
     anonymousContact.status === 403 ||
     (Array.isArray(anonymousContact.body) && anonymousContact.body.length === 0),
   '비회원이 주최자 연락처 RPC를 사용할 수 있습니다.'
+);
+
+assert(
+  anonymousApproval.status === 401 ||
+    anonymousApproval.status === 403 ||
+    anonymousApproval.status === 404,
+  '비회원이 사용자 승인 RPC를 호출할 수 있습니다.'
 );
 
 console.log(
@@ -135,6 +147,7 @@ console.log(
       publicProfileRpc: firstPost ? 'ok' : 'skipped-no-post',
       publicReviewLikeCountRpc: firstReview ? 'ok' : 'skipped-no-review',
       anonymousOrganizerContact: 'blocked',
+      anonymousUserApproval: 'blocked',
     },
     null,
     2

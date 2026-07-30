@@ -55,6 +55,16 @@ where routine_schema = 'public'
     'get_public_review_like_counts',
     'is_approved_admin',
     'can_read_private_user_profile',
-    'get_organizer_contact'
+    'get_organizer_contact',
+    'approve_user'
   )
 order by routine_name;
+
+select
+  has_table_privilege('authenticated', 'public.users', 'INSERT') as authenticated_users_insert,
+  has_column_privilege('authenticated', 'public.users', 'contact', 'UPDATE') as authenticated_contact_update,
+  has_column_privilege('authenticated', 'public.users', 'address', 'UPDATE') as authenticated_address_update,
+  has_column_privilege('authenticated', 'public.users', 'job', 'UPDATE') as authenticated_job_update,
+  has_column_privilege('authenticated', 'public.users', 'email', 'UPDATE') as authenticated_email_update,
+  has_column_privilege('authenticated', 'public.users', 'role', 'UPDATE') as authenticated_role_update,
+  has_column_privilege('authenticated', 'public.users', 'is_approved', 'UPDATE') as authenticated_approval_update;
