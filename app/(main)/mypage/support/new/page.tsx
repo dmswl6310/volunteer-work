@@ -1,7 +1,10 @@
 ﻿import Link from 'next/link';
 import SupportTicketForm from '@/components/support/SupportTicketForm';
+import { requireApprovedPageUser } from '@/lib/page-auth';
 
-export default function NewSupportTicketPage() {
+export default async function NewSupportTicketPage() {
+  await requireApprovedPageUser('/mypage/support/new');
+
   return (
     <div className="space-y-4">
       <section className="rounded-2xl border border-slate-200/80 bg-white px-5 py-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">

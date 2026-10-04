@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import LogoutButton from '@/components/LogoutButton';
 import { ChevronRight, ExternalLink, MessageSquareText, PencilLine } from 'lucide-react';
+import { requireApprovedPageUser } from '@/lib/page-auth';
 
 const RELEASE_NOTES_URL = 'https://www.notion.so/34378c2336a080438bfad481f935c596';
 
@@ -19,7 +20,9 @@ const SETTINGS_LINKS = [
   },
 ] as const;
 
-export default function MyPageSettingsPage() {
+export default async function MyPageSettingsPage() {
+  await requireApprovedPageUser('/mypage/settings');
+
   return (
     <div className="space-y-4">
       <section className="rounded-3xl border border-slate-200/80 bg-white px-5 py-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">

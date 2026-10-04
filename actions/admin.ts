@@ -20,10 +20,7 @@ export type PendingAdminUser = {
 export async function approveUser(userId: string) {
   try {
     const { supabase } = await requireAdminUser();
-    const { error } = await supabase
-      .from('users')
-      .update({ is_approved: true })
-      .eq('id', userId);
+    const { error } = await supabase.rpc('approve_user', { target_user_id: userId });
 
     if (error) throw error;
     revalidatePath('/admin');

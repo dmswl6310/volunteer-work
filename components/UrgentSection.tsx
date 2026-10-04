@@ -67,7 +67,7 @@ export default async function UrgentSection({ status = 'recruiting' }: { status?
                   </div>
 
                   <div className="flex justify-between items-end text-xs mt-2">
-                    <span className="font-medium text-slate-600">{post.author.username || '익명'}</span>
+                    <span className="font-medium text-slate-600">{post.author?.username || '익명'}</span>
                     <span className="text-slate-400">{post.current_participants}/{post.max_participants}명</span>
                   </div>
                 </div>

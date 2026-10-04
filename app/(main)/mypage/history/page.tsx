@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getMyHistoryPageData } from '@/actions/user';
+import { requireApprovedPageUser } from '@/lib/page-auth';
 
 function parseLimit(limit?: string) {
   const parsed = Number(limit);
@@ -20,6 +21,7 @@ export default async function MyHistoryPage({
 }: {
   searchParams?: Promise<{ completedLimit?: string; scrapLimit?: string; reviewLimit?: string }>;
 }) {
+  await requireApprovedPageUser('/mypage/history');
   const params = await searchParams;
   const completedLimit = parseLimit(params?.completedLimit);
   const scrapLimit = parseLimit(params?.scrapLimit);

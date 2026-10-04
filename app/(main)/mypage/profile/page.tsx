@@ -1,8 +1,10 @@
 import { getMyProfileData } from '@/actions/user';
 import ProfileEditForm from '@/components/ProfileEditForm';
 import LogoutButton from '@/components/LogoutButton';
+import { requireApprovedPageUser } from '@/lib/page-auth';
 
 export default async function MyProfilePage() {
+  await requireApprovedPageUser('/mypage/profile');
   const profile = await getMyProfileData();
 
   return (

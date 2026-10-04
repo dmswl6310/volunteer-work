@@ -3,6 +3,7 @@ import { getMyHostingPageData } from '@/actions/user';
 import AttendanceConfirmationCard from '@/components/AttendanceConfirmationCard';
 import IncomingRequestItem from '@/components/IncomingRequestItem';
 import { getPostStatus } from '@/lib/post-status';
+import { requireApprovedPageUser } from '@/lib/page-auth';
 
 function parseLimit(limit?: string) {
   const parsed = Number(limit);
@@ -18,6 +19,7 @@ function parseTab(tab?: string): HostingTab {
 }
 
 export default async function MyHostingPage({ searchParams }: { searchParams?: Promise<{ limit?: string; tab?: string }> }) {
+  await requireApprovedPageUser('/mypage/hosting');
   const params = await searchParams;
   const limit = parseLimit(params?.limit);
   const tab = parseTab(params?.tab);

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Volunteer Platform Maintenance"
+  short_description: "Safely maintain volunteer auth, privacy, and RLS"
+  default_prompt: "Use $volunteer-platform-maintenance to safely update authentication, RLS, and public access in this repository."

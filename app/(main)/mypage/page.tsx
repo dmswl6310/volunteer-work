@@ -2,12 +2,14 @@
 import { getMyApplicationsPageData } from '@/actions/user';
 import CancelApplicationButton from '@/components/CancelApplicationButton';
 import StatusBadge from '@/components/StatusBadge';
+import { requireApprovedPageUser } from '@/lib/page-auth';
 
 function formatDate(dateValue?: string | null) {
   return dateValue ? new Date(dateValue).toLocaleDateString() : '-';
 }
 
 export default async function MyPagePage() {
+  await requireApprovedPageUser('/mypage');
   const { activeApplications, completedActivities } = await getMyApplicationsPageData();
   const visibleActiveApplications = activeApplications.slice(0, 5);
   const visibleCompletedActivities = completedActivities.slice(0, 5);

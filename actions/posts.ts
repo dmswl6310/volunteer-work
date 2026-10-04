@@ -1,6 +1,9 @@
 'use server';
 
 import { createServerSupabaseClient } from '@/lib/supabase';
+import { getPublicProfileMap } from '@/lib/public-data';
+
+const PUBLIC_POST_FIELDS = 'id, title, content, image_url, category, max_participants, volunteer_hours, current_participants, is_urgent, is_recruiting, due_date, views, scraps, created_at, author_id';
 
 export type PostWithAuthor = {
   id: string;
@@ -20,9 +23,23 @@ export type PostWithAuthor = {
   author_id: string;
   author: {
     username: string;
-    contact?: string | null;
   } | null;
 };
+
+type PublicPostRow = Omit<PostWithAuthor, 'author'>;
+
+async function attachPublicAuthors(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  rows: PublicPostRow[]
+): Promise<PostWithAuthor[]> {
+  const profiles = await getPublicProfileMap(supabase, rows.map((post) => post.author_id));
+  return rows.map((post) => ({
+    ...post,
+    author: profiles.has(post.author_id)
+      ? { username: profiles.get(post.author_id)?.username ?? '익명' }
+      : null,
+  }));
+}
 
 /**
  * 게시글 목록을 페이지네이션, 정렬, 필터링 조건에 따라 조회합니다.
@@ -59,7 +76,7 @@ export async function getPosts({
     const supabase = await createServerSupabaseClient();
     let query = supabase
       .from('posts')
-      .select('*, author:users(username)')
+      .select(PUBLIC_POST_FIELDS)
       .range(from, to);
 
     if (category) {
@@ -86,8 +103,10 @@ export async function getPosts({
     const { data: posts, error } = await query;
     if (error) throw error;
 
+    const publicPosts = await attachPublicAuthors(supabase, (posts ?? []) as PublicPostRow[]);
+
     return {
-      posts: (posts ?? []) as PostWithAuthor[],
+      posts: publicPosts,
       nextId: (posts?.length ?? 0) === limit ? page + 1 : null,
     };
   } catch (error) {
@@ -108,7 +127,7 @@ export async function getUrgentPosts(status: 'recruiting' | 'closed' | 'all' = '
     
     let query = supabase
       .from('posts')
-      .select('*, author:users(username)')
+      .select(PUBLIC_POST_FIELDS)
       .eq('is_urgent', true)
       .order('created_at', { ascending: false })
       .limit(10);
@@ -121,7 +140,7 @@ export async function getUrgentPosts(status: 'recruiting' | 'closed' | 'all' = '
 
     const { data, error } = await query;
     if (error) throw error;
-    return data ?? [];
+    return attachPublicAuthors(supabase, (data ?? []) as PublicPostRow[]);
   } catch (error) {
     console.error('Error fetching urgent posts:', error);
     return [];

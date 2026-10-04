@@ -21,6 +21,25 @@ export async function requireAuthenticatedUser() {
   return { supabase, user };
 }
 
+export async function getOptionalApprovedUser() {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  const { data: profile, error } = await supabase
+    .from('users')
+    .select('id, role, is_approved, email, username')
+    .eq('id', user.id)
+    .maybeSingle<UserProfile>();
+
+  if (error || !profile?.is_approved) return null;
+
+  return { supabase, user, profile };
+}
+
 export async function requireApprovedUser() {
   const { supabase, user } = await requireAuthenticatedUser();
   const { data: profile, error } = await supabase
