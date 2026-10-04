@@ -333,6 +333,11 @@ RPC
 
 - `fix-signup-auth-sync.sql`
   - `auth.users`와 `public.users` 동기화 트리거 보정
+  - 신규 계정의 권한은 메타데이터와 무관하게 `role = 'user'`, `is_approved = false`, `points = 0`으로 고정합니다. 기존 프로필과 충돌할 때 권한·승인·포인트를 변경하지 않습니다.
+  - 운영 반영: Supabase SQL Editor 또는 관리 권한이 있는 PostgreSQL 연결에서 전체 스크립트를 실행해야 합니다. 코드 배포만으로 DB 트리거는 변경되지 않습니다. 적용 전 실제 컬럼 타입과 트리거 정의를 확인하고 적용 후 함수 정의·ACL을 확인하세요.
+  - 기존 계정은 자동으로 변경하지 않습니다. 의심스러운 관리자·승인 계정과 포인트는 실제 승인 및 포인트 지급 기록과 대조해야 합니다.
+- `test-signup-trigger.sql`
+  - 격리된 PostgreSQL 테스트 DB에서 위 스크립트를 적용한 뒤 실행하는 롤백형 회귀 테스트입니다. 관리자 메타데이터, 잘못된 타입, 기존 계정 권한 보존을 확인합니다. 운영 DB용 테스트가 아닙니다.
 - `add-points-and-attendance.sql`
   - 포인트 / 참석 처리 컬럼 및 `point_transactions` / RPC 추가
 - `finalize-attendance-processing.sql`
