@@ -365,8 +365,6 @@ export async function registerUser(input: RegisterUserParams): Promise<RegisterU
         contact: input.contact,
         address: trimmedAddress,
         job: trimmedJob,
-        role: 'user',
-        is_approved: false,
         email: normalizedEmail,
       },
     });

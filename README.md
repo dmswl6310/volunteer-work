@@ -5,11 +5,16 @@
 
 ---
 
-## 화면 미리보기
+## 주요 화면
 
-| 게시판 | 게시글 상세 | 마이페이지 | 관리자 |
-|:---:|:---:|:---:|:---:|
-| ![board](public/screenshots/board.png) | ![detail](public/screenshots/detail.png) | ![mypage](public/screenshots/mypage.png) | ![admin](public/screenshots/admin.png) |
+| 화면 | 경로 | 용도 |
+|------|------|------|
+| 봉사활동 게시판 | `/board` | 모집글 검색, 필터, 긴급 모집 확인 |
+| 봉사활동 상세 | `/board/[id]` | 모집 정보 확인, 신청, 스크랩 |
+| 후기 | `/reviews` | 참여 후기 탐색, 좋아요 |
+| 내 정보 | `/mypage` | 신청·주최·활동 기록·포인트 관리 |
+| 관리자 | `/admin` | 신규 회원 승인, 고객 문의 처리 |
+| 앱 설치 안내 | `/qr` | QR 코드와 Android·iPhone 홈 화면 추가 안내 |
 
 ---
 
@@ -94,6 +99,9 @@
 - Pull to Refresh
 - 상단 로딩 바
 - 고객 문의 등록 시 이메일 알림 전송 지원
+- `/qr`에서 Android Chrome·iPhone Safari 홈 화면 추가 안내
+- 게시판 홍보 배너 캐러셀과 터치 스와이프
+- 회원가입 닉네임, 모집글 제목·내용, 후기의 부적절한 표현 검사
 
 ---
 
@@ -333,6 +341,11 @@ RPC
 
 - `fix-signup-auth-sync.sql`
   - `auth.users`와 `public.users` 동기화 트리거 보정
+  - 신규 계정의 권한은 메타데이터와 무관하게 `role = 'user'`, `is_approved = false`, `points = 0`으로 고정합니다. 기존 프로필과 충돌할 때 권한·승인·포인트를 변경하지 않습니다.
+  - 운영 반영: Supabase SQL Editor 또는 관리 권한이 있는 PostgreSQL 연결에서 전체 스크립트를 실행해야 합니다. 코드 배포만으로 DB 트리거는 변경되지 않습니다. 적용 전 실제 컬럼 타입과 트리거 정의를 확인하고 적용 후 함수 정의·ACL을 확인하세요.
+  - 기존 계정은 자동으로 변경하지 않습니다. 의심스러운 관리자·승인 계정과 포인트는 실제 승인 및 포인트 지급 기록과 대조해야 합니다.
+- `test-signup-trigger.sql`
+  - 격리된 PostgreSQL 테스트 DB에서 위 스크립트를 적용한 뒤 실행하는 롤백형 회귀 테스트입니다. 관리자 메타데이터, 잘못된 타입, 기존 계정 권한 보존을 확인합니다. 운영 DB용 테스트가 아닙니다.
 - `add-points-and-attendance.sql`
   - 포인트 / 참석 처리 컬럼 및 `point_transactions` / RPC 추가
 - `finalize-attendance-processing.sql`
@@ -378,6 +391,8 @@ npm run verify:public-access
 app/
 ├─ layout.tsx                     # 루트 레이아웃, 메타데이터, PWA/서비스워커 등록
 ├─ globals.css
+├─ qr/page.tsx                    # QR 코드 및 PWA 설치 안내
+├─ opengraph-image.tsx            # 공유 미리보기 이미지
 ├─ auth/
 │  ├─ login/page.tsx              # 로그인
 │  └─ signup/                     # 3단계 회원가입
@@ -391,6 +406,7 @@ app/
 │
 actions/
 ├─ auth.ts                        # 회원가입, 이메일/닉네임 중복 확인
+├─ scrap.ts                       # 게시글 스크랩
 ├─ posts.ts                       # 게시글 목록 조회
 ├─ get-post.ts                    # 게시글 상세 조회
 ├─ create-post.ts                 # 게시글 작성
@@ -414,6 +430,7 @@ components/
 ├─ ToastProvider.tsx
 ├─ BottomNav.tsx
 ├─ LoginGateLink.tsx
+├─ PromoCarousel.tsx
 ├─ PullToRefresh.tsx
 └─ support/
    ├─ SupportTicketForm.tsx
@@ -425,6 +442,7 @@ lib/
 ├─ auth-navigation.ts             # 안전한 로그인 후 복귀 경로 처리
 ├─ page-auth.ts                   # 보호 페이지 리다이렉트
 ├─ public-data.ts                 # 공개 프로필/후기 집계 RPC 헬퍼
+├─ profanity.ts                   # 부적절한 표현 검사
 ├─ support.ts                     # 문의 타입/상태 정의
 ├─ post-status.ts
 ├─ date-kst.ts
@@ -445,6 +463,8 @@ tests/
 
 ## 실행 방법
 
+Node.js 20 이상과 npm, 연결할 Supabase 프로젝트가 필요합니다. 봉사활동 목록과 인증 기능은 실제 Supabase 데이터 및 설정을 사용합니다.
+
 ### 1. 의존성 설치
 
 ```bash
@@ -453,11 +473,16 @@ npm install
 
 ### 2. 환경 변수 설정
 
-코드에서 직접 확인되는 환경 변수는 아래와 같습니다.
+저장소 루트에 `.env.local`을 직접 만들고 아래 값을 설정합니다. 현재 저장소에는 `.env.example`이 없습니다.
 
-```bash
-cp .env.example .env.local
+```dotenv
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVER_ONLY_SERVICE_ROLE_KEY
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
+
+서비스 역할 키는 서버 전용 값입니다. `NEXT_PUBLIC_` 접두사를 붙이거나 저장소에 커밋하지 않습니다.
 
 #### 기본 실행에 필요한 값
 - `NEXT_PUBLIC_SUPABASE_URL`
@@ -488,6 +513,8 @@ cp .env.example .env.local
 npm run dev
 ```
 
+브라우저에서 `http://127.0.0.1:3000`에 접속합니다. 루트 경로는 봉사활동 게시판으로 이동합니다.
+
 ### 4. 프로덕션 빌드
 
 ```bash
@@ -510,10 +537,43 @@ npm run test:e2e:headed
 npm run verify:public-access
 ```
 
-### 참고
-- E2E 테스트는 Playwright 설정을 사용합니다.
-- `playwright.config.ts` 기준으로 개발 서버는 `127.0.0.1:3001`에서 실행됩니다.
-- `verify:public-access`는 `.env.local`의 Supabase URL, 익명 키, 서비스 역할 키를 사용하지만 키나 개인정보를 출력하지 않습니다.
+### 테스트 실행
+
+처음 E2E 테스트를 실행할 때 Chromium을 설치합니다.
+
+```bash
+npx playwright install chromium
+npm run lint
+npm run typecheck
+npm run test:e2e
+```
+
+`playwright.config.ts`가 `127.0.0.1:3001`에서 개발 서버를 시작합니다. 같은 주소에 서버가 실행 중이면 재사용합니다.
+
+| 테스트 파일 | 검증 범위 |
+|-------------|-----------|
+| `auth-and-privacy.spec.ts` | 공개 탐색, 로그인·회원가입 화면, 보호 경로, 연락처 노출 |
+| `authenticated-flows.spec.ts` | 로그인한 사용자와 관리자의 기능 흐름 |
+| `mypage-navigation.spec.ts` | 로그인 후 마이페이지 이동 |
+
+인증 테스트에는 승인된 관리자와 일반 회원의 테스트 계정이 필요합니다. 다음 환경 변수가 없으면 해당 테스트 묶음은 건너뜁니다.
+
+```dotenv
+E2E_ADMIN_EMAIL=YOUR_TEST_ADMIN_EMAIL
+E2E_ADMIN_PASSWORD=YOUR_TEST_ADMIN_PASSWORD
+E2E_USER_EMAIL=YOUR_TEST_USER_EMAIL
+E2E_USER_PASSWORD=YOUR_TEST_USER_PASSWORD
+```
+
+위 값은 실행 셸에 설정하거나 `.env.local`에 추가한 뒤 아래 명령으로 불러옵니다. Playwright 설정은 `.env.local`을 직접 로드하지 않습니다.
+
+```bash
+node --env-file=.env.local node_modules/@playwright/test/cli.js test
+```
+
+게시글 상세 검증에는 조회 가능한 게시글이 필요합니다. Supabase 연결이 끊겼거나 테스트 데이터가 없으면 관련 검사가 실패할 수 있습니다.
+
+`npm run verify:public-access`는 `.env.local`의 Supabase URL, 익명 키, 서비스 역할 키를 사용해 원격 접근 범위를 검사하며 키나 개인정보를 출력하지 않습니다.
 
 ---
 
@@ -522,36 +582,30 @@ npm run verify:public-access
 ### 관리자 계정 생성
 
 ```bash
-npx tsx scripts/create-admin.ts
+npx tsx --env-file=.env.local scripts/create-admin.ts
 ```
 
 ### 더미 게시글 생성
 
 ```bash
-npx tsx scripts/seed-posts.ts
+npx tsx --env-file=.env.local scripts/seed-posts.ts
 ```
 
 ### 비관리자 데이터 정리
 
 ```bash
-npx tsx scripts/cleanup-db.ts
+npx tsx --env-file=.env.local scripts/cleanup-db.ts
 ```
 
-> 위 스크립트들은 Supabase 서비스 키 기반으로 동작하므로 운영 환경에서는 주의해서 사용해야 합니다.
+`tsx`는 현재 개발 의존성에 포함되어 있지 않아 최초 실행 시 `npx`가 설치를 요청할 수 있습니다. 관리자 생성에는 위의 `ADMIN_*` 환경 변수와 서비스 역할 키가 필요합니다. 시드·정리 스크립트는 서비스 역할 키가 없으면 익명 키를 사용하므로 RLS에 따라 실패할 수 있습니다. 특히 정리 스크립트는 데이터를 삭제하므로 대상 프로젝트를 확인하고 실행합니다.
 
 ---
 
-## 현재 문서가 다루는 범위
+## 모바일 앱 설치
 
-이 README는 저장소에 실제로 존재하는 코드와 SQL 스크립트를 기준으로 작성되었습니다.
+별도 앱 스토어 설치 없이 브라우저에서 홈 화면에 추가해 사용할 수 있습니다. `/qr` 화면에서 QR 코드와 기기별 안내를 확인할 수 있습니다.
 
-- 게시글 / 신청 / 후기 / 스크랩 / 포인트 / 고객 문의 / 관리자 승인 흐름 반영
-- Supabase 기반 인증 및 PostgreSQL 구조 반영
-- `scripts/`에 있는 운영 SQL 반영
-- 실제 `package.json` 스크립트와 Playwright 설정 반영
+- Android: Chrome에서 사이트를 열고 메뉴의 **홈 화면에 추가** 선택
+- iPhone: Safari에서 사이트를 열고 공유 메뉴의 **홈 화면에 추가** 선택
 
-추가로 원하시면 다음도 정리해드릴 수 있습니다.
-- ERD 스타일 DB 다이어그램
-- 기능별 화면 흐름도
-- 배포 체크리스트
-- 테이블/액션 기준 API-like 문서
+서비스 워커와 오프라인 상태 안내를 제공합니다. 회원가입, 신청, 데이터 조회 등 서버와 통신하는 기능은 인터넷 연결이 필요합니다.
